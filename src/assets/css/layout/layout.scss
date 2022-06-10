@@ -1,0 +1,547 @@
+// screen layout
+$content-scroll-flag : 1536px;
+
+#app {
+  height: 100%;
+  overflow-x:auto ;
+  .mode {
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    background-color: nth($clrs-achromatic, 2);
+    color: #fff;
+    z-index: 10000;
+    font-size: 12px;
+    padding: 5px 10px;
+    opacity: 0.8;
+  }
+}
+
+#main {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  min-width: $content-scroll-flag; 
+}
+
+.wrap {
+  position: relative;
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+
+  .content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 8px;
+    box-sizing: border-box;
+    background-color: nth($clrs-achromatic, 7);
+    transition: all 0.1s;
+    overflow-x: auto;
+
+    .content_body {
+      position: relative;
+      flex: 1;
+      border-top: 1px solid nth($clrs-border, 3);
+      background-color: nth($clrs-achromatic, 9);
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 2;
+
+      &.border-blue {
+        border: 2px solid nth($clrs-base, 9);
+      }
+
+      [class^=container] {
+        padding-right: var(--bs-gutter-x);
+        padding-left: var(--bs-gutter-x);
+      }
+    }
+  }
+}
+
+// 테이블 타입의 필드
+.fields-grid{
+  width: 100% ;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+
+  column-gap: var( --col-gap, 6px );
+  row-gap: var( --row-gap, 10px ) ;
+
+  .field {
+    &.tit{
+      .txt-dot-square{
+        height:24px ; 
+      }
+    }
+    &.desc{
+      .ow-textarea{
+        vertical-align: top ;
+      }
+    }
+  }
+}
+
+.fields {
+  $gap: var(--gap, 4px);
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: $gap;
+  flex-wrap: nowrap;
+  align-items: center;
+
+  // field 일정한 간격으로 배치
+  &.fields-between{
+    justify-content: space-between;
+  }
+
+  &.fields-align-top{
+    align-items: flex-start;
+  }
+
+  > .field {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--innergap, 0px);
+
+    // 고정 사이즈
+    &.field-size-fix {
+      flex: 0 0 var(--width, 100px);
+    }
+    // 유동 사이즈 (컨텐츠 사이즈 만큼 차지)
+    &.field-size-fluid {
+      flex: 0 0 auto;
+    }
+    // 우측 정렬 고정
+    &.field-align-end {
+      margin-left: auto;
+      flex: 0 0 var(--width, auto);
+    }
+
+    &.field-hoz-align-top {
+      align-self: flex-start;
+    }
+    &.field-hoz-align-bottom {
+      align-self: flex-end;
+    }
+    // 우측 하단 정렬
+    &.field-align-right-bottom{
+      margin-left: auto;
+      margin-top: auto;
+      flex: 0 0 var(--width, auto);
+    }
+    // 가운데 정렬
+    &.field-align-center {
+      justify-content: center;
+    }
+    // 아이템 방향 column
+    &.field-dir-col{
+      flex-direction: column;
+    }
+    // 필드 내 제목 텍스트
+    .title-field {
+      flex: 0 0 auto;
+    }
+    &.field-position-right {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+    }
+
+    &.field-position-left {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+    }
+    &.field-btns{
+      gap:4px ; 
+    }
+  }
+  & + & {
+    margin-top: 10px;
+  }
+  &.fields-popup-title, &.fields-popup-top-form {
+    margin-bottom: 10px;
+  }
+
+  // 상단 입력양식 필드 블럭
+  @at-root .fields-wrap-repeat {
+    display: grid;
+    grid-template-columns: repeat(var(--col, 4), 1fr);
+    grid-template-rows: repeat(var(--row, 2), 1fr);
+    padding: 12px 8px;
+    background-color: #f3f3f3;
+    gap: 5px 5%;
+    .fields {
+      margin-top: 0;
+    }
+  }
+}
+
+.ow-flex-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: var(--wrap ,nowrap);
+  gap: var(--gap, 4px);
+  width: 100%;  
+  padding-top: var(--padding-top, 0);
+  height:var(--wrap-height, auto) ; 
+  padding:var(--wrap-padding, 0 ) ; 
+  // padding-top: var(--padding-top, 0);
+  // align-items: var(--align-item, center);
+  
+  // 아이템 column 방향으로 지정 기본은 방향은 row
+  &.dir-col{ flex-direction: column; }
+
+  // 컨테이너 영역 높이 100% 지정
+  &.size-full{ height: 100%; }
+
+  // 일정한 간격으로 정렬
+  &.items-between{ justify-content: space-between; }
+
+  // 상단으로 수직 정렬
+  &.items-y-top{ align-items: flex-start; }
+
+  &.item-size-content { // 하위 item 사이즈 컨텐츠만큼만 적용
+    > .item { flex : 0 0 auto }
+  }
+
+  // 아이템 사이즈가 균등하게 공간을 차지
+  .size-fluid{ flex: 1 1 var(--size, 0);  background-color: var(--bg, #fff); }
+
+  // 아이템 사이즈가 자신의 컨텐츠 크기만큼만 차지
+  .size-fix{ flex: 0 0 var(--size, auto) !important;  background-color: var(--bg, #fff); }
+
+  .item{
+    display: flex;
+    gap: var(--gap-item, 0px);
+    flex: 1;
+    align-items: var(--align-item, center);
+    // 단락을 구분지어주는 라인
+    &-bar{
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 1px;
+      margin: 0 var(--gap-bar, 4px);
+      &:after{
+        content: "";
+        display: inline-flex;
+        width: 100%; height: 21px;
+        background-color: #c3cbd4;
+      }
+      &.size-small::after{
+        width: 100%;height: 12px;
+        background-color: #c9c9c9;
+      }
+
+      &.dir-col{ flex-direction: column; }
+      &.dir-row{ flex-direction: row ; }
+    }
+
+    &.dir-col{ flex-direction: column; }
+    &.dir-row{ flex-direction: row ; }
+
+    &.align-y-start{ align-items: flex-start; }
+    &.align-y-center{ align-items: center; }
+    &.align-y-end{ align-items: flex-end; }
+
+    &.align-x-start{ justify-content: flex-start; }
+    &.align-x-center{ justify-content: center; }
+    &.align-x-end{ justify-content: flex-end; }
+
+    &.align-to-right { margin-left: auto; flex: 0 0 var(--width, auto); }
+
+    // 필드 내 제목 텍스트
+    .item-title { flex: 0 0 auto; }
+    
+    // 아이템 포지션 좌우 정렬
+    &.pos-right,
+    &.pos-left{ position: absolute; top: 0; height: 100%;}
+    &.pos-right { right: 0; }
+    &.pos-left { left: 0; }
+
+    // 아이템 내부 버튼영역 간격
+    &.item-btns{ gap:4px ; }
+
+    &.bg-round{
+      padding-left: 10px ; 
+      border-top-left-radius: 12px ;
+      border-bottom-left-radius: 12px ;
+      background-color: var(--clr-bg, #cfddf2);
+    }
+
+    &.has-grid {
+      flex: 1 1 0px;
+      height: 100% ;
+      flex-direction: column; 
+    }
+    &.item-ribbon{
+      flex:0 0 auto ; 
+      height: 44px;
+    }
+  }
+
+
+  // 입력필드 정렬 타입
+  &.fields{
+    // position: relative;
+    // flex-direction: row;
+    // flex-wrap: nowrap;
+    // align-items: center;
+
+    > .item{
+      flex: 1;
+      align-items: center;
+
+      // 아이템 수평 정렬 
+      &.item-align-end {
+        margin-left: auto;
+        flex: 0 0 var(--width, auto);
+      }
+    }
+
+    & + & {
+      margin-top: 10px;
+    }
+    &.fields-popup-title, &.fields-popup-top-form {
+      margin-bottom: 10px;
+    }
+
+    // 상단 입력양식 필드 블럭
+    @at-root .fields-wrap-repeat {
+      display: grid;
+      grid-template-columns: repeat(var(--col, 4), 1fr);
+      grid-template-rows: repeat(var(--row, 2), 1fr);
+      padding: 12px 8px;
+      background-color: #f3f3f3;
+      gap: 5px 5%;
+      .fields {
+        margin-top: 0;
+      }
+    }
+  }
+
+  // 컨텐츠영역 분할 타입
+  &.splits{
+    border: 1px solid blue;
+    height: 100%;
+
+    > .item{ flex: 1; }
+    > .size-fix, 
+    > .size-fluid{ flex-direction: column; }
+    > .size-fluid.scroll{ overflow-y: auto; }
+  }
+
+  // 배경이 있는 플렉스 박스
+  // type 1
+  &.has-bg-type-1 {
+    height: 30px ; 
+    padding:0 20px ;
+    background-color: #cfddf2;
+    border-radius : 14px ; 
+    .item { background-color: transparent ; }
+  }
+  // type 2
+  &.has-bg-type-2 {
+    height: 40px ; 
+    padding:0 8px ;
+    background-color: #f1f5f9;
+    border-radius : 2px ; 
+    .item { background-color: transparent ; }
+    .pos-right{ right : var( --has-bg-side-pd, 8px )}
+  }
+
+  &.has-bg {
+    height: var( --has-bg-height , 30px ); 
+    padding:0 var( --has-bg-side-pd , 20px ) ;
+    background-color: var( --has-bg-clr , #cfddf2 );
+    border-radius : var( --has-bg-radius, 14px ); 
+    .item { background-color: transparent ; }
+    .pos-right{ right : var( --has-bg-side-pd, 20px )}
+  }
+  
+}
+
+.lst-data-label {
+  display: flex;
+  li {
+    position: relative;
+    padding: 0 6px;
+    font-size: 12px;
+    letter-spacing: -1px;
+    color: nth($clrs-achromatic, 2);
+    font-weight: 700;
+    &:first-child {
+      padding-left: 0;
+    }
+    &:not(:last-child):after {
+      content: "";
+      display: inline-flex;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 12px;
+      background-color: #c9c9c9;
+    }
+    span {
+      display: inline-flex;
+      margin-left: 5px;
+    }
+  }
+}
+
+.fields-form-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: var(--gap, 6px);
+  padding: 10px;
+  background-color: #f3f3f3;
+  border-radius: 2px ;
+  .fields {
+    width: 100%;
+    margin-top: 0;
+    // align-items: flex-start;
+
+    > .field{
+      min-height: 26px;
+      // flex: 0 0 auto;
+      gap: var(--innergap, 6px);
+      align-items: initial;
+
+      .title-field-wrap, 
+      .input-field-wrap{
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .input-field-wrap{
+        flex : 1; 
+      }
+
+      .title-field-wrap{
+        justify-content: space-around;
+      }
+
+      .field-col-wrap{
+        display: flex;
+        gap: var(--innergap, 6px);
+        &.none-title{
+          height: 24px;
+        }
+      }
+
+    }
+
+  }
+  &.type-has-label{
+    border: 1px solid #e0e0e0 ; 
+    padding-top:8px ;
+  }
+  &.bdb-none {
+    border-bottom: 0 ;
+  }
+}
+
+.form-group-field {
+  display: flex;
+  flex:1 1 auto ; 
+  gap: var(--gap, 2px);
+  align-items: center;
+}
+
+// 타이틀 들어가는 그리드박스
+.ow-panel-grid{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: var(--gap, 8px);
+  background-color: #f3f3f3;
+  height: 100%;
+  border-radius: 0;
+  padding: 8px 0 0 0;
+  border: 1px solid #e0e0e0;
+  
+  .fields-label{ 
+    flex: 0 0 auto; 
+    margin-left: 0;
+  }
+  .ow-panel-fluid{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .ow-panel-fix{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 0;
+    padding: 7px 10px 15px;
+  }
+}
+
+// 컨텐츠 내부 레이아웃
+.ow-container {
+  display: grid;
+  grid-template-columns: repeat(var(--col, 1), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--row, 1), minmax(0, 1fr));
+  gap: var(--gap-container, 4px);
+  height: 100%;
+
+  @mixin grid-set( $direction, $count ){
+    @if $direction == 'col'{
+      @if $count == 2 { grid-template-columns: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) }
+      @else if $count == 3 { grid-template-columns: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) minmax(0, var(--size-3, 1fr)); }
+      @else if $count == 4 { grid-template-columns: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) minmax(0, var(--size-3, 1fr)) minmax(0, var(--size-4, 1fr)); }
+      @else if $count == 5 { grid-template-columns: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) minmax(0, var(--size-3, 1fr)) minmax(0, var(--size-4, 1fr)) minmax(0, var(--size-5, 1fr)); }
+      @else if $count == 6 { grid-template-columns: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) minmax(0, var(--size-3, 1fr)) minmax(0, var(--size-4, 1fr)) minmax(0, var(--size-5, 1fr)) minmax(0, var(--size-6, 1fr)); }
+    }@else if $direction == 'row'{
+      @if $count == 2 { grid-template-rows: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)); }
+      @else if $count == 3 { grid-template-rows: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) minmax(0, var(--size-3, 1fr)); }
+      @else if $count == 4 { grid-template-rows: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) minmax(0, var(--size-3, 1fr)) minmax(0, var(--size-4, 1fr)); }
+      @else if $count == 5 { grid-template-rows: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) minmax(0, var(--size-3, 1fr)) minmax(0, var(--size-4, 1fr)) minmax(0, var(--size-5, 1fr)); }
+      @else if $count == 6 { grid-template-rows: minmax(0, var(--size-1, 1fr)) minmax(0, var(--size-2, 1fr)) minmax(0, var(--size-3, 1fr)) minmax(0, var(--size-4, 1fr)) minmax(0, var(--size-5, 1fr)) minmax(0, var(--size-6, 1fr)); }
+    }
+  };
+
+  // 그리드 columns
+  &.col-2-set{ @include grid-set('col', 2); }
+  &.col-3-set{ @include grid-set('col', 3); }
+  &.col-4-set{ @include grid-set('col', 4); }
+  &.col-5-set{ @include grid-set('col', 5); }
+  &.col-6-set{ @include grid-set('col', 6); }
+
+  // 그리드 rows
+  &.row-2-set{ @include grid-set('row', 2); }
+  &.row-3-set{ @include grid-set('row', 3); }
+  &.row-4-set{ @include grid-set('row', 4); }
+  &.row-5-set{ @include grid-set('row', 5); }
+  &.row-6-set{ @include grid-set('row', 6); }
+
+  .ow-content {
+    padding: var(--bs-gutter);
+    gap: calc(var(--bs-gutter) * .5);
+    background-color: var(--bg, #fff);
+  }
+}
+
+// scroll box
+.ow-scroll-wrap {
+  padding:8px ; 
+  overflow-y: auto;
+  height:var(--height,300px) ; 
+  @include border(1px, #ccc);
+}

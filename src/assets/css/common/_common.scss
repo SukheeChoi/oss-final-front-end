@@ -1,0 +1,321 @@
+// Form Component 그룹
+$clrs-achromatic: getColors("achromatic");
+$clrs-base: getColors("base");
+
+/* 제목 */
+h1 { font-size: 15px; font-weight: 700; }
+h2 { font-size: 14px; font-weight: 700; }
+h3 { font-size: 13px; font-weight: 700; }
+h4 { font-size: 12px; font-weight: 700; }
+.title-field {
+  display: inline-flex;
+  font-weight: 700;
+  font-size: 13px;
+  color: nth($clrs-achromatic, 2);
+  letter-spacing: -1px;
+  align-items: center;
+  margin-right: var(--mr-title, 0) ;
+  white-space:nowrap ; 
+  &.normal{
+    font: { weight: normal; size: 12px; }
+  }
+}
+// item-title(flex layout sample 제목용)
+.item-title{ @extend .title-field; }
+
+.title-content {
+  display: inline-flex;
+  font-weight: 700;
+  font-size: 14px;
+  line-height:20px ; 
+  color: nth($clrs-achromatic, 2);
+  letter-spacing: -0.7px;
+  align-items: center;
+  @at-root .ow-flex-wrap & { 
+    margin-bottom: 10px ;
+  }
+}
+.title-field-popup {
+  display: inline-flex;
+  font-weight: 700;
+  font-size: 14px;
+  color: nth($clrs-achromatic, 2);
+  letter-spacing: -0.7px;
+  align-items: center;
+}
+.title-side-info {
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 400;
+  align-self: flex-end;
+  letter-spacing: -1px;
+  strong {
+    font-weight: 700;
+  }
+}
+.desc-field {
+  display: inline-flex;
+  font-size: 12px;
+  color: nth($clrs-achromatic, 2);
+  letter-spacing: -1px;
+}
+// 텍스트앞에 dot 추가
+.txt-dot-square {
+  display: flex;
+  position: relative;
+  font-size: 13px;
+  font-weight: 700;
+  color: nth($clrs-achromatic, 2);
+  letter-spacing: -1px;
+  align-items: center;
+  &:before {
+    content: "";
+    display: inline-flex;
+    width: 4px;
+    height: 4px;
+    margin-right: 4px;
+    background-color: nth($clrs-achromatic, 2);
+  }
+  &.gray:before{
+    background-color: #b9bdc2;
+  }
+  &.blue:before{
+    background-color: #3860b6;
+  }
+}
+// 필수입력
+.txt-sign-required {
+  display: inline-flex;
+  color: nth($clrs-achromatic, 1);
+  font-size: 12px;
+  align-items: center;
+  &:before {
+    content: "";
+    display: inline-flex;
+    width: 8px;
+    height: 8px;
+    margin-right: 2px;
+    background: url(~@/assets/images/icon/icon-required.svg) no-repeat 0 0;
+  }
+}
+// 타이틀 우측 추가정보 리스트
+.lst-side-info {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  letter-spacing: -1px;
+  color: nth($clrs-achromatic, 2);
+  gap: var(--lstgap, 6px);
+  .value {
+    display: inline-flex;
+    margin-left: 5px;
+  }
+  strong {
+    font-weight: 700;
+  }
+}
+
+// 구분 라인
+.bar-sep {
+  display: inline-flex;
+  width: 1px;
+  justify-content: center;
+  align-items: center;
+  margin: 0 var(--col-margin, 0);
+  &:after {
+    content: "";
+    display: inline-flex;
+    width: 100%;
+    height: 21px;
+    background-color: #c3cbd4;
+  }
+  &.sm {
+    width: 1px;
+    &:after {
+      width: 100%;
+      height: 12px;
+      background-color: #c9c9c9;
+    }
+  }
+  &.xsm {
+    width: 1px;
+    &:after {
+      width: 100%;
+      height: 10px;
+      background-color: #c3cbd4;
+    }
+  }
+}
+
+// 컨텐츠 구분선
+.line-split{
+  $color-border : #d7dce3 ; 
+  &-right {border-right: 1px solid $color-border;}
+  &-left {border-left: 1px solid $color-border;}
+  &-bottom {border-bottom: 1px solid $color-border;}
+  &-top {border-top: 1px solid $color-border;}
+}
+
+// gap만 주기위한 박스입니다. (예. 여러 버튼들 있는 경우 사이 여백 줄 경우 )
+.bx-gap {
+  display: flex;
+  gap : var( --gap, 2px ) ; 
+}
+
+// 폼 그룹 박스 내 제목
+.fields-label {
+  display: inline-flex;
+  width: max-content ;
+  align-items: center ;
+  height: 28px;
+  padding: 0 10px;
+  background-color: #cfddf2;
+  color: nth($clrs-achromatic, 2);
+  font-size:12px; 
+  letter-spacing: -.6px; 
+  font-weight: 700 ;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  margin-left: -10px ;
+}
+
+// 테이블 형태의 필드
+.fields-table{
+  width: 100% ;
+  display: table ;
+  table-layout: fixed ;
+  border : 2px solid red; 
+  .fields {
+    width: 100% ;
+    display:table-row ; 
+    .field {
+      display:table-cell ; 
+      border: 1px solid #eee ; 
+      &.field-th {
+        padding-right: 6px ;
+      }
+    }
+  }
+}
+
+// 게시판 댓글
+.ct-board-comment {
+  .head-board-comment {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e6ec;
+    .count-comment {
+      color: nth($clrs-base, 2);
+    }
+  }
+}
+
+// 게시판 댓글 작성
+.bx-comment {
+  position: relative;
+  display: flex;
+  padding: 10px 9px;
+  flex-direction: column;
+  &.comment-type-writer {
+    background-color: #f4f4f4;
+  }
+  &.comment-type-view {
+    padding: 10px 0;
+  }
+  .comment-enter {
+    height: 42px;
+    .field,
+    .ow-btn,
+    .ow-textarea {
+      height: 100%;
+    }
+  }
+  .comment-content {
+    font-size: 12px;
+    line-height: 1.33;
+  }
+  .field-comment-author {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: -1px;
+    flex: 0 0 auto;
+    align-items: center;
+  }
+  .field-comment-time {
+    font-size: 12px;
+    letter-spacing: -1px;
+  }
+}
+.lst-comment {
+  > li {
+    border-bottom: 1px solid #e2e6ec;
+    .wrap-comment-reply {
+      padding-left: 30px;
+      border-top: 1px solid #e2e6ec;
+      .comment-type-view {
+        &:not(:last-child) {
+          border-bottom: 1px solid #e2e6ec;
+        }
+        &:before {
+          content: "";
+          display: inline-flex;
+          width: 12px;
+          height: 12px;
+          background: url(~@/assets/images/icon/icon-reply.svg) no-repeat 0 0;
+          background-size: 12px;
+          position: absolute;
+          left: -22px;
+          top: 14px;
+        }
+      }
+    }
+  }
+}
+
+.last-save-time {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 12px;
+  color: nth($clrs-achromatic, 1);
+
+  strong {
+    display: inline-flex;
+    margin: 0 6px 0 4px;
+    font-weight: 700;
+  }
+}
+
+.bx-flex {
+  display: flex;
+  gap: var(--gap, 5px);
+  &.type-row {
+    flex-direction: row;
+  }
+  &.type-col {
+    flex-direction: column;
+  }
+}
+
+.content-bg-style{
+  display: flex;
+  border: solid 1px #e0e0e0;
+  background-color: #f4f4f4;
+}
+
+.ribbon-txt {
+  display: inline-flex;
+  align-items: center ;
+  height:28px; 
+  padding:0 10px; 
+  font-weight: 700;
+  font-size: 13px;
+  color: nth($clrs-achromatic, 2);
+  letter-spacing: -1px;
+  background-color:nth($clrs-base, 11);
+  border-top-right-radius: 15px ;
+  border-bottom-right-radius: 15px ;
+}
+
+.text-ellipsis {
+  @include ellipsis(1);
+}

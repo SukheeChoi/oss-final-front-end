@@ -1,0 +1,253 @@
+<template>
+  <div>
+    <template v-if="isNotBlank">
+      <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
+        <slot name="left">
+          <h1 class="h1">그리드</h1>
+        </slot>
+        <slot name="right">
+          <template v-if="editable">
+            <button type="button" class="ow-btn type-state" v-if="insert" @click="addNew">추가</button>
+          </template>
+        </slot>
+      </div>
+    </template>
+    <div class="ow-grid-wrap mt-8 mb-8">
+      <template v-for="i in n" :key="i">
+        <ow-flex-grid :initialized="initialize.bind(null, i)" v-bind="$attrs">
+          <slot></slot>
+        </ow-flex-grid>
+      </template>
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <button type="button" class="ow-button type-icon mr-5"><i class="fas fa-cog fa-fw" /></button>
+        <ow-select :items="pageSizeList" v-model="pageSize" style="--width: 80px"></ow-select>
+      </div>
+      <div>
+        <b-pagination
+          class="ow-pagination"
+          first-class="go-first"
+          prev-class="go-prev"
+          next-class="go-next"
+          last-class="go-last"
+          :total-rows="totalCount"
+          :per-page="perPage"
+          :limit="10"
+          v-model="pageNo"
+        ></b-pagination>
+      </div>
+      <div>전체 {{ totalCount }} 건</div>
+    </div>
+    <ow-flex-grid-editor v-if="editable" :src="[...grids]" :type="editorSize">
+      <template #default="item">
+        <slot name="editor" :item="item.data"> </slot>
+      </template>
+    </ow-flex-grid-editor>
+  </div>
+</template>
+
+<script>
+import { ref } from 'vue';
+import OwFlexGrid from '@/components/grid/new/OwFlexGrid';
+import OwFlexGridEditor from '@/components/grid/new/OwFlexGridEditor';
+import {
+  //
+  isFunction,
+  //
+  EventArgs,
+} from '@grapecity/wijmo';
+import {
+  //
+  FlexGrid,
+} from '@grapecity/wijmo.grid';
+import {
+  //
+  NGridRestCollectionView,
+} from '@/model';
+import {
+  //
+  computed,
+  reactive,
+  watch,
+  toRefs,
+  onMounted,
+  nextTick,
+} from 'vue';
+
+/**
+ * 그리드의 프록시 객체 생성
+ *
+ * @param {FlexGrid} s
+ */
+function asProxyFlexGrid(s) {
+  return new Proxy(s, {
+    get(target, prop, receiver) {
+      return Reflect.get(target, prop, receiver);
+    },
+    set(target, prop, value, receiver) {
+      if (prop === 'itemsSource') {
+        console.error('NGridRestCollectionView는 itemsSource를 설정할 수 없습니다.');
+        return true;
+      }
+      return Reflect.set(target, prop, value, receiver);
+    },
+  });
+}
+
+export default {
+  name: 'OwNGrid',
+  components: {
+    OwFlexGrid,
+    OwFlexGridEditor,
+  },
+  inheritAttrs: false,
+  props: {
+    initialized: Function,
+    n: { type: Number, default: 1 },
+    read: Function,
+    insert: Function,
+    update: Function,
+    remove: Function,
+    editable: Boolean,
+    editorSize: { type: String, default: 'L' },
+  },
+  setup(props) {
+    const header = ref(null);
+
+    const state = reactive({
+      grids: ['a', 'b', 'c', 'd', 'e'],
+      pageNo: 1,
+      pageSize: 20,
+      pageSizeList: [],
+      totalCount: 0,
+      api: {
+        getItems: props.read,
+        addItem: props.insert,
+        patchItem: props.update,
+        deleteItem: props.remove,
+      },
+      isNotBlank: true,
+      // 보여지는 페이지의 수
+      perPage: computed(() => state.pageSize * props.n),
+    });
+
+    /**
+     * 페이지 정보 설정
+     *
+     * @param {NGridRestCollectionView} c
+     * @param {EventArgs} e
+     */
+    const setPage = (c) => {
+      if (c.first) {
+        const { pageNo, pageSize, totalItemCount, pageSizeList } = c;
+        state.pageNo = pageNo;
+        state.pageSize = pageSize;
+        state.totalCount = totalItemCount;
+        state.pageSizeList = pageSizeList;
+      }
+    };
+
+    /**
+     * 이벤트 설정
+     *
+     * @param {FlexGrid} s
+     * @param {NGridRestCollectionView} c
+     */
+    const setDefaultEvents = (s, c) => {
+      // 데이터 로드시 페이지 정보 설정
+      c.loaded.addHandler(setPage);
+    };
+
+    /**
+     * 그리드 초기화
+     *
+     * @param {Number} i
+     * @param {FlexGrid} s
+     */
+    const initialize = (i, s) => {
+      // 그리드
+      const grid = s;
+
+      state.grids.push(grid);
+
+      // 컬렉션뷰
+      const collection = new NGridRestCollectionView({
+        grid,
+        n: props.n,
+        i,
+        pageNo: state.pageNo,
+        pageSize: state.pageSize,
+        getItems: props.read,
+        addItem: props.insert,
+        patchItem: props.update,
+        deleteItem: props.remove,
+      });
+
+      // 아이템 설정//
+      grid.itemsSource = collection;
+
+      // 이벤트 설정
+      setDefaultEvents(grid, collection);
+
+      watch(
+        () => state.pageSize,
+        (pageSize) => (collection.pageSize = pageSize)
+      );
+
+      watch(
+        () => state.pageNo,
+        (pageNo) => collection.moveToPage(pageNo)
+      );
+
+      if (isFunction(props.initialized)) {
+        props.initialized(asProxyFlexGrid(grid));
+      }
+    };
+
+    const addNew = () => {
+      const grid = state.grid;
+      const sourceCollection = grid.sourceCollection;
+      const editableCollectionView = grid.editableCollectionView;
+      const defaultNewItem = isFunction(editableCollectionView.newItemCreator)
+        ? editableCollectionView.newItemCreator()
+        : sourceCollection && sourceCollection.length
+        ? new sourceCollection[0].constructor()
+        : {};
+      grid.editor.start(defaultNewItem);
+    };
+
+    onMounted(async () => {
+      await nextTick();
+      const el = header.value;
+      const textContent = el.textContent.trim();
+      state.isNotBlank = textContent !== '';
+    });
+
+    return {
+      header,
+      initialize,
+      addNew,
+      ...toRefs(state),
+    };
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+:deep(.h1),
+:deep(.h2),
+:deep(.h3) {
+  position: relative;
+  padding-left: 0.75rem;
+  &::before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: cornflowerblue;
+  }
+}
+</style>

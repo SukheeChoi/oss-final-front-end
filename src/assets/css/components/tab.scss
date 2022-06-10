@@ -1,0 +1,162 @@
+$color-base: getColors('base');
+$color-achromatic: getColors('achromatic');
+$color-border: getColors('border');
+
+$tabs-name: ".ow-tabs";
+
+#{$tabs-name}{
+  @mixin add-shadow-tab($color: rgba(0, 0, 0, 0.12)) { 
+    box-shadow: 0 2px 4px 0 $color;
+  };
+
+  @mixin set-color( $bg, $bdr, $clr ) {
+    background-color: $bg;
+    border-color: $bdr;
+    color: $clr;
+  };
+
+  @mixin size-full{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  display: flex;
+  justify-content: flex-start;
+
+  @at-root .ow-content-wrap{
+    padding: var(--bs-gutter) 3px;
+    display: flex;
+    flex-direction: column;
+    width: 100% ;
+    height: 100%;
+    background-color: nth($color-achromatic, 13);
+    border: 2px solid nth($color-base, 9);
+  }
+
+  @at-root .ow-tab-content{
+    position: relative;
+    min-height: 86px;
+    padding: 10px;
+    background-color: nth($color-achromatic, 13);
+    border: 2px solid nth($color-base, 9);
+  }
+
+  @at-root .ow-tabs-wrap{
+    position: relative;
+    width: 100%;
+    
+    .tabs{ width: 100%; }
+  
+    .ow-tabs-side{
+      position: absolute;
+      right: 0; top: -1px; z-index: 3;
+    }
+
+    &.fix-content{
+      @include size-full;
+
+      .ow-main-content{
+        height: 100%;
+      }
+    }
+  }
+  
+  @at-root .tab-size-full{
+    @include size-full;
+
+    .ow-main-content{
+      @include size-full;
+
+      .tab-pane{
+        height: 100%;
+      }
+    }
+
+    .tabs{
+      @include size-full;
+    }
+  }
+
+  ul{
+    > li{
+      margin-left: 1px;
+      &:first-child{ margin-left: 0; }
+
+      .nav-link{
+        padding: 0 calc(var(--bs-gutter) * 2);
+        margin-bottom: 0;
+        height: 26px;
+        line-height: 100%;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        background-color: nth($color-achromatic, 13);
+        font-weight: 700;
+        color: nth($color-achromatic, 4);
+        border-radius: 4px 4px 0 0;
+        border-bottom: 0;
+
+        &:hover,
+        &:focus {
+          border-color: transparent;
+        }
+        
+        &.active{
+          @include add-shadow-tab( rgba(0, 0, 0, 0.5) );
+          @include set-color(nth($clrs-achromatic, 5), nth($color-achromatic, 3), nth($color-achromatic, 13) );
+        }
+      }
+    }
+  }
+  
+  &.type-main{
+    .nav-link{ 
+      &.active{
+        @include set-color(nth($color-base, 4), #1359b8, nth($color-achromatic, 13) );
+      }
+    }
+  }
+
+  &.type-content{
+    width: 100%;
+    border-bottom: 2px solid nth($color-base, 9);
+    .nav-link{
+      border: 0;
+      background-color: #dce0e8;
+      &.active {
+        background-color: nth($color-base, 4);
+        box-shadow: none;
+      }
+    }
+  }
+
+  @at-root {
+    // 기본 style 제거
+    .nav-tabs {
+      border-bottom: 0;
+    }
+  
+    // GNB 영역 스타일 추가
+    .content_tab {
+      $border-width: 1px;
+  
+      > .tabs {
+        &:last-child {
+          & ul > li .nav-link.active,
+          #{$tabs-name} > ul > li .nav-link.active {
+            @include set-color(nth($color-base, 4), #1359b8, nth($color-achromatic, 13) )
+          }
+        }
+        
+        + .tabs {
+          #{$tabs-name} {
+            padding-top: calc(var(--bs-gutter) - $border-width);
+            background-color: nth($clrs-achromatic, 9);
+            border-top: $border-width solid nth($color-border, 3);
+          }
+        }
+      }
+    }
+  }
+}

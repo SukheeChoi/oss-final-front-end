@@ -1,0 +1,219 @@
+$clrs-achromatic: getColors("achromatic");
+$clrs-base: getColors("base");
+
+$size: 24px;
+
+.ow-pagination-old {
+  display: flex;
+  justify-content: center;
+  > button {
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #c0c0c0;
+    margin-left: -1px;
+    font-size: 13px;
+    color: nth($clrs-achromatic, 1);
+    &.first,
+    &.last,
+    &.next,
+    &.prev {
+      text-indent: -9999em;
+      font-size: 0;
+      border: 0;
+    }
+    &.first {
+      background-image: url("~@/assets/images/icon/icon_pagination_first.svg");
+    }
+    &.prev {
+      margin-right: 6px;
+      background-image: url("~@/assets/images/icon/icon_pagination_prev.svg");
+    }
+    &.next {
+      margin-left: 6px;
+      background-image: url("~@/assets/images/icon/icon_pagination_next.svg");
+    }
+    &.last {
+      background-image: url("~@/assets/images/icon/icon_pagination_last.svg");
+    }
+    &:hover,
+    &:focus,
+    &.active {
+      background-color: #333;
+      border-color: #333;
+      color: #fff;
+      z-index: 3;
+    }
+  }
+}
+
+.ow-pagination {
+  @include d-flex(center, center);
+
+  .page-item {
+    width: $size;
+    height: $size;
+    
+    &:not(:first-child) {
+      margin-left: -1px;
+      
+      // 기본 스타일 제거
+      .page-link {
+        margin-left: 0;
+      }
+    }
+    
+    &[class*=state-selected],
+    &.active,
+    &:hover {
+      .page-link {
+        background-color: nth($clrs-achromatic, 2);
+        border-color: nth($clrs-achromatic, 2);
+        color: #fff;
+        z-index: 3;
+      }
+    }
+
+    &[class*=go-] {
+      .page-link {
+        &,
+        &.active,
+        &:hover {
+          border-color: transparent;
+          background-color: transparent;
+      }
+    }
+      }
+    }
+
+      .page-link {
+    @extend .ow-pagination;
+    padding: 0;
+    width: $size;
+    height: $size;
+    line-height: 1;
+    border-color: #c0c0c0;
+    color: nth($clrs-achromatic, 1);
+
+    &:focus {
+      box-shadow: none;
+      }
+    }
+
+  $goBtn: (
+    'first',
+    'prev-step', // step img 추가요청
+    'prev',
+    'next',
+    'next-step', // step img 추가요청
+    'last',
+  );
+
+  @each $name in $goBtn {
+    .go-#{$name} {
+      text-indent: -9999em;
+      font-size: 0;
+      background-image: url("~@/assets/images/icon/icon_pagination_#{$name}.svg");
+      background-position: 50%;
+
+      @if ($name == 'prev') {
+        margin-right: calc(#{$size} * 0.25);
+      } @else if ($name == 'next') {
+        margin-left: calc(#{$size} * 0.25) !important;
+      }
+    }
+  }
+
+  .page-link:disabled {
+    // opacity: 0.65;
+  }
+
+  // 임시 fontawesome
+  @mixin arrow($c) {
+    position: relative;
+    font-family: 'Font Awesome 5 Free';
+    font-size: inherit;
+    font-weight: 600;
+    text-indent: 0;
+    background-image: none;
+    background-color: #f5f5f5;
+    @content;
+
+    &::after {
+      margin-left: -0.2rem;
+      content: '#{$c}';
+      letter-spacing: -0.18rem;
+      font-size: 10px;
+      color: #3f3f3f;
+      }
+    }
+
+  .go-first-img {
+    @include arrow(\f053 \f053 \f053);
+  }
+
+  .go-last-img {
+    @include arrow(\f054 \f054 \f054);
+  }
+}
+    
+.ow-pagination-layout {
+  @include d-flex(normal, center);
+  width: 100%;
+
+  .ow-pagination-wrap {
+    @extend .ow-pagination-layout;
+  }
+
+  &.center {
+    .ow-pagination-wrap {
+      justify-content: center;
+  }
+  }
+
+  &.col-2-set {
+    .ow-pagination-wrap {
+      .page-number {
+        position: absolute;
+        right: 0;
+  }
+  }
+  }
+
+  &.col-3-set {
+    .item:first-child {
+      position: absolute;
+      left: 0;
+  }
+    
+    .ow-pagination-wrap {
+      justify-content: center;
+  }
+
+    .page-number {
+      position: absolute;
+      right: 0;
+    }
+    }
+  }
+
+.ow-pagination {
+  + .page-number {
+    margin-left: calc(var(--bs-gutter) * 2);
+  }
+}
+
+.page-number {
+  @include d-flex(normal, center);
+
+  &-item {
+    font-size: 11px;
+    color: #888;
+
+    &:not(:first-child) {
+      margin-left: var(--bs-gutter);
+    }
+}
+}
