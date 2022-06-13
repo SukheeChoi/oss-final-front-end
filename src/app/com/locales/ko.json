@@ -1,0 +1,11 @@
+{
+  "hello": {
+    "world": "헬로월드 컴"
+  },
+  "wordMgmt": {
+    "valid": {
+      "required": "(0)을 입력해 주시기 바랍니다.",
+      "dataSelect": "데이터를 선택해 주시기 바랍니다."
+    }
+  }
+}
