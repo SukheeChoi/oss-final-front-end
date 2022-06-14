@@ -34,9 +34,14 @@ const MenuList2 = [
       Menu.create('배치변경이력', 'COMBT003'),
     ]),
   ]),
-  Menu.create('교육', 'EDUROOT', [
-    Menu.create('교육중메뉴', 'TestSub', [
-      Menu.create('ABC', 'abc001')
+  Menu.create('물류', 'DIST', [
+    Menu.create('주문-고객수취', 'DISTSub', [
+      Menu.create('주문확인', 'DISTSub1'),
+      Menu.create('출고검수/패킹', 'DISTSub2'),
+      Menu.create('출고검수/패킹 진행', 'DISTSub3'),
+      Menu.create('합배송 품목 수령/전달', 'DISTSub4'),
+      Menu.create('주문-고객수취', 'DISTSub5'),
+      Menu.create('검품검수 및 라벨링 모니터링', 'DISTSub6'),
     ])
   ])
 ];
