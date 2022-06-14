@@ -39,12 +39,12 @@ export default [
             component: () => import('@@/edu/views/Picking')
         },
         {
-            path: 'CustomerReceipt.vue',
+            path: 'CustomerReceipt',
             name: 'DISTSub5',
-            component: () => import('@@/edu/views/CustomerReceipe')
+            component: () => import('@@/edu/views/CustomerReceipt')
         },
         {
-            path: 'InspectionLabelling.vue',
+            path: 'InspectionLabelling',
             name: 'DISTSub6',
             component: () => import('@@/edu/views/InspectionLabelling')
         },
