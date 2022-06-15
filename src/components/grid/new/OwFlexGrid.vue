@@ -1,5 +1,5 @@
 <template>
-  <wj-flex-grid class="ow-grid" :initialized="initialize" v-bind="$attrs">
+  <wj-flex-grid class="ow-grid" v-bind="$attrs">
     <slot></slot>
   </wj-flex-grid>
 </template>
