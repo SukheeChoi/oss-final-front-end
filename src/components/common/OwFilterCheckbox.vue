@@ -1,6 +1,6 @@
 <template>
   <template v-if="label">
-    <div class="filter-checkbox-label">{{ label }}</div>
+    <label class="filter-checkbox-label">{{ label }}</label>
   </template>
   <div class="ow-filter" ref="root" v-bind="$attrs">
     <template v-if="overflow">
@@ -54,6 +54,7 @@ export default {
     },
   },
   setup(props, { emit }) {
+    console.log(props);
     const root = ref(null);
     const filter = ref(null);
 
@@ -65,8 +66,11 @@ export default {
       enabledValues: computed(() => props.items.filter((item) => !item.disabled)),
       isAllChecked: computed(() => state.enabledValues.length === state.checkedValues.length),
       overflow: false,
-    });
+    },);
 
+    console.log("checkedValues", state.checkedValues);
+    console.log("enabledValues", state.enabledValues);
+    
     watch(
       () => state.checkedValues,
       (newCheckedValues, oldCheckedValues = []) => {
@@ -87,8 +91,9 @@ export default {
       if (!state.isAllChecked) {
         state.checkedValues = state.enabledValues.map((item) => item.value);
       }
+      console.log("checkedValues", state.checkedValues);
     };
-
+    
     const getContentRect = (dom) => {
       let boundingClientRect;
       if (dom) {

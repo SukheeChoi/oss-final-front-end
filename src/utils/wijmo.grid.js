@@ -5,6 +5,9 @@ import { Selector } from '@grapecity/wijmo.grid.selector';
 
 class SimpleMergeManager extends MergeManager {
   constructor(config) {
+    console.log("config", config)
+    console.log("config.groupingColumns", config.groupingColumns);
+    console.log("config.mergedColumns", config.mergedColumns);
     super();
     this.groupingColumns = config.groupingColumns || [];
     this.mergedColumns = config.mergedColumns || [];
