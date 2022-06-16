@@ -48,6 +48,11 @@ export default [
             name: 'DISTSub6',
             component: () => import('@@/edu/views/InspectionLabelling')
         },
+        {
+            path: 'test',
+            name: 'test',
+            component: () => import('@@/edu/views/Test')
+        },
       ]
   }
 ]

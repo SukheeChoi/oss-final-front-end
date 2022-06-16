@@ -1,5 +1,5 @@
 <template>
-  <wj-flex-grid class="ow-grid" v-bind="$attrs">
+  <wj-flex-grid class="ow-grid" :initialized="initialize" v-bind="$attrs">
     <slot></slot>
   </wj-flex-grid>
 </template>
@@ -156,8 +156,8 @@ function setCustomEvents(s) {
  * @param {FlexGrid} s
  */
 function adjustGridHeight(s) {
-   let height = 500;
-  //let height = 0;
+  //  let height = 500;
+  let height = 0;
   const {
     columnHeaders: { rows: rows1 },
     rows: rows2,
