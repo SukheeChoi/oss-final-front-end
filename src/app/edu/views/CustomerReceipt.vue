@@ -10,7 +10,7 @@
             <div class="item">계획 대비 실적 달성률</div>
             <div class="item">
               <!-- <approval-grid :transportData="transportData" ref="animateEvent" /> -->
-              <progress :value="85" max="100">{{ value }}</progress>
+              <!-- <progress :value="85" max="100">{{ value }}</progress> -->
             </div>
           </div>
           <hr />
@@ -196,7 +196,8 @@
     </div>
     <div>
       <div class="ow-grid-wrap">
-        <ow-n-grid :n="8" headersVisibility="Column" :itemsSource="data" :autoRowHeights="true">
+        <ow-n-grid :n="8" :initialized="initialized" headersVisibility="Column" :read="read" :autoRowHeights="true">
+        <template #left>&nbsp;</template>
           <wj-flex-grid-column binding="client" header="거래처" :width="80" align="center" />
           <wj-flex-grid-column binding="level" header="처리단계" :width="120" align="center" isReadOnly="true">
             <wj-flex-grid-cell-template cellType="Cell" let-cell="cell">
@@ -218,6 +219,29 @@ import OwNGrid from '@/components/grid/new/OwNGrid';
 import OwFilterCheckbox from '@/components/common/OwFilterCheckbox.vue';
 import { CollectionView } from '@grapecity/wijmo';
 
+function read() {
+  let data = [];
+    for (let i = 0; i < 20; i++) {
+      data.push({
+        client: '현대',
+        level: '주문',
+      });
+    }
+    for (let i = 0; i < 10; i++) {
+      data.push({
+        client: '에덴',
+        level: '주문',
+      });
+    }
+  return Promise.resolve({
+    data,
+    status: 200,
+    code: 'OK',
+    message: 'Success',
+    totalCount: data.length
+  });
+}
+
 export default {
   components: {
     OwNGrid,
@@ -232,26 +256,34 @@ export default {
     };
   },
   setup() {
-    let data = new CollectionView(getData(), {});
-    function getData() {
-      let data = [];
-      for (let i = 0; i < 20; i++) {
-        data.push({
-          client: '현대',
-          level: '주문',
-        });
-      }
-      for (let i = 0; i < 10; i++) {
-        data.push({
-          client: '에덴',
-          level: '주문',
-        });
-      }
-      return data;
+    // let data = new CollectionView(getData(), {});
+    // function getData() {
+    //   let data = [];
+    //   for (let i = 0; i < 20; i++) {
+    //     data.push({
+    //       client: '현대',
+    //       level: '주문',
+    //     });
+    //   }
+    //   for (let i = 0; i < 10; i++) {
+    //     data.push({
+    //       client: '에덴',
+    //       level: '주문',
+    //     });
+    //   }
+    //   return data;
+    // }
+
+    const initialized = (s) => {
+console.log('initialized', s)
     }
 
+    console.log(read)
+
     return {
-      data,
+      // data,
+      read,
+      initialized
     };
   },
 };

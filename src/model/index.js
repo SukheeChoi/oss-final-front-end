@@ -456,6 +456,7 @@ export class GridRestCollectionView extends RestCollectionView {
     }
     const fn = this._getItems.bind(this);
     const result = await fn(this.query, this.pageIndex + 1, this.pageSize);
+    console.log('result', result);
     const { totalCount: totalItemCount, data: items } = result;
     this._totalItemCount = totalItemCount;
     return items;
