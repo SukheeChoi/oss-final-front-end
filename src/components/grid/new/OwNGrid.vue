@@ -1,6 +1,6 @@
 <template>
   <div>
-    <template v-if="isNotBlank">
+    <!-- <template v-if="isNotBlank">
       <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
         <slot name="left">
           <h1 class="h1">그리드</h1>
@@ -11,7 +11,7 @@
           </template>
         </slot>
       </div>
-    </template>
+    </template> -->
     <div class="ow-grid-wrap mt-8 mb-8">
       <template v-for="i in n" :key="i">
         <ow-flex-grid :initialized="initialize.bind(null, i)" v-bind="$attrs">
@@ -21,9 +21,12 @@
     </div>
     <div class="d-flex justify-content-between align-items-center">
       <div>
+
+      </div>
+      <!-- <div>
         <button type="button" class="ow-button type-icon mr-5"><i class="fas fa-cog fa-fw" /></button>
         <ow-select :items="pageSizeList" v-model="pageSize" style="--width: 80px"></ow-select>
-      </div>
+      </div> -->
       <div>
         <b-pagination
           class="ow-pagination"
@@ -37,7 +40,8 @@
           v-model="pageNo"
         ></b-pagination>
       </div>
-      <div>전체 {{ totalCount }} 건</div>
+      <div></div>
+      <!-- <div>전체 {{ totalCount }} 건</div> -->
     </div>
     <ow-flex-grid-editor v-if="editable" :src="[...grids]" :type="editorSize">
       <template #default="item">
