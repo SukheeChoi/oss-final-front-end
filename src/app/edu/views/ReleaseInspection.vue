@@ -26,13 +26,13 @@
 <!-- 본문 시작, ow-flex 사용 -->
 <div class="ow-flex-wrap">
   <!-- 그리드 영역 -->
-  <div class="item" style="--size: 60%;">
+  <div class="item" style="--size: 50%;">
     <div class="container-fluid">
       <div class="ow-grid-wrap">
         <wj-flex-grid
           headersVisibility="Column"
           selectionMode="None"
-          :itemsSource="data"
+          :itemsSource="releaseInspectionData"
           class="ow-grid"
           :allowMerging="'Cells'"
         >
@@ -42,16 +42,16 @@
           <wj-flex-grid-column :binding="'c'" :header="'출고지'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column :binding="'d'" :header="'배송지'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column :binding="'e'" :header="'업체명'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'품목명'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'품목코드'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'피킹수량'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'검수수량'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'피킹담당자'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'d'" :header="'출고요청서인쇄'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'출고Box수량'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'출고검수'" width="*" align="center"></wj-flex-grid-column>           
-          <wj-flex-grid-column :binding="'d'" :header="'거래명세서인쇄'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'비고'" width="*" align="center"></wj-flex-grid-column>           
+          <wj-flex-grid-column :binding="'f'" :header="'품목명'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'g'" :header="'품목코드'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'h'" :header="'피킹수량'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'i'" :header="'검수수량'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'j'" :header="'피킹담당자'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'k'" :header="'출고요청서인쇄'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'l'" :header="'출고Box수량'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'m'" :header="'출고검수'" width="*" align="center"></wj-flex-grid-column>           
+          <wj-flex-grid-column :binding="'n'" :header="'거래명세서인쇄'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'o'" :header="'비고'" width="*" align="center"></wj-flex-grid-column>           
           
         </wj-flex-grid>
       </div>
@@ -136,13 +136,21 @@ export default {
       { name : '일반', value : '일반'} ,
     ]);
     const emptyGroup = ref([]);
-    const forwardingInfo = ref([
-
+    const releaseInspectionData = ref([
+      {No: '1', a: '현대치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k:'김현일', l:'', m:'', n:'', o:''},
+      {No: '1', a: '현대치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k:'김현일', l:'', m:'', n:'', o:''},
+      {No: '1', a: '현대치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k:'김현일', l:'', m:'', n:'', o:''},
+      {No: '2', a: '램브란트치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k: '', l:'김현일', m:'', n:'', o:''},
+      {No: '2', a: '램브란트치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k: '', l:'김현일', m:'', n:'', o:''},
+      {No: '2', a: '램브란트치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k: '', l:'김현일', m:'', n:'', o:''},
+      {No: '3', a: '햇살치과의원', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k: '', l:'김현일', m:'', n:'', o:''},
     ]);
 
     return {
       checkboxGroup5,
-      emptyGroup};
+      emptyGroup,
+      releaseInspectionData
+    };
   },
 };
 </script>
