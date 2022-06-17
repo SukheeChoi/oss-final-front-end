@@ -209,10 +209,14 @@
         <wj-flex-grid-column binding="level" header="처리단계" width="2*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell">
             <span class="ow-tag type-category"><i class="o">주</i></span>
-            <span class="ow-tag type-category"><i class="p">피</i></span>
-            <span class="ow-tag type-category"><i class="i">검</i></span>
-            <span class="ow-tag type-category"><i class="r">출</i></span>
-            <span class="ow-tag type-category"><i class="t">인</i></span>
+            <!-- <span class="ow-tag type-category"><i class="p">피</i></span> -->
+            <!-- <span class="ow-tag type-category"><i class="i">검</i></span> -->
+            <!-- <span class="ow-tag type-category"><i class="r">출</i></span> -->
+            <!-- <span class="ow-tag type-category"><i class="t">인</i></span> -->
+            <span class="ow-tag type-category"><i class="n">피</i></span>
+            <span class="ow-tag type-category"><i class="n">검</i></span>
+            <span class="ow-tag type-category"><i class="n">출</i></span>
+            <span class="ow-tag type-category"><i class="n">인</i></span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
       </ow-n-grid>

@@ -53,11 +53,6 @@ export default [
             name: 'test',
             component: () => import('@@/edu/views/Test')
         },
-        {
-            path: 'test1',
-            name: 'test1',
-            component: () => import('@@/edu/views/Test1')
-        },
       ]
   }
 ]
