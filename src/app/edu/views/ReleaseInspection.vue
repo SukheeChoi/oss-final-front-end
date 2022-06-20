@@ -37,21 +37,22 @@
           :allowMerging="'Cells'"
         >
           <wj-flex-grid-column :binding="'No'" :header="'No'" :allowMerging="true" width="*" align="center"/>
-          <wj-flex-grid-column :binding="'a'" :header="'거래처'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'b'" :header="'배송구분'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'c'" :header="'출고지'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'d'" :header="'배송지'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'e'" :header="'업체명'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'f'" :header="'품목명'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'g'" :header="'품목코드'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'h'" :header="'피킹수량'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'i'" :header="'검수수량'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'j'" :header="'피킹담당자'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'k'" :header="'출고요청서인쇄'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'l'" :header="'출고Box수량'" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'m'" :header="'출고검수'" width="*" align="center"></wj-flex-grid-column>           
-          <wj-flex-grid-column :binding="'n'" :header="'거래명세서인쇄'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column :binding="'o'" :header="'비고'" width="*" align="center"></wj-flex-grid-column>           
+          <wj-flex-grid-column :binding="'orderClient'" :header="'거래처'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'shippingCat'" :header="'배송구분'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'releaseNo'" :header="'출고번호'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'deliveryDest'" :header="'배송지'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'orderNum'" :header="'주문번호'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'companyName'" :header="'업체명'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'itemName'" :header="'품목명'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'itemCode'" :header="'품목코드'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'pickingQty'" :header="'피킹수량'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'inspectionQty'" :header="'검수수량'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'personInCharge'" :header="'피킹담당자'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'releasePrint'" :header="'출고요청서인쇄'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'boxQty'" :header="'출고Box수량'" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'inspection'" :header="'출고검수'" width="*" align="center"></wj-flex-grid-column>           
+          <wj-flex-grid-column :binding="'transactionPrint'" :header="'거래명세서인쇄'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column :binding="'note'" :header="'비고'" width="*" align="center"></wj-flex-grid-column>           
           
         </wj-flex-grid>
       </div>
@@ -126,9 +127,27 @@ import { ref, reactive, toRefs } from 'vue';
 import OwFlexGrid from '../../../components/grid/OwFlexGrid.vue';
 
 export default {
+  setup() {
+    const state = reactive({
+      flex: undefined,  //wj-flex-grid의 정보를 flex에 담아서 사용
+    });
+
+    const onInitialized = (flex) => {
+      const config = {
+        groupingColumns: [0],
+        mergedColumns: [0,1,2,3,4,5],
+      };
+      flex.mergeManager = new SimpleMergeManager(config);    
+    };
+    return {
+      onInitialized
+    }
+  },
+
   components: {
     WjFlexGrid,
   },
+  
   data() {
     OwFlexGrid
     const checkboxGroup5 = ref([ 
@@ -137,13 +156,13 @@ export default {
     ]);
     const emptyGroup = ref([]);
     const releaseInspectionData = ref([
-      {No: '1', a: '현대치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k:'김현일', l:'', m:'', n:'', o:''},
-      {No: '1', a: '현대치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k:'김현일', l:'', m:'', n:'', o:''},
-      {No: '1', a: '현대치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k:'김현일', l:'', m:'', n:'', o:''},
-      {No: '2', a: '램브란트치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k: '', l:'김현일', m:'', n:'', o:''},
-      {No: '2', a: '램브란트치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k: '', l:'김현일', m:'', n:'', o:''},
-      {No: '2', a: '램브란트치과', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k: '', l:'김현일', m:'', n:'', o:''},
-      {No: '3', a: '햇살치과의원', b: '일반', c: 'C_02_006', d: '현대치과', e: '2201043708', f: 'Kavo', g: 'SmartMembrane', h: 'SM2W10129SB', i: '10', j: '', k: '', l:'김현일', m:'', n:'', o:''},
+      {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+      {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+      {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+      {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+      {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+      {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+      {No: '3', orderClient : '햇살치과의원', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
     ]);
 
     return {

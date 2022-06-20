@@ -361,12 +361,6 @@ export default {
     });
 
     const onInitialized = (flex) => {
-      state.flex = flex;
-      console.log('flex.onCellEditEnded', flex.onCellEditEnded);
-      flex.onCellEditEnded = (...args) => {
-        console.log('argsssssssssssssssssssss', args);
-      };
-
       const config = {
         groupingColumns: [0],
         mergedColumns: [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
