@@ -35,6 +35,7 @@
           :itemsSource="releaseInspectionData"
           class="ow-grid"
           :allowMerging="'Cells'"
+          :initialized="onInitialized"
         >
           <wj-flex-grid-column :binding="'No'" :header="'No'" :allowMerging="true" width="*" align="center"/>
           <wj-flex-grid-column :binding="'orderClient'" :header="'거래처'" :allowMerging="true" width="*" align="center"></wj-flex-grid-column>
@@ -125,6 +126,7 @@ import WjFlexGrid from '@grapecity/wijmo.vue2.grid';
 import { CollectionView } from '@grapecity/wijmo';
 import { ref, reactive, toRefs } from 'vue';
 import OwFlexGrid from '../../../components/grid/OwFlexGrid.vue';
+import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
 export default {
   setup() {
@@ -137,9 +139,10 @@ export default {
         groupingColumns: [0],
         mergedColumns: [0,1,2,3,4,5],
       };
-      flex.mergeManager = new SimpleMergeManager(config);    
+      flex.mergeManager = new SimpleMergeManager(config);
     };
     return {
+      ...toRefs(state),
       onInitialized
     }
   },
@@ -149,27 +152,30 @@ export default {
   },
   
   data() {
-    OwFlexGrid
-    const checkboxGroup5 = ref([ 
-      { name : '긴급', value : '긴급'} ,
-      { name : '일반', value : '일반'} ,
-    ]);
-    const emptyGroup = ref([]);
-    const releaseInspectionData = ref([
-      {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      {No: '3', orderClient : '햇살치과의원', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-    ]);
-
+    // OwFlexGrid
     return {
-      checkboxGroup5,
-      emptyGroup,
-      releaseInspectionData
-    };
+      checkboxGroup5: [ 
+        { name : '긴급', value : '긴급'} ,
+        { name : '일반', value : '일반'} ,
+      ]
+      , emptyGroup: []
+      , releaseInspectionData: [
+        {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+        {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+        {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+        {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+        {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+        {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+        {No: '3', orderClient : '햇살치과의원', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
+      ]
+
+    }
+
+    // return {
+    //   checkboxGroup5,
+    //   emptyGroup,
+    //   releaseInspectionData
+    // };
   },
 };
 </script>
