@@ -122,7 +122,7 @@ export default {
     const state = reactive({
       grids: ['a', 'b', 'c', 'd', 'e'],
       pageNo: 1,
-      pageSize: 15,
+      pageSize: 10,
       pageSizeList: [],
       totalCount: 0,
       api: {
