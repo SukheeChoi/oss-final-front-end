@@ -114,6 +114,17 @@ export default {
     OwNGrid,
   },
   setup() {
+    //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
+    const assigneeList = ref([]);
+    const getAssigneeList = async () => {
+      const result = await combineShippingApi.getAssigneeList();
+      return result;
+    };
+    getAssigneeList().then((result) => {
+      console.log('getAssigneeList - result : ' + result);
+      console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
+    });
+
     // '수령'탭에서 바인딩할 데이터를 불러옴.
     const receiptList = ref([]);
     const getReceiptList = async (employeeId) => {
@@ -188,6 +199,7 @@ const retrieve = (param) => {
   console.log('deliveryList.value.length : ' + deliveryList.value.length);
   let filteredDeliveryList = [];
   for(let i=0; i<deliveryList.value.length; i++) {
+    //No는 행번호를 이용해서 생성할것.
     console.log('deliveryList.value[' + i + '] : ' + deliveryList.value[i]);
     //주문번호
     console.log('deliveryList.value[' + i + ']["orderItem"]["orderNo"] : ' + deliveryList.value[i]["orderItem"]["orderNo"]);
@@ -212,7 +224,6 @@ const retrieve = (param) => {
       , 'itemQuantity': deliveryList.value[i]["deliveryQuantity"]
       , 'unreleased': deliveryList.value[i]["deliveryUnrelease"]
     });
-
   }
   //
 
