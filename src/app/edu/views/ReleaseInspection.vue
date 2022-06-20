@@ -131,15 +131,16 @@ export default {
     const state = reactive({
       flex: undefined,  //wj-flex-grid의 정보를 flex에 담아서 사용
     });
-
+    //숙희 언니 화이텡
     const onInitialized = (flex) => {
       const config = {
-        groupingColumns: [0],
+        groupingColumns: [1],
         mergedColumns: [0,1,2,3,4,5],
       };
       flex.mergeManager = new SimpleMergeManager(config);    
     };
     return {
+      ...toRefs(state),
       onInitialized
     }
   },
