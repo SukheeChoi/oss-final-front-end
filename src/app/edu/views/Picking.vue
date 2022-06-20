@@ -78,7 +78,9 @@
 </template>
 
 <script>
-// const countries = 'US,Germany,UK,Japan,Italy,Greece'.split(',');
+import combineShippingApi from '../../../api/combineShippingApi';
+import { ref } from 'vue';
+
 const items = [
   {No: 1, order_release_no: "2201042337/C_02_005", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
   , {No: 2, order_release_no: "22010423828/C_02_001", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
@@ -106,29 +108,11 @@ const items = [
   , {No: 23, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
   , {No: 24, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
 ];
-// for (let i = 0; i < 100; i += 1) {
-//   const index = parseInt(Math.random() * 100) % countries.length;
-//   items.push({
-//     id: i + 1,
-//     country: countries[index],
-//     sales: Math.random() * 10000,
-//     expenses: Math.random() * 5000,
-//   });
-// }
+
 const retrieve = (param) => {
   console.log('param', param);
   let filteredItems = _.cloneDeep(items);
-  // if (param.country) {
-  //   filteredItems = filteredItems.filter(
-  //     (item) => (item.country ?? '').toUpperCase().indexOf(param.country.toUpperCase()) > -1
-  //   );
-  // }
-  // if (param.sales) {
-  //   filteredItems = filteredItems.filter((item) => item.sales > param.sales);
-  // }
-  // if (param.expenses) {
-  //   filteredItems = filteredItems.filter((item) => item.expenses > param.expenses);
-  // }
+
   const totalCount = filteredItems.length;
   if (param.sort) {
     filteredItems = _.sortBy(filteredItems, param.sort);
@@ -185,6 +169,45 @@ export default {
     OwNGrid,
   },
   setup() {
+    // '수령'탭에서 바인딩할 데이터를 불러옴.
+    const receiptList = ref([]);
+    const getReceiptList = async (employeeId) => {
+      const result = await combineShippingApi.getReceiptList(employeeId);
+      return result;
+    };
+
+    getReceiptList('E2').then(result => {
+      console.log('result : ' + result);
+      console.log('result.receiptList : ' + result.receiptList);
+      console.log('result.receiptList[0] : ' + result.receiptList[0]);
+      console.log('result.receiptList[0]["orderItemNo"] : ' + result.receiptList[0]['orderItemNo']);
+      receiptList.value = result.receiptList;
+      console.log('receiptList.value[0]// : ' + receiptList.value[0]);
+      console.log('receiptList.value[0]["orderItemNo"]// : ' + receiptList.value[0]['orderItemNo']);
+      console.log('JSON.stringify(receiptList.value[0]) : ' + JSON.stringify(receiptList.value[0]));
+    });
+    getReceiptList('E2');
+
+    // '전달' 탭에서 바인딩할 데이터를 불러옴.
+    const deliveryList = ref([]);
+    const getDeliveryList = async (employeeId) => {
+      const result = await combineShippingApi.getDeliveryList(employeeId);
+      return result;
+    };
+    getDeliveryList('E1').then(result => {
+      console.log('result : ' + result);
+      console.log('result.deliveryList : ' + result.deliveryList);
+      console.log('result.deliveryList[0] : ' + result.deliveryList[0]);
+      console.log('result.deliveryList[0]["orderItemNo"] : ' + result.deliveryList[0]['orderItemNo']);
+      deliveryList.value = result.deliveryList;
+      console.log('deliveryList.value[0]// : ' + deliveryList.value[0]);
+      console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
+      console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
+    });
+     getDeliveryList('E1');
+      
+
+
     const state = reactive({
       visibleRowsCount: 20,
     });
@@ -197,12 +220,6 @@ export default {
       // const index = parseInt(Math.random() * 100) % countries.length;
       const item = 
         {No: 1, order_release_no: 142654, itemName: "CoverCap", itemCode: "BD72S643", itemQuantity: 10, unreleased: 0 };
-      // const item = {
-      //   id: 10000 + (globalIndex += 1),
-      //   country: countries[index],
-      //   sales: Math.random() * 10000,
-      //   expenses: Math.random() * 5000,
-      // };
       e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(item));
     };
 
