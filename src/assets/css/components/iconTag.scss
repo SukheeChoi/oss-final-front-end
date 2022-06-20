@@ -40,25 +40,33 @@ $ow-tag: ".ow-tag";
         font-style: normal;
         border-radius: $radius;
         font-weight: 700;
-        &.m {
-          background-color: #dc5782;
-          border: 1px solid #a53c60;
+        &.o {
+          background-color: rgb(0, 96, 257);
+          // border: 1px solid #a53c60;
         }
-        &.d {
-          background-color: #f4a332;
-          border: 1px solid #c87e04;
+        &.p {
+          background-color: rgb(255, 116, 37);
+          // border: 1px solid #c87e04;
         }
-        &.s {
-          background-color: #309499;
-          border: 1px solid #1e787c;
+        &.i {
+          background-color: rgb(3, 124, 77);
+          // border: 1px solid #1e787c;
         }
-        &.x {
-          background-color: #7a4986;
-          border: 1px solid #592465;
+        &.r {
+          background-color: rgb(101, 55, 183);
+          // border: 1px solid #592465;
         }
-        &.b {
-          background-color: #3d3bad;
-          border: 1px solid #252378;
+        &.t {
+          background-color: rgb(255, 186, 44);
+          // border: 1px solid #252378;
+        }
+        &.n { //아직 처리되지 않은
+          background-color: rgb(216, 216, 216);
+          // border: 1px solid #252378;
+        }
+        &.u { //미출고
+          background-color: rgb(249, 11, 22);
+          // border: 1px solid #252378;
         }
       }
     }
