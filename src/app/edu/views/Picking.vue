@@ -51,7 +51,33 @@
   </div>
 
   <!-- ngrid -->
+  <!-- '전달'탭이 선택된 경우. -->
   <ow-n-grid
+    v-if="false"
+    :initialized="initialize"
+    :n="2"
+    :read="read"
+    :insert="insert"
+    :update="update"
+    :remove="remove"
+    :visible-rows-count="state.visibleRowsCount"
+  >
+    <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
+    <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
+    <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
+    <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
+    <wj-flex-grid-column header="수량" binding="itemQuantity" :width="60"></wj-flex-grid-column>
+    <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
+    <wj-flex-grid-column header="전달여부" binding="delivered" align="center" :width="70" wordWrap="true">
+      <wj-flex-grid-cell-template cellType="Cell">
+        <button class="ow-btn type-icon check-state"></button>
+        <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
+      </wj-flex-grid-cell-template>
+    </wj-flex-grid-column>
+  </ow-n-grid>
+  <!-- 킵,, -->
+  <ow-n-grid
+    v-if="true"
     :initialized="initialize"
     :n="2"
     :read="read"
@@ -80,87 +106,6 @@
 <script>
 import combineShippingApi from '../../../api/combineShippingApi';
 import { ref } from 'vue';
-
-const items = [
-  {No: 1, order_release_no: "2201042337/C_02_005", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
-  , {No: 2, order_release_no: "22010423828/C_02_001", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
-  , {No: 3, order_release_no: "2201042337/C_02_005", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 1, unreleased: 0 }
-  , {No: 4, order_release_no: "2201041332/C_02_004", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 2, unreleased: 0 }
-  , {No: 5, order_release_no: "2201043708/C_02_006", itemName: "SB Anchor", itemCode: "SBAC4030TSR", itemQuantity: 5, unreleased: 0 }
-  , {No: 6, order_release_no: "2201043708/C_02_006", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 2, unreleased: 0 }
-  , {No: 7, order_release_no: "2201041015/C_02_002", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 3, unreleased: 0 }
-  , {No: 8, order_release_no: "2201043708/C_02_006", itemName: "SmartMembrane", itemCode: "SM2W10129SB", itemQuantity: 10, unreleased: 0 }
-  , {No: 9, order_release_no: "2201042337/C_02_005", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 9, unreleased: 0 }
-  , {No: 10, order_release_no: "2201042337/C_02_004", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 1, unreleased: 0 }
-  , {No: 11, order_release_no: "2201044479/E_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
-  , {No: 12, order_release_no: "2201043828/C_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
-  , {No: 13, order_release_no: "2201041332/C_02_004", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 1, unreleased: 0 }
-  , {No: 14, order_release_no: "2201040991/C_02_003", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 4, unreleased: 0 }
-  , {No: 15, order_release_no: "2201043828/C_02_001", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 3, unreleased: 0 }
-  , {No: 16, order_release_no: "2201040991/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  , {No: 17, order_release_no: "2201041015/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 1, unreleased: 0 }
-  , {No: 18, order_release_no: "2201044479/E_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 10, unreleased: 0 }
-  , {No: 19, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  // 
-  , {No: 20, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  , {No: 21, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  , {No: 22, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  , {No: 23, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  , {No: 24, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-];
-
-const retrieve = (param) => {
-  console.log('param', param);
-  let filteredItems = _.cloneDeep(items);
-
-  const totalCount = filteredItems.length;
-  if (param.sort) {
-    filteredItems = _.sortBy(filteredItems, param.sort);
-    if (['desc', 'DESC'].includes(param.direction)) {
-      filteredItems = filteredItems.reverse();
-    }
-  }
-  if (param.pageNo) {
-    filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
-  }
-
-  return Promise.resolve({
-    data: filteredItems,
-    status: 200,
-    code: 'OK',
-    message: 'Success',
-    totalCount,
-  });
-};
-
-async function read(query, pageNo, pageSize) {
-  const result = await retrieve({
-    ...query,
-    pageNo,
-    pageSize,
-  });
-  console.log('result', result);
-  return result;
-}
-
-async function insert(item) {
-  items.push(item);
-  return true;
-}
-
-async function update(item) {
-  const at = items.findIndex((target) => target.id === item.id);
-  items[at] = item;
-  return true;
-}
-
-async function remove(item) {
-  const at = items.findIndex((target) => target.id === item.id);
-  items.splice(at, 1);
-  return true;
-}
-
-console.log('items', items);
 import OwNGrid from '@/components/grid/new/OwNGrid';
 import { reactive } from 'vue';
 export default {
@@ -204,9 +149,126 @@ export default {
       console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
       console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
     });
-     getDeliveryList('E1');
-      
+    getDeliveryList('E1');
+    
+const items = [
+  {No: 1, order_release_no: "2201042337/C_02_005", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
+  , {No: 2, order_release_no: "22010423828/C_02_001", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
+  , {No: 3, order_release_no: "2201042337/C_02_005", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 1, unreleased: 0 }
+  , {No: 4, order_release_no: "2201041332/C_02_004", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 2, unreleased: 0 }
+  , {No: 5, order_release_no: "2201043708/C_02_006", itemName: "SB Anchor", itemCode: "SBAC4030TSR", itemQuantity: 5, unreleased: 0 }
+  , {No: 6, order_release_no: "2201043708/C_02_006", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 2, unreleased: 0 }
+  , {No: 7, order_release_no: "2201041015/C_02_002", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 3, unreleased: 0 }
+  , {No: 8, order_release_no: "2201043708/C_02_006", itemName: "SmartMembrane", itemCode: "SM2W10129SB", itemQuantity: 10, unreleased: 0 }
+  , {No: 9, order_release_no: "2201042337/C_02_005", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 9, unreleased: 0 }
+  , {No: 10, order_release_no: "2201042337/C_02_004", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 1, unreleased: 0 }
+  , {No: 11, order_release_no: "2201044479/E_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
+  , {No: 12, order_release_no: "2201043828/C_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
+  , {No: 13, order_release_no: "2201041332/C_02_004", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 1, unreleased: 0 }
+  , {No: 14, order_release_no: "2201040991/C_02_003", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 4, unreleased: 0 }
+  , {No: 15, order_release_no: "2201043828/C_02_001", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 3, unreleased: 0 }
+  , {No: 16, order_release_no: "2201040991/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+  , {No: 17, order_release_no: "2201041015/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 1, unreleased: 0 }
+  , {No: 18, order_release_no: "2201044479/E_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 10, unreleased: 0 }
+  , {No: 19, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+  // 
+  , {No: 20, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+  , {No: 21, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+  , {No: 22, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+  , {No: 23, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+  , {No: 24, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+];
 
+const retrieve = (param) => {
+  console.log('param', param);
+  let filteredItems = _.cloneDeep(items);
+  
+  //
+  // let filteredItems = _.cloneDeep(deliveryList);
+  console.log('deliveryList.value.length : ' + deliveryList.value.length);
+  let filteredDeliveryList = [];
+  for(let i=0; i<deliveryList.value.length; i++) {
+    console.log('deliveryList.value[' + i + '] : ' + deliveryList.value[i]);
+    //주문번호
+    console.log('deliveryList.value[' + i + ']["orderItem"]["orderNo"] : ' + deliveryList.value[i]["orderItem"]["orderNo"]);
+    //출고번호
+    console.log('deliveryList.value[' + i + ']["release"]["releaseNo"] : ' + deliveryList.value[i]["release"]["releaseNo"]);
+    //품목명
+    console.log('deliveryList.value[' + i + ']["item"]["itemName"] : ' + deliveryList.value[i]["item"]["itemName"]);
+    //품목코드
+    console.log('deliveryList.value[' + i + ']["item"]["itemCode"] : ' + deliveryList.value[i]["item"]["itemCode"]);
+    //수량
+    console.log('deliveryList.value[' + i + ']["deliveryQuantity"] : ' + deliveryList.value[i]["deliveryQuantity"]);
+    //미출고
+    console.log('deliveryList.value[' + i + ']["deliveryUnrelease"] : ' + deliveryList.value[i]["deliveryUnrelease"]);
+    //전달여부
+    console.log('deliveryList.value[' + i + ']["deliverCheck"] : ' + deliveryList.value[i]["deliverCheck"]);
+
+    filteredDeliveryList.push({
+      'No': i+1
+      , 'order_release_no': deliveryList.value[i]["orderItem"]["orderNo"] + '/' + deliveryList.value[i]["release"]["releaseNo"]
+      , 'itemName': deliveryList.value[i]["item"]["itemName"]
+      , 'itemCode': deliveryList.value[i]["item"]["itemCode"]
+      , 'itemQuantity': deliveryList.value[i]["deliveryQuantity"]
+      , 'unreleased': deliveryList.value[i]["deliveryUnrelease"]
+    });
+
+  }
+  //
+
+  // const totalCount = filteredItems.length;
+  const totalCount = filteredDeliveryList.length;
+  if (param.sort) {
+    filteredDeliveryList = _.sortBy(filteredDeliveryList, param.sort);
+    // filteredItems = _.sortBy(filteredItems, param.sort);
+    if (['desc', 'DESC'].includes(param.direction)) {
+      filteredDeliveryList = filteredDeliveryList.reverse();
+      // filteredItems = filteredItems.reverse();
+    }
+  }
+  if (param.pageNo) {
+    filteredDeliveryList = filteredDeliveryList.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
+    // filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
+  }
+
+  return Promise.resolve({
+    data: filteredDeliveryList,
+    // data: filteredItems,
+    status: 200,
+    code: 'OK',
+    message: 'Success',
+    totalCount,
+  });
+};
+
+async function read(query, pageNo, pageSize) {
+  const result = await retrieve({
+    ...query,
+    pageNo,
+    pageSize,
+  });
+  console.log('result', result);
+  return result;
+}
+
+async function insert(item) {
+  items.push(item);
+  return true;
+}
+
+async function update(item) {
+  const at = items.findIndex((target) => target.id === item.id);
+  items[at] = item;
+  return true;
+}
+
+async function remove(item) {
+  const at = items.findIndex((target) => target.id === item.id);
+  items.splice(at, 1);
+  return true;
+}
+
+console.log('items', items);
 
     const state = reactive({
       visibleRowsCount: 20,
@@ -219,8 +281,8 @@ export default {
     const start = (e) => {
       // const index = parseInt(Math.random() * 100) % countries.length;
       const item = 
-        {No: 1, order_release_no: 142654, itemName: "CoverCap", itemCode: "BD72S643", itemQuantity: 10, unreleased: 0 };
-      e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(item));
+        e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(deliveryList));
+        // e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(item));
     };
 
     return {
@@ -234,6 +296,7 @@ export default {
     };
   },
 };
+
 </script>
 
 <style>
