@@ -4,7 +4,9 @@ const webpack = require('webpack');
 module.exports = {
   lintOnSave: false,
   devServer: {
-    port: process.env.VUE_APP_SERVER_PORT,
+    // port: process.env.VUE_APP_SERVER_PORT,
+    proxy: 'http://localhost',
+    historyApiFallback: true,//
     https: false,
     overlay: false,
     disableHostCheck: true,
