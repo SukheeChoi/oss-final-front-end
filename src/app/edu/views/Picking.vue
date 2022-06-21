@@ -3,8 +3,8 @@
     <div class="ow-flex-wrap item-size-content">
         <!-- 수령/전달 -->
       <div class="item size-fix" style="margin-right: 6px;">
-        <button class="ow-btn type-group" data-label="receipt" onclick="handleChangeReceiptOrDelivery"><span>수령</span></button>
-        <button class="ow-btn type-group" data-label="delivery" onclick="handleChangeReceiptOrDelivery" active><span>전달</span></button>
+        <button class="ow-btn type-group active" data-label="receipt" onclick="handleChangeReceiptOrDelivery"><span>수령</span></button>
+        <button class="ow-btn type-group" data-label="delivery" onclick="handleChangeReceiptOrDelivery"><span>전달</span></button>
       </div>
       <!-- 담당자 이름 filter -->
       <div class="item size-fix" style="--gap-item: 6px">
@@ -113,17 +113,49 @@
 
 <script>
 import combineShippingApi from '../../../api/combineShippingApi';
-import { ref, reactive, beforeCreate } from 'vue';
+import { ref, reactive, beforeCreate, onMouted } from 'vue';
 import OwNGrid from '@/components/grid/new/OwNGrid';
-import axios from "axios";
 export default {
   name: 'TheOwNewGrid',
   components: {
     OwNGrid,
   },
   setup() {
-    //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
+    const vendorList = ref([]);
     const assigneeList = ref([]);
+    const receiptList = ref([]);
+    const deliveryList = ref([]);
+    const deliveredList = ref([]);
+
+    //수령 탭
+    // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
+    const getVendorList = async () => {
+      const result = await combineShippingApi.getVendorList(['2022-06-10', '2022-06-25']);
+      return result;
+    };
+    getVendorList().then((result) => {
+      console.log('getVendorList - JSON.stringify(result) : ' + JSON.stringify(result));
+      vendorList.value = result.list;
+      console.log('vendorList.value.length : ' + vendorList.value.length);
+      // 담당 업체명
+      console.log('vendorList.value[0].vendorNo : ' + vendorList.value[0].vendorNo);
+      console.log('vendorList.value[0].vendorName : ' + vendorList.value[0].vendorName);
+      console.log('vendorList.value[0]["vendorNo"] : ' + vendorList.value[0]['vendorNo']);
+    });
+
+
+    // (수령예정) 기간으로 필터링한 수령 목록 조회.
+    const getReceiptListByDate = async () => {
+      const result = await combineShippingApi.getReceiptListByDate(['2022-06-10', '2022-06-25']);
+      return result;
+    };
+    getReceiptListByDate().then((result) => {
+      console.log('getReceiptListByDate - JSON.stringify(result) : ' + JSON.stringify(result));
+      receiptList.value = result.list;
+      console.log('receiptList.value.length : ' + receiptList.value.length);
+    });
+
+    //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
     const getAssigneeList = async () => {
       const result = await combineShippingApi.getAssigneeList();
       return result;
@@ -140,12 +172,13 @@ export default {
       console.log('getAssigneeList - result : ' + result);
       console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
       assigneeList.value = result.list;
-      console.log('assigneeList.value[0]["employeeId"] : ' + assigneeList.value[0]['employeeId']);
+      console.log('assigneeList.value[0]["orderItem"] : ' + assigneeList.value[0]['orderItem']);
       console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
     });
 
+    // onMouted(() => console.log('component mounted'));
+
     // '수령'탭에서 바인딩할 데이터를 불러옴.
-    const receiptList = ref([]);
     const getReceiptList = async (employeeId) => {
       const result = await combineShippingApi.getReceiptList(employeeId);
       return result;
@@ -162,7 +195,6 @@ export default {
     });
 
     // '전달' 탭에서 바인딩할 데이터를 불러옴.
-    const deliveryList = ref([]);
     const getDeliveryList = async (employeeId) => {
       const result = await combineShippingApi.getDeliveryList(employeeId);
       return result;
@@ -179,7 +211,6 @@ export default {
     });
 
     // 전달된 항목 정보 update.
-    const deliveredList = ref([]);
     deliveredList.value.push(
       {
           "orderItemNo": 2,
@@ -225,33 +256,33 @@ export default {
     });
     
     
-    const items = [
-      {No: 1, order_release_no: "2201042337/C_02_005", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
-      , {No: 2, order_release_no: "22010423828/C_02_001", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
-      , {No: 3, order_release_no: "2201042337/C_02_005", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 1, unreleased: 0 }
-      , {No: 4, order_release_no: "2201041332/C_02_004", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 2, unreleased: 0 }
-      , {No: 5, order_release_no: "2201043708/C_02_006", itemName: "SB Anchor", itemCode: "SBAC4030TSR", itemQuantity: 5, unreleased: 0 }
-      , {No: 6, order_release_no: "2201043708/C_02_006", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 2, unreleased: 0 }
-      , {No: 7, order_release_no: "2201041015/C_02_002", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 3, unreleased: 0 }
-      , {No: 8, order_release_no: "2201043708/C_02_006", itemName: "SmartMembrane", itemCode: "SM2W10129SB", itemQuantity: 10, unreleased: 0 }
-      , {No: 9, order_release_no: "2201042337/C_02_005", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 9, unreleased: 0 }
-      , {No: 10, order_release_no: "2201042337/C_02_004", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 1, unreleased: 0 }
-      , {No: 11, order_release_no: "2201044479/E_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
-      , {No: 12, order_release_no: "2201043828/C_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
-      , {No: 13, order_release_no: "2201041332/C_02_004", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 1, unreleased: 0 }
-      , {No: 14, order_release_no: "2201040991/C_02_003", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 4, unreleased: 0 }
-      , {No: 15, order_release_no: "2201043828/C_02_001", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 3, unreleased: 0 }
-      , {No: 16, order_release_no: "2201040991/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-      , {No: 17, order_release_no: "2201041015/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 1, unreleased: 0 }
-      , {No: 18, order_release_no: "2201044479/E_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 10, unreleased: 0 }
-      , {No: 19, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-      // 
-      , {No: 20, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-      , {No: 21, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-      , {No: 22, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-      , {No: 23, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-      , {No: 24, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-    ];
+    // const items = [
+    //   {No: 1, order_release_no: "2201042337/C_02_005", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
+    //   , {No: 2, order_release_no: "22010423828/C_02_001", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
+    //   , {No: 3, order_release_no: "2201042337/C_02_005", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 1, unreleased: 0 }
+    //   , {No: 4, order_release_no: "2201041332/C_02_004", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 2, unreleased: 0 }
+    //   , {No: 5, order_release_no: "2201043708/C_02_006", itemName: "SB Anchor", itemCode: "SBAC4030TSR", itemQuantity: 5, unreleased: 0 }
+    //   , {No: 6, order_release_no: "2201043708/C_02_006", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 2, unreleased: 0 }
+    //   , {No: 7, order_release_no: "2201041015/C_02_002", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 3, unreleased: 0 }
+    //   , {No: 8, order_release_no: "2201043708/C_02_006", itemName: "SmartMembrane", itemCode: "SM2W10129SB", itemQuantity: 10, unreleased: 0 }
+    //   , {No: 9, order_release_no: "2201042337/C_02_005", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 9, unreleased: 0 }
+    //   , {No: 10, order_release_no: "2201042337/C_02_004", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 1, unreleased: 0 }
+    //   , {No: 11, order_release_no: "2201044479/E_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
+    //   , {No: 12, order_release_no: "2201043828/C_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
+    //   , {No: 13, order_release_no: "2201041332/C_02_004", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 1, unreleased: 0 }
+    //   , {No: 14, order_release_no: "2201040991/C_02_003", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 4, unreleased: 0 }
+    //   , {No: 15, order_release_no: "2201043828/C_02_001", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 3, unreleased: 0 }
+    //   , {No: 16, order_release_no: "2201040991/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+    //   , {No: 17, order_release_no: "2201041015/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 1, unreleased: 0 }
+    //   , {No: 18, order_release_no: "2201044479/E_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 10, unreleased: 0 }
+    //   , {No: 19, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+    //   // 
+    //   , {No: 20, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+    //   , {No: 21, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+    //   , {No: 22, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+    //   , {No: 23, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+    //   , {No: 24, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
+    // ];
 
     const retrieve = (param) => {
       console.log('param', param);
@@ -342,7 +373,7 @@ export default {
       return true;
     }
 
-    console.log('items', items);
+    // console.log('items', items);
 
     const state = reactive({
       visibleRowsCount: 20,

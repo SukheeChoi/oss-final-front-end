@@ -1,7 +1,31 @@
 // 합배송품목 수령및전달 페이지에서의 통신.
 
 import axios from "axios";
+//수령/전달 날짜 필터링 유무로 나눠진 API 합치기!!
+async function getVendorList(dateList) {
+  let vendorList = null;
+  try {
+    const response = await axios.post(`/combineShipping/getVendorList`, dateList);
+    vendorList = response.data;
+  } catch(error) {
+    console.log(error);
+  }
+  return vendorList;
+}
 
+// 날짜 필터링을 통한 수령 목록 조회.
+async function getReceiptListByDate(dateList) {
+  let receiptList = null;
+  try {
+    const response = await axios.post(`/combineShipping/getReceiptListByDate`, dateList);
+    receiptList = response.data;
+  } catch(error) {
+    console.log(error);
+  }
+  return receiptList;
+}
+
+// 선택된 날짜에 해당하는 목록 조회.
 
 // 담당자 띄우기. 이름과 코드 필요.
 async function getAssigneeList() {
@@ -56,7 +80,9 @@ async function updateDeliveryList(deliveredList) {
 
 
 export default {
-  getAssigneeList
+  getVendorList
+  , getReceiptListByDate
+  , getAssigneeList
   , getReceiptList
   , getDeliveryList
   , updateDeliveryList
