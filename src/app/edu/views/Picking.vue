@@ -145,15 +145,15 @@ export default {
 
 
     // (수령예정) 기간으로 필터링한 수령 목록 조회.
-    const getReceiptListByDate = async () => {
-      const result = await combineShippingApi.getReceiptListByDate(['2022-06-10', '2022-06-25']);
-      return result;
-    };
-    getReceiptListByDate().then((result) => {
-      console.log('getReceiptListByDate - JSON.stringify(result) : ' + JSON.stringify(result));
-      receiptList.value = result.list;
-      console.log('receiptList.value.length : ' + receiptList.value.length);
-    });
+    // const getReceiptListByDate = async () => {
+    //   const result = await combineShippingApi.getReceiptListByDate(['2022-06-10', '2022-06-25']);
+    //   return result;
+    // };
+    // getReceiptListByDate().then((result) => {
+    //   console.log('getReceiptListByDate - JSON.stringify(result) : ' + JSON.stringify(result));
+    //   receiptList.value = result.list;
+    //   console.log('receiptList.value.length : ' + receiptList.value.length);
+    // });
 
     //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
     const getAssigneeList = async () => {
@@ -180,7 +180,7 @@ export default {
     // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
     // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
     const getReceiptList = async (employeeId, dateList=[]) => {
-      const result = await combineShippingApi.getReceiptList(employeeId, dateList);
+      const result = await combineShippingApi.getReceiptList(employeeId, Array.from(dateList));
     console.log('dsfksugfhnm,dlk' + result);
       return result;
     };
@@ -196,12 +196,12 @@ export default {
     });
 
     // '전달' 탭에서 바인딩할 데이터를 불러옴.
-    const getDeliveryList = async (employeeId) => {
-      const result = await combineShippingApi.getDeliveryList(employeeId);
+    const getDeliveryList = async (employeeId, dateList=[]) => {
+      const result = await combineShippingApi.getDeliveryList(employeeId, Array.from(dateList));
       return result;
     };
-    getDeliveryList('E1').then(result => {
-      console.log('result : ' + result);
+    getDeliveryList('E1', ['2022-06-10', '2022-06-25']).then(result => {
+      console.log('getDeliveryList - result : ' + result);
       console.log('result.deliveryList : ' + result.deliveryList);
       console.log('result.deliveryList[0] : ' + result.deliveryList[0]);
       console.log('result.deliveryList[0]["orderItemNo"] : ' + result.deliveryList[0]['orderItemNo']);
