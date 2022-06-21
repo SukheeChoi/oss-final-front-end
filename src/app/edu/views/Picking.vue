@@ -176,19 +176,20 @@ export default {
       console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
     });
 
-    // onMouted(() => console.log('component mounted'));
-
-    // '수령'탭에서 바인딩할 데이터를 불러옴.
-    const getReceiptList = async (employeeId) => {
-      const result = await combineShippingApi.getReceiptList(employeeId);
+    // '수령'탭에 바인딩할 데이터를 불러옴.
+    // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
+    // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
+    const getReceiptList = async (employeeId, dateList=[]) => {
+      const result = await combineShippingApi.getReceiptList(employeeId, dateList);
+    console.log('dsfksugfhnm,dlk' + result);
       return result;
     };
     getReceiptList('E2').then(result => {
       console.log('result : ' + result);
+      receiptList.value = result.receiptList;
       console.log('result.receiptList : ' + result.receiptList);
       console.log('result.receiptList[0] : ' + result.receiptList[0]);
       console.log('result.receiptList[0]["orderItemNo"] : ' + result.receiptList[0]['orderItemNo']);
-      receiptList.value = result.receiptList;
       console.log('receiptList.value[0]// : ' + receiptList.value[0]);
       console.log('receiptList.value[0]["orderItemNo"]// : ' + receiptList.value[0]['orderItemNo']);
       console.log('JSON.stringify(receiptList.value[0]) : ' + JSON.stringify(receiptList.value[0]));

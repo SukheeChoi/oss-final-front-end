@@ -42,10 +42,11 @@ async function getAssigneeList() {
 
 // param: 담당자 코드, pageNo
 // '수령'탭에서 표시할 list.
-async function getReceiptList(employeeId) {
+async function getReceiptList(employeeId, dateList) {
   let receiptList = null;
   try {
-    const response = await axios.get(`/combineShipping/getReceiptList?employeeId=${employeeId}`);
+    const response = await axios.post(`/combineShipping/getReceiptList`, {"employeeId": employeeId
+                                                                          , "dateList": Array.from(deliveredList)});
     receiptList = response.data;
   } catch(error) {
     console.log(error);
