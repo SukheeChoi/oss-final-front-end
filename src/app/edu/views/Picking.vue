@@ -128,21 +128,21 @@ export default {
       const result = await combineShippingApi.getAssigneeList();
       return result;
     };
-    axios.all([getAssigneeList()]).then((result) => {
-      console.log('getAssigneeList - result : ' + result);
-      console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
-      assigneeList.value = result.list;
-      console.log('assigneeList.value[0]["employeeId"] : ' + assigneeList.value[0]['employeeId']);
-      console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
-    });
-
-    // getAssigneeList().then((result) => {
+    // axios.all([getAssigneeList()]).then((result) => {
     //   console.log('getAssigneeList - result : ' + result);
     //   console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
     //   assigneeList.value = result.list;
     //   console.log('assigneeList.value[0]["employeeId"] : ' + assigneeList.value[0]['employeeId']);
     //   console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
     // });
+
+    getAssigneeList().then((result) => {
+      console.log('getAssigneeList - result : ' + result);
+      console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
+      assigneeList.value = result.list;
+      console.log('assigneeList.value[0]["employeeId"] : ' + assigneeList.value[0]['employeeId']);
+      console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
+    });
 
     // '수령'탭에서 바인딩할 데이터를 불러옴.
     const receiptList = ref([]);
@@ -177,6 +177,53 @@ export default {
       console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
       console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
     });
+
+    // 전달된 항목 정보 update.
+    const deliveredList = ref([]);
+    deliveredList.value.push(
+      {
+          "orderItemNo": 2,
+          "orderCheckDate": null,
+          "receiveCheck": true,
+          "receiveUnrelease": 0,
+          "deliveryUnrelease": 0,
+          "deliverCheck": true,
+          "employeeId": null,
+          "releaseScheduleDate": null,
+          "receiveDate": null,
+          "releaseQuantity": 2,
+          "deliveryQuantity": 2
+      }
+    );
+    deliveredList.value.push(
+      {
+          "orderItemNo": 3,
+          "orderCheckDate": null,
+          "receiveCheck": true,
+          "receiveUnrelease": 0,
+          "deliveryUnrelease": 0,
+          "deliverCheck": true,
+          "employeeId": null,
+          "releaseScheduleDate": null,
+          "receiveDate": null,
+          "releaseQuantity": 10,
+          "deliveryQuantity": 10
+      }
+    );
+    console.log('typeof(deliveredList) : ' + typeof(deliveredList));
+    console.log('typeof(deliveredList.value) : ' + typeof(deliveredList.value));
+    console.log('deliveredList.value : ' + deliveredList.value);
+    console.log('deliveredList.value[0] : ' + deliveredList.value[0]);
+    console.log('deliveredList.value[0]["orderItemNo"] : ' + deliveredList.value[0]["orderItemNo"]);
+
+    const updateDeliveryList = async (deliveredList) => {
+      const result = await combineShippingApi.updateDeliveryList(deliveredList);
+      return result;
+    };
+    updateDeliveryList(deliveredList).then(result => {
+      console.log('updateDeliveryList - result : ' + result);
+    });
+    
     
     const items = [
       {No: 1, order_release_no: "2201042337/C_02_005", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
