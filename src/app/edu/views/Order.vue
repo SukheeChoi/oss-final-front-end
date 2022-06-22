@@ -25,20 +25,10 @@
         v-model:modelValue="checkboxGroup4"
         :label="`회사`"
       />
-      <ow-filter-checkbox
-        name="checkboxGp2"
-        :items="checkboxGroup2"
-        v-model:modelValue="checkboxGroup5"
-        :label="`배송구분`"
-      />
-      <ow-filter-checkbox
-        name="checkboxGp3"
-        :items="checkboxGroup3"
-        v-model:modelValue="checkboxGroup6"
-        :label="`미출고`"
-      />
+      <ow-filter-checkbox name="checkboxGp2" :items="checkboxGroup2" v-model="checkboxGroup5" :label="`배송구분`" />
+      <ow-filter-checkbox name="checkboxGp3" :items="checkboxGroup3" v-model="checkboxGroup6" :label="`미출고`" />
       <div class="title-field">지점별 보기</div>
-      <button class="ow-btn type-util">지점선택(전체)</button>
+      <button class="ow-btn type-util" @click="postData()">지점선택(전체)</button>
 
       <div class="item align-to-right" style="--gap-item: 6px">
         <div class="title-field">검색</div>
@@ -251,15 +241,41 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs } from 'vue';
+import { ref, reactive, toRefs, watch, computed } from 'vue';
 import orderApi from '@/api/orderApi';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
+
+async function postData(filter) {
+  const model = await orderApi.postData(filter);
+  console.log(model);
+}
+
 export default {
   name: 'Order',
   setup() {
     const state = reactive({
       flex: undefined,
     });
+
+    const checkboxGroup1 = ref([
+      { name: '오스템제품', value: 'osstem' },
+      { name: '오스템상품', value: 'osstemproduct' },
+      { name: '협력사상품(합배송)', value: 'vendorproduct' },
+      { name: '협력사상품(직배송)', value: 'vendorproductDir' },
+    ]);
+
+    const checkboxGroup2 = ref([
+      { name: '긴급', value: '긴급' },
+      { name: '일반', value: '일반' },
+    ]);
+
+    const checkboxGroup3 = ref([
+      { name: '출고', value: '출고' },
+      { name: '미출고', value: '미출고' },
+    ]);
+    const checkboxGroup4 = ref([]);
+    const checkboxGroup5 = ref([]);
+    const checkboxGroup6 = ref([]);
 
     const onInitialized = (flex) => {
       state.flex = flex;
@@ -285,39 +301,41 @@ export default {
 
     getList();
 
+    watch(
+      () => [checkboxGroup4, checkboxGroup5, checkboxGroup6],
+      (newGroup, oldGroup) => {
+
+        const list = newGroup.map((data) => {
+          return data.value
+        });
+
+        const company = list[0].map((data) => {return data});
+        const shippingway = list[1].map((data) => {return data});
+        const unreleased = list[2].map((data) => {return data});
+
+        const jsonData = {
+          "company" : {...company},
+          "shippingway" : {...shippingway},
+          "unreleased" : {...unreleased}
+        };
+
+        console.log(jsonData);
+        postData(jsonData);
+      },
+      { deep: true }
+    );
+
     return {
       ...toRefs(state),
       onInitialized,
       response,
-    };
-  },
-
-  
-  data() {
-    return {
-      checkboxGroup1: [
-        { name: '오스템제품', value: '1' },
-        { name: '오스템상품', value: '2' },
-        { name: '협력사상품(합배송)', value: '3' },
-        { name: '협력사상품(직배송)', value: '4' },
-      ],
-      checkboxGroup2: [
-        { name: '긴급', value: '1' },
-        { name: '일반', value: '2' },
-      ],
-      checkboxGroup3: [
-        { name: '출고', value: '1' },
-        { name: '미출고', value: '2' },
-      ],
-      checkboxGroup4: [],
-      checkboxGroup5: [],
-      checkboxGroup6: [],
-      checkboxGroup7: [
-        { a: '05-31 09:10', b: '2111293708', c: '현대치과\n이동현', d: 'SmartMembrane' },
-        { a: '05-31 09:10', b: '2111293708', c: '현대치과\n이동현', d: 'SB Anchor' },
-        { a: '05-31 09:10', b: '2111293708', c: '현대치과\n이동현', d: 'Cover Cap' },
-        { a: '05-31 09:15', b: '2111293708', c: '현대치과 이동현', d: 'Cover Cap' },
-      ],
+      postData,
+      checkboxGroup1,
+      checkboxGroup2,
+      checkboxGroup3,
+      checkboxGroup4,
+      checkboxGroup5,
+      checkboxGroup6,
     };
   },
 };

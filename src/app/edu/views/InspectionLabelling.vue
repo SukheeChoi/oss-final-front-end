@@ -24,7 +24,7 @@
         <button class="ow-btn type-util">예정시간수정</button>
         <button class="ow-btn type-util">추가</button>
       </div>
-      <ow-tree-grid :initialized="initialize" :read="read" :query="['name']" :childItemsPath="['children', 'children']">
+      <ow-tree-grid :initialized="initialize" :read="read" :query="['name']" :childItemsPath="childItemsPath">
         <!-- childitem 순서대로 입력하기 children(albert)아래 children(anton) -->
         <wj-flex-grid-column header="Name" binding="name" width="*"></wj-flex-grid-column>
         <wj-flex-grid-column header="Country" binding="country" width="2*" :is-required="true"></wj-flex-grid-column>
@@ -76,6 +76,7 @@
 </template>
 
 <script>
+const childItemsPath = ['children', 'children'];
 const items = [
   {
     name: '전체',

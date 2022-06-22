@@ -23,7 +23,21 @@ async function getAllList() {
   return response.data;
 }
 
+async function postData(filter) {
+  console.log(filter);
+  let response = null;
+  try {
+    response = await axios.get("/order/orderfilter", { params: { filter }});
+    // response = await axios.post(`/order/orderview?model=${"이동현"}`);
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+  return response;
+}
+
 export default {
   getTotal,
   getAllList,
+  postData,
 };

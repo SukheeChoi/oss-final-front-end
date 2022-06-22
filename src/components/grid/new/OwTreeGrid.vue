@@ -245,9 +245,9 @@ export default {
 
     onMounted(async () => {
       await nextTick();
-      const el = header.value;
-      const textContent = el.textContent.trim();
-      state.isNotBlank = textContent !== '';
+      // const el = header.value;
+      // const textContent = el.textContent.trim();
+      // state.isNotBlank = textContent !== '';
     });
 
     return {
