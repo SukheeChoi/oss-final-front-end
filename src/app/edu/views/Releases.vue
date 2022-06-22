@@ -355,6 +355,9 @@ const ITEM_VENDORS = [
 export default {
   name: 'releaseInspection_packing',
   setup() {
+    
+
+
     const state = reactive({
       flex: undefined,
       //
@@ -372,6 +375,7 @@ export default {
       ...toRefs(state),
       onInitialized,
     };
+
   },
 
   components: {
@@ -415,6 +419,7 @@ export default {
           release_personincharge: '이가을',
           deliveryCompany: '대한통운',
           invoiceNo: '18374650',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_002',
@@ -436,6 +441,7 @@ export default {
           release_personincharge: '이가을',
           deliveryCompany: '대한통운',
           invoiceNo: '18374650',
+          etc: ' '
         },
         {
           placingorderNo: 'E_02_001',
@@ -457,6 +463,7 @@ export default {
           release_personincharge: '김수환',
           deliveryCompany: '우체국',
           invoiceNo: '38471625',
+          etc: ' '
         },
         {
           placingorderNo: 'E_02_001',
@@ -478,6 +485,7 @@ export default {
           release_personincharge: '김수환',
           deliveryCompany: '우체국',
           invoiceNo: '38471625',
+          etc: ' '
         },
         {
           placingorderNo: 'E_02_001',
@@ -499,6 +507,7 @@ export default {
           release_personincharge: '김수환',
           deliveryCompany: '우체국',
           invoiceNo: '38471625',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -520,6 +529,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -541,6 +551,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -562,6 +573,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -583,6 +595,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ''
         },
         {
           placingorderNo: 'C_03_001',
@@ -604,6 +617,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -625,6 +639,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -646,6 +661,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         ///
         {
@@ -668,6 +684,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -689,6 +706,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -710,6 +728,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -731,6 +750,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -752,6 +772,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -773,6 +794,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -794,6 +816,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -815,6 +838,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -836,6 +860,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -857,6 +882,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -878,6 +904,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -899,6 +926,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -920,6 +948,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -941,6 +970,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -962,6 +992,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -983,6 +1014,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
       ],
     };
