@@ -332,9 +332,10 @@
 <script>
 import OwSearch from '../../../components/common/OwSearch.vue';
 import OwSearchInput from '../../com/components/input/OwSearchInput.vue';
+import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-import { reactive, toRefs } from 'vue';
+import { ref, reactive, toRefs } from 'vue';
 
 function getRandomCount(i = 1500) {
   return Math.round(Math.random() * i);
@@ -355,8 +356,60 @@ const ITEM_VENDORS = [
 export default {
   name: 'releaseInspection_packing',
   setup() {
-    
-
+    const afterPickingList = ref([]);
+    // 리스트 전체 조회.
+    const getAfterPickingList = async () => {
+      const result = await afterPickingApi.getAfterPickingList()
+        .then((result) => {
+          console.log('getAfterPickingList - JSON.stringify(result) : ' + JSON.stringify(result));
+          afterPickingList.value = result.list;
+          console.log('afterPickingList.value.length : ' + afterPickingList.value.length);
+          // 출고번호
+          console.log('afterPickingList.value[0]["release"]["releaseNo"] : ' + afterPickingList.value[0]["release"]["releaseNo"]);
+          // 품목명
+          console.log('afterPickingList.value[0]["item"]["itemName"] : ' + afterPickingList.value[0]["item"]["itemName"]);
+          // 품목코드
+          console.log('afterPickingList.value[0]["item"]["itemCode"] : ' + afterPickingList.value[0]["item"]["itemCode"]);
+          // 피킹수량
+          console.log('afterPickingList.value[0]["picking"]["pickingQty"] : ' + afterPickingList.value[0]["picking"]["pickingQty"]);
+          // 검수수량
+          console.log('afterPickingList.value[0]["releaseInspectionQuantity"] : ' + afterPickingList.value[0]["releaseInspectionQuantity"]);
+          // 출고검수 - 미출고수량
+          console.log('afterPickingList.value[0]["unReleased"] : ' + afterPickingList.value[0]["unReleased"]);
+          // 패킹 - 미출고수량
+          console.log('afterPickingList.value[0]["packing"]["unrelease"] : ' + afterPickingList.value[0]["packing"]["unrelease"]);
+          // 거래처
+          console.log('afterPickingList.value[0]["vendor"]["vendorName"] : ' + afterPickingList.value[0]["vendor"]["vendorName"]);
+          // 배송지
+          console.log('afterPickingList.value[0]["order"]["shippingDestination"] : ' + afterPickingList.value[0]["order"]["shippingDestination"]);
+          // 배송구분
+          console.log('afterPickingList.value[0]["order"]["shippingCategory"] : ' + afterPickingList.value[0]["order"]["shippingCategory"]);
+          // 배송방식
+          console.log('afterPickingList.value[0]["order"]["shippingWay"] : ' + afterPickingList.value[0]["order"]["shippingWay"]);
+          // 출고검수 - 담당자
+          console.log('afterPickingList.value[0]["employeeName"] : ' + afterPickingList.value[0]["employeeName"]);
+          // 출고요청서 출력일시
+          console.log('afterPickingList.value[0]["releasePrintDate"] : ' + afterPickingList.value[0]["releasePrintDate"]);
+          // 거래명세서 출력일시
+          console.log('afterPickingList.value[0]["receiptePrintDate"] : ' + afterPickingList.value[0]["receiptePrintDate"]);
+          // 검수일시
+          console.log('afterPickingList.value[0]["releaseInspectionDate"] : ' + afterPickingList.value[0]["releaseInspectionDate"]);
+          // 출고 - 담당자
+          console.log('afterPickingList.value[0]["release"]["employeeName"] : ' + afterPickingList.value[0]["release"]["employeeName"]);
+          // 택배사
+          console.log('afterPickingList.value[0]["release"]["shippingCompany"] : ' + afterPickingList.value[0]["release"]["shippingCompany"]);
+          // 송장번호
+          console.log('afterPickingList.value[0]["release"]["invoiceCode"] : ' + afterPickingList.value[0]["release"]["invoiceCode"]);
+          // 출고검수 - 비고
+          console.log('afterPickingList.value[0]["releaseInspectionNote"] : ' + afterPickingList.value[0]["releaseInspectionNote"]);
+          // 패킹 - 비고
+          console.log('afterPickingList.value[0]["packing"]["note"] : ' + afterPickingList.value[0]["packing"]["note"]);
+          // 출고 - 비고
+          console.log('afterPickingList.value[0]["release"]["note"] : ' + afterPickingList.value[0]["release"]["note"]);
+        });
+      return result;
+    };
+    getAfterPickingList();
 
     const state = reactive({
       flex: undefined,
