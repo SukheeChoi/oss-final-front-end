@@ -337,8 +337,4 @@ progress::-webkit-progress-value {
   width: 50%;
   height: 100%;
 }
-
-/* progress {
-    width: 100%;
-} */
 </style>
