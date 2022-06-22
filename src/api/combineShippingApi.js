@@ -5,7 +5,9 @@ import axios from "axios";
 async function getVendorList(dateList) {
   let vendorList = null;
   try {
-    const response = await axios.post(`/combineShipping/getVendorList`, dateList);
+    let params = new URLSearchParams();
+    params.append('dateList', Array.from(dateList));
+    const response = await axios.post(`/combineShipping/getVendorList`, params);
     vendorList = response.data;
   } catch(error) {
     console.log(error);
