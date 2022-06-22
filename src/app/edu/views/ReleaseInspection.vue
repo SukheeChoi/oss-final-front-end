@@ -190,13 +190,8 @@
 
 </template>
 
-<!-- <script>
-
-</script> -->
-
-
 <script>
-import WjFlexGrid from '@grapecity/wijmo.vue2.grid';
+//import WjFlexGrid from '@grapecity/wijmo.vue2.grid';
 import { ref, reactive, toRefs } from 'vue';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 import axios from "axios";
@@ -232,8 +227,8 @@ export default {
     const onInitialized = (flex) => {
       const config = {
         groupingColumns: ["clientName"],
-        mergedColumns : ["clientName","boxQty"],
-        //mergedColumns : [0,1,2,3,4,5,'releasePrintDate','boxQty',14,15,16],
+        //mergedColumns : ["clientName","boxQty"],
+        mergedColumns : [0,1,2,3,4,5,'releasePrintDate','boxQty',14,15,16],
         
       };
       flex.mergeManager = new SimpleMergeManager(config);
@@ -245,18 +240,36 @@ export default {
     const getReleaseInspectionList = async () => {
       console.log('111111111111111111111111~~~~~~~~~~~~~~~~~~~~~~~~~~');
       const list = await releaseInspectionApi.getReleaseInspectionList();
+
+      //데이터 처리
+      console.log(list);
+      console.log("데이터 크기");
+      console.log(list.length);
+      for(let i=0; i<list.length; i++){
+        if(list[i].boxQty === 0){
+          list[i].boxQty = " ";
+        }
+        if(list[i].releasePrintDate === null){
+          list[i].releasePrintDate = " ";
+        }
+        if(list[i].receiptePrintDate === null){
+          list[i].receiptePrintDate = " ";
+        }
+      }
       console.log('222222222222222222222222~~~~~~~~~~~~~~~~~~~~~~~~~~');
       releaseInspectionData.value = list;
     };
 
     getReleaseInspectionList();
 
+
+
     // const data = new CollectionView(list, {sortDescriptions: ["country", "active"]});
 
     return {
       ...toRefs(state),
       onInitialized,
-      releaseInspectionData
+      releaseInspectionData,
     }
   },
 
@@ -264,9 +277,9 @@ export default {
   //   this.getReleaseInspectionList();
   // },
 
-  components: {
-    WjFlexGrid,
-  },
+  // components: {
+  //   WjFlexGrid,
+  // },
 };
 </script>
 
