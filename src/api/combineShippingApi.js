@@ -1,6 +1,7 @@
 // 합배송품목 수령및전달 페이지에서의 통신.
 
 import axios from "axios";
+
 //수령/전달 날짜 필터링 유무로 나눠진 API 합치기!!
 async function getVendorList(dateList) {
   let vendorList = null;
