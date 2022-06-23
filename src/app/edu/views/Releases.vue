@@ -166,12 +166,11 @@
       allowSorting="None"
       selectionMode="None"
       class="ow-grid type-header-group"
-      :items-source="releaseInspection_Packing_Data"
+      :items-source="releaseInspection_Packing_Data2"
       :initialized="onInitialized"
       :allowMerging="'Cells'"
       style="display: flex"
     >
-      <!-- :itemsSource="releaseInspection_Packing_Data" -->
       <!-- :allowResizing="Row" -->
       <!--화이팅 이라구요! 언니 힘내라구요! -->
       <!-- :loadedRows="onloadedRows" -->
@@ -341,7 +340,7 @@ import OwSearchInput from '../../com/components/input/OwSearchInput.vue';
 import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-import { ref, reactive, toRefs, beforeCreate, onBeforeMount } from 'vue';
+import { ref, reactive, toRefs, beforeCreate, onBeforeMount, onMounted } from 'vue';
 
 function getRandomCount(i = 1500) {
   return Math.round(Math.random() * i);
@@ -413,8 +412,8 @@ export default {
     getSummary();
 
     // 리스트 전체 조회.(페이지네이션 필요.)
-    const getAfterPickingList = async (filterList) => {
-      const result = await afterPickingApi.getAfterPickingList(filterList)
+    const getAfterPickingList = (filterList) => {
+      const result = afterPickingApi.getAfterPickingList(filterList)
         .then((result) => {
           console.log('getAfterPickingList - JSON.stringify(result) : ' + JSON.stringify(result));
           afterPickingList.value = result.list;
@@ -465,6 +464,47 @@ export default {
       // return result;
     };
     getAfterPickingList(filterList);
+    onMounted(() => {
+      console.log('~~~~~~~!!~');
+
+    });
+
+    // 통신을 통한 데이터 바인딩.
+    const releaseInspection_Packing_Data2 = ref([]);
+    console.log('qqqqqqqq');
+    console.log('@@@@ afterPickingList.value.length : ' + afterPickingList.value.length);
+    for(let i=0; i<afterPickingList.value.length; i++) {
+      console.log('inside for loop');
+      releaseInspection_Packing_Data2.value.push(
+        {
+          placingorderNo: afterPickingList.value[i]["release"]["releaseNo"]
+          , itemName: afterPickingList.value[i]["item"]["itemName"]
+          , itemCode: afterPickingList.value[i]["item"]["itemCode"]
+          , pickingQty: afterPickingList.value[i]["picking"]["pickingQty"]
+          , inspectionQty: afterPickingList.value[i]["releaseInspectionQuantity"]
+          , packing_unrelease: (
+            afterPickingList.value[i]["unReleased"]
+            + afterPickingList.value[i]["packing"]["unrelease"]
+          )
+          , orderClient: afterPickingList.value[i]["vendor"]["vendorName"]
+          , shippingDest: afterPickingList.value[i]["order"]["shippingDestination"]
+          , shippingCat: afterPickingList.value[i]["order"]["shippingCategory"]
+          , shippingWay: afterPickingList.value[i]["order"]["shippingWay"]
+          , packing_personincharge: afterPickingList.value[i]["employeeName"]
+          , releaseprintDate: afterPickingList.value[i]["releasePrintDate"]
+          , transactionprintDate: afterPickingList.value[i]["receiptePrintDate"]
+          , inspectionDate: afterPickingList.value[i]["releaseInspectionDate"]
+          , boxQty: afterPickingList.value[i]["release"]["boxQuantity"]
+          // 출고~/
+          , release_personincharge: afterPickingList.value[i]["release"]["employeeName"]
+          , deliveryCompany: afterPickingList.value[i]["release"]["shippingCompany"]
+          , invoiceNo: afterPickingList.value[i]["release"]["invoiceCode"]
+          , etc: ' '
+          // , etc: afterPickingList.value[i]["packing"]["note"]
+        }
+      );
+      console.log('###### i : ' + releaseInspection_Packing_Data2.value.placingorderNo);
+    }
 
     const state = reactive({
       flex: undefined,
@@ -479,10 +519,13 @@ export default {
 
       flex.mergeManager = new SimpleMergeManager(config);
     };
+
+
     return {
       ...toRefs(state)
       , onInitialized
       , summaryList
+      , releaseInspection_Packing_Data2
     };
 
   },
@@ -492,8 +535,9 @@ export default {
     // OwSearchInput
   },
   data() {
+    // const item = releaseInspection_Packing_Data2;
     return {
-      // summaryList: summaryList
+      // releaseInspection_Packing_Data2: releaseInspection_Packing_Data2,
       // ,
       emptyGroup: []
       , data: []
