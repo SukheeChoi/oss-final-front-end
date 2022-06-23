@@ -32,7 +32,7 @@
         <wj-flex-grid
           headersVisibility="Column"
           selectionMode="RowRange"
-          :itemsSource="releaseInspectionData"
+          :items-source="releaseInspectionData"
           class="ow-grid"
           :allowMerging="'Cells'"
           :initialized="onInitialized"
@@ -41,7 +41,7 @@
         > <!-- :autoRowHeights="true" -->
           <wj-flex-grid-column :binding="'no'" :header="'No'" :allowMerging="true" :width=40 align="center"/>
           <wj-flex-grid-column :binding="'clientName'" :header="'거래처'" :allowMerging="true" :width=100 align="center"/>
-          <wj-flex-grid-column :binding="'shippingWay'" :header="'배송구분'" :allowMerging="true" :width=65 align="center"/>
+          <wj-flex-grid-column :binding="'category'" :header="'배송구분'" :allowMerging="true" :width=65 align="center"/>
           <wj-flex-grid-column :binding="'releaseCode'" :header="'출고번호'" :allowMerging="true" :width=100 align="center"/>
           <wj-flex-grid-column :binding="'shippingDestination'" :header="'배송지'" :allowMerging="true" :width=100 align="center"/>
           <wj-flex-grid-column :binding="'orderNo'" :header="'주문번호'" :allowMerging="true" :width=100 align="center"/>
@@ -63,10 +63,12 @@
   </div>
 
   <!-- 검수스캔 영역 -->
-  <div class="item">
+  <div class="item align-items-start">
     <div class="ow-flex-wrap dir-col">
+      
       <!-- 바코드 스캔(윗부분) -->
       <div class="item size-fix ow-flex-wrap dir-col">
+
         <div class="ow-flex-wrap">
           <div class="item size-fix" style="--gap-item:6px;">
             <div class="title-field">거래처명</div>
@@ -139,7 +141,7 @@
           </tbody>
         </table>
         <div class="container">
-          <button class="ow-btn type-util float-right" style="float:right">+-</button>
+          <button class="ow-btn type-util float-right" style="float:right">미출고처리</button>
         </div>
                
       </div>
@@ -165,8 +167,7 @@
         <div class="ow-grid-wrap">
           <wj-flex-grid
             headersVisibility="Column"
-            :itemsSource="data"
-            class="ow-grid">
+            class="ow-grid"><!-- :itemsSource="data" -->
             <wj-flex-grid-column :binding="'No'" :header="'No'" :width=55 />
             <wj-flex-grid-column :binding="'No'" :header="'품목명'" :width=100 />
             <wj-flex-grid-column :binding="'No'" :header="'품목코드'" :width=100 />
@@ -191,55 +192,32 @@
 </template>
 
 <script>
-//import WjFlexGrid from '@grapecity/wijmo.vue2.grid';
-import { ref, reactive, toRefs } from 'vue';
+import { ref, reactive, toRefs, watch, toRaw, onMounted } from 'vue';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-import axios from "axios";
 import releaseInspectionApi from '@/api/releaseInspectionApi';
-import CollectionView from "@grapecity/wijmo";
 
 export default {
-  data() {
-
-    // OwFlexGrid
-    return {
-      checkboxGroup5: [ 
-        { name : '긴급', value : '긴급'} ,
-        { name : '일반', value : '일반'} ,
-      ]
-      , emptyGroup: []
-      // , releaseInspectionData: [
-      //   {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      //   {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      //   {No: '1', orderClient : '현대치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      //   {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      //   {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      //   {No: '2', orderClient : '램브란트치과', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      //   {No: '3', orderClient : '햇살치과의원', shippingCat: '일반', releaseNo: 'C_02_006', deliveryDest: '현대치과', orderNum: '2201043708', companyName: 'Kavo', itemName: 'SmartMembrane', itemCode: 'SM2W10129SB', pickingQty: '10', inspectionQty:'10', personInCharge: '김현일', releasePrint:'', boxQty:'',inspection:'',transactionPrint:'', note:''},
-      // ]
-    }
-  },
-
   setup() {
     const state = reactive({
       flex: undefined,  //wj-flex-grid의 정보를 flex에 담아서 사용
     });
+
+    //grid 병합 처리 >> custom merge
     const onInitialized = (flex) => {
       const config = {
         groupingColumns: ["clientName"],
-        //mergedColumns : ["clientName","boxQty"],
-        mergedColumns : [0,1,2,3,4,5,'releasePrintDate','boxQty',14,15,16],
-        
+        mergedColumns : [0,1,2,3,4,5,'releasePrintDate','boxQty',14,15,16],        
       };
       flex.mergeManager = new SimpleMergeManager(config);
     };
 
-    //ref 활용해서 데이터 넣는 법!
+    //ref 활용해서 전체 데이터 가져오기
     const releaseInspectionData = ref([]);
 
     const getReleaseInspectionList = async () => {
       console.log('111111111111111111111111~~~~~~~~~~~~~~~~~~~~~~~~~~');
       const list = await releaseInspectionApi.getReleaseInspectionList();
+      //const list = await releaseInspectionApi.getFilterList(['긴급']);
 
       //데이터 처리
       console.log(list);
@@ -257,21 +235,115 @@ export default {
         }
       }
       console.log('222222222222222222222222~~~~~~~~~~~~~~~~~~~~~~~~~~');
+      console.log(list);
       releaseInspectionData.value = list;
+
     };
 
     getReleaseInspectionList();
 
+    //필터링된 정보만 가져오기
+    const releaseInspectionFilterData = ref([]);
 
+    const getFilterList = async(newGroup) => {
+      console.log("지금 들어가는 newGroup", newGroup);
+      const list = await releaseInspectionApi.getFilterList(newGroup);
+      return list;
+    };
+    
+    console.log("emptyGroup==> ", emptyGroup)
+
+    // update aggregates when selection changes
+    function sellectionChanged() {
+      
+      //calculate aggregates
+      let tally = {pickingQty:0, releaseInspectionQuantity:0, }
+    }
 
     // const data = new CollectionView(list, {sortDescriptions: ["country", "active"]});
 
+    //Filter
+    const checkboxGroup5 = ref([ { name : '긴급', value : '긴급'} , { name : '일반', value : '일반'}]);
+    const emptyGroup = ref([]);
+
+    function getEmptyGroup() {
+      console.log("=== emptyGroup ===");
+      console.log(emptyGroup);
+    }
+
+    const s = reactive({
+      item: undefined,  //wj-flex-grid의 정보를 flex에 담아서 사용
+    });
+
+    onMounted(() => {
+      //Filter 긴급, 일반 변화 감시
+      watch(emptyGroup,
+        (newGroup, oldGroup)=>{
+          console.log("emptyGroup 객체 변경 감시");
+          console.log("newGroup:", toRaw(newGroup));
+          console.log("oldGroup:", toRaw(oldGroup))
+          console.log(newGroup[0])
+          let filterType = emptyGroup;
+          let temp = []
+          for(let i=0; i<newGroup.length; i++){
+            temp.push(i);
+          }
+          console.log("temp>>",temp);
+
+          getFilterList(newGroup).then((v)=>{
+            console.log("젭알요 ㅠㅜㅜㅜㅜ");
+            console.log(v);
+            for(let i=0; i<v.length; i++){
+              if(v[i].boxQty === 0){
+                v[i].boxQty = " ";
+              }
+              if(v[i].releasePrintDate === null){
+                v[i].releasePrintDate = " ";
+              }
+              if(v[i].receiptePrintDate === null){
+                v[i].receiptePrintDate = " ";
+              }
+            }            
+              releaseInspectionData.value = v;
+          })
+
+          // releaseInspectionData.value = getFilterList(newGroup).then((appData) => {
+          //   return appData;
+          // });
+          // releaseInspectionData.value = getFilterList(newGroup);
+          // console.log("^^^^^^^^^^^^^^^^^^^");
+          // console.log(tt);
+
+
+
+          //  //방법 1) collectionView에 추가하기
+          //  releaseInspectionData.value.filter((item) =>{
+          //    console.log("1) collectionView에 추가하기");
+          //    console.log(item.category);
+          //    console.log("==============");
+          //    if (filterType[0] === "긴급") {
+          //      console.log("긴급일 때");
+          //      return item.category == "긴급";
+          //    }else {
+          //      return item.category == '일반';
+          //    }
+          //  })
+
+          //방법 2) 데이터 변화할 때 정보 넘기기!
+         },
+       );
+     })
+
     return {
-      ...toRefs(state),
+      ...toRefs(state, s),
       onInitialized,
       releaseInspectionData,
+      checkboxGroup5,
+      emptyGroup
     }
   },
+
+
 
   // created() {
   //   this.getReleaseInspectionList();
