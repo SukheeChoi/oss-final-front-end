@@ -265,13 +265,13 @@ export default {
     ]);
 
     const checkboxGroup2 = ref([
-      { name: '긴급', value: '긴급' },
-      { name: '일반', value: '일반' },
+      { name: '긴급', value: 'a' },
+      { name: '일반', value: 'b' },
     ]);
 
     const checkboxGroup3 = ref([
-      { name: '출고', value: '출고' },
-      { name: '미출고', value: '미출고' },
+      { name: '출고', value: 'c' },
+      { name: '미출고', value: 'd' },
     ]);
     const checkboxGroup4 = ref([]);
     const checkboxGroup5 = ref([]);
@@ -295,8 +295,8 @@ export default {
     const response = ref(null);
 
     async function getList() {
-      const list = await orderApi.getAllList();
-      response.value = list;
+      const result = await orderApi.getAllList();
+      response.value = result.list;
     }
 
     getList();
@@ -304,23 +304,28 @@ export default {
     watch(
       () => [checkboxGroup4, checkboxGroup5, checkboxGroup6],
       (newGroup, oldGroup) => {
-
         const list = newGroup.map((data) => {
-          return data.value
+          return data.value;
         });
 
-        const company = list[0].map((data) => {return data});
-        const shippingway = list[1].map((data) => {return data});
-        const unreleased = list[2].map((data) => {return data});
+        const company = list[0].map((data) => {
+          return data;
+        });
+        const shippingway = list[1].map((data) => {
+          return data;
+        });
+        const unreleased = list[2].map((data) => {
+          return data;
+        });
 
         const jsonData = {
-          "company" : {...company},
-          "shippingway" : {...shippingway},
-          "unreleased" : {...unreleased}
+          company: company,
+          shippingway: shippingway,
+          unreleased: unreleased,
         };
 
         console.log(jsonData);
-        postData(jsonData);
+        // postData(jsonData);
       },
       { deep: true }
     );
