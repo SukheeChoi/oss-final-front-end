@@ -18,12 +18,12 @@
           <div class="ow-flex-wrap">
             <div class="item">계획</div>
             <div class="align-to-right">
-              1,694건(<strong class="color-type-1">잔여<span>300</span>건</strong>/<span>미출고6건</span>)
+              2000건(<strong class="color-type-1">잔여<span>300</span>건</strong>/<span>미출고6건</span>)
             </div>
           </div>
           <div class="ow-flex-wrap">
             <div class="item">실적</div>
-            <div class="align-to-right">1,000건</div>
+            <div class="align-to-right">{{ status }}건</div>
           </div>
         </div>
       </div>
@@ -167,17 +167,23 @@
       >
         <template #left>&nbsp;</template>
         <wj-flex-grid-column binding="client" header="거래처" width="*" align="center" />
-        <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
+        <wj-flex-grid-column v-bind:value="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell">
             <span class="ow-tag type-category"><i class="o">주</i></span>
-            <!-- <span class="ow-tag type-category"><i class="p">피</i></span> -->
-            <!-- <span class="ow-tag type-category"><i class="i">검</i></span> -->
-            <!-- <span class="ow-tag type-category"><i class="r">출</i></span> -->
-            <!-- <span class="ow-tag type-category"><i class="t">인</i></span> -->
-            <span class="ow-tag type-category"><i class="n">피</i></span>
-            <span class="ow-tag type-category"><i class="n">검</i></span>
-            <span class="ow-tag type-category"><i class="n">출</i></span>
-            <span class="ow-tag type-category"><i class="n">인</i></span>
+
+            <span class="ow-tag type-category">
+              <i v-if="level >= 2" class="p">피</i>
+              <i v-else class="n">피</i>
+            </span>
+
+            <span v-if="level >= 3" class="ow-tag type-category"><i class="i">검</i></span>
+            <span v-else class="ow-tag type-category"><i class="n">검</i></span>
+
+            <span v-if="level >= 4" class="ow-tag type-category"><i class="r">출</i></span>
+            <span v-else class="ow-tag type-category"><i class="n">출</i></span>
+
+            <span v-if="level == 5" class="ow-tag type-category"><i class="t">인</i></span>
+            <span v-else class="ow-tag type-category"><i class="n">인</i></span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
       </ow-n-grid>
@@ -187,38 +193,35 @@
 
 <script>
 import OwNGrid from '@/components/grid/new/OwNGrid';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import clientApi from '@/api/customerReceipt';
+import { promised } from 'q';
+import { interfaceDeclaration } from '@babel/types';
 
 const items = [];
+const status = ref(null);
 
 //db에서 데이터 불러오기
 const dummy = async () => {
   let list = await clientApi.getClientInfo();
-  console.log('list[0] : ' + list[0]);
   console.log('list[0]["clientName"] : ' + list[0]['clientName']);
+  console.log('list[0]["order"]["status"] : ' + list[0]['order']['status']);
   return list;
 };
 
 dummy().then((list) => {
-  console.log('list[0] : ' + list[0]);
+  console.log('list[0] : ' + list[0]['clientName']);
   for (let i = 0; i < list.length; i++) {
     items.push({
       client: list[i]['clientName'],
-      level: '주문',
+      level: list[i]['order']['status'],
     });
+    console.log('~~~~~~~~~~~~~~~~' + items);
   }
 });
 
 const retrieve = (param) => {
-  // console.log('param', param);
   let filteredItems = _.cloneDeep(items);
-  if (param.sales) {
-    filteredItems = filteredItems.filter((item) => item.client > param.client);
-  }
-  if (param.expenses) {
-    filteredItems = filteredItems.filter((item) => item.level > param.level);
-  }
   const totalCount = filteredItems.length;
   if (param.sort) {
     filteredItems = _.sortBy(filteredItems, param.sort);
@@ -245,11 +248,9 @@ async function read(query, pageNo, pageSize) {
     pageNo,
     pageSize,
   });
-  // console.log('result', result);
   return result;
 }
 
-console.log('items', items);
 export default {
   name: 'TheOwNewGrid',
   components: {
@@ -272,7 +273,7 @@ export default {
       checkboxGroup4: [],
     };
   },
-  setup() {
+  setup(props) {
     const state = reactive({
       visibleRowsCount: 15,
     });
@@ -281,19 +282,18 @@ export default {
 
     let globalIndex = 0;
 
-    const start = (e) => {
-      const item = {
-        client: '현대',
-        level: '주문',
-      };
-      e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(item));
-    };
+    async function getCnt() {
+      const cnt = await clientApi.getStatusCnt();
+      status.value = cnt;
+      return cnt;
+    }
+    getCnt();
 
     return {
       initialize,
       read,
       state,
-      start,
+      status,
     };
   },
 };
@@ -307,21 +307,21 @@ progress {
   background: gainsboro;
 }
 
-progress::-moz-progress-bar {
-  border-radius: 2px;
-  background: green;
-}
-
 progress::-webkit-progress-bar {
   background: transparent;
 }
+
+/* progress::-webkit-progress-value {
+  border-radius: 2px;
+  background: yellow;
+} */
 progress::-webkit-progress-value {
   border-radius: 2px;
   background: green;
 }
-
-/* progress {
-    -webkit-appearance: none;
+/* progress::-webkit-progress-value {
+  border-radius: 2px;
+  background: blue;
 } */
 
 .progress-bar span {
