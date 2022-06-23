@@ -386,6 +386,8 @@ export default {
       }
     });
     const afterPickingList = ref([]);
+        // 통신을 통한 데이터 바인딩.
+    const releaseInspection_Packing_Data2 = ref([]);
 
     // 현황/배송구분 정보 불러오기.(새로고침 시에만 통신.)
     const getSummary = async () => {
@@ -460,51 +462,46 @@ export default {
           console.log('afterPickingList.value[0]["packing"]["note"] : ' + afterPickingList.value[0]["packing"]["note"]);
           // 출고 - 비고
           console.log('afterPickingList.value[0]["release"]["note"] : ' + afterPickingList.value[0]["release"]["note"]);
+
+///////
+          console.log('*******afterPickingList.value.length : ' + afterPickingList.value.length);
+          for(let i=0; i<afterPickingList.value.length; i++) {
+              console.log('inside for loop');
+              releaseInspection_Packing_Data2.value.push(
+                {
+                  placingorderNo: afterPickingList.value[i]["release"]["releaseNo"]
+                  , itemName: afterPickingList.value[i]["item"]["itemName"]
+                  , itemCode: afterPickingList.value[i]["item"]["itemCode"]
+                  , pickingQty: afterPickingList.value[i]["picking"]["pickingQty"]
+                  , inspectionQty: afterPickingList.value[i]["releaseInspectionQuantity"]
+                  , packing_unrelease: (
+                    afterPickingList.value[i]["unReleased"]
+                    + afterPickingList.value[i]["packing"]["unrelease"]
+                  )
+                  , orderClient: afterPickingList.value[i]["vendor"]["vendorName"]
+                  , shippingDest: afterPickingList.value[i]["order"]["shippingDestination"]
+                  , shippingCat: afterPickingList.value[i]["order"]["shippingCategory"]
+                  , shippingWay: afterPickingList.value[i]["order"]["shippingWay"]
+                  , packing_personincharge: afterPickingList.value[i]["employeeName"]
+                  , releaseprintDate: afterPickingList.value[i]["releasePrintDate"]
+                  , transactionprintDate: afterPickingList.value[i]["receiptePrintDate"]
+                  , inspectionDate: afterPickingList.value[i]["releaseInspectionDate"]
+                  , boxQty: afterPickingList.value[i]["release"]["boxQuantity"]
+                  // 출고~/
+                  , release_personincharge: afterPickingList.value[i]["release"]["employeeName"]
+                  , deliveryCompany: afterPickingList.value[i]["release"]["shippingCompany"]
+                  , invoiceNo: afterPickingList.value[i]["release"]["invoiceCode"]
+                  , etc: ' '
+                  // , etc: afterPickingList.value[i]["packing"]["note"]
+                }
+              );
+              console.log('###### ' + i + ' : ' + releaseInspection_Packing_Data2.value[i].placingorderNo);
+            }
+/////
         });
       // return result;
     };
     getAfterPickingList(filterList);
-    onMounted(() => {
-      console.log('~~~~~~~!!~');
-
-    });
-
-    // 통신을 통한 데이터 바인딩.
-    const releaseInspection_Packing_Data2 = ref([]);
-    console.log('qqqqqqqq');
-    console.log('@@@@ afterPickingList.value.length : ' + afterPickingList.value.length);
-    for(let i=0; i<afterPickingList.value.length; i++) {
-      console.log('inside for loop');
-      releaseInspection_Packing_Data2.value.push(
-        {
-          placingorderNo: afterPickingList.value[i]["release"]["releaseNo"]
-          , itemName: afterPickingList.value[i]["item"]["itemName"]
-          , itemCode: afterPickingList.value[i]["item"]["itemCode"]
-          , pickingQty: afterPickingList.value[i]["picking"]["pickingQty"]
-          , inspectionQty: afterPickingList.value[i]["releaseInspectionQuantity"]
-          , packing_unrelease: (
-            afterPickingList.value[i]["unReleased"]
-            + afterPickingList.value[i]["packing"]["unrelease"]
-          )
-          , orderClient: afterPickingList.value[i]["vendor"]["vendorName"]
-          , shippingDest: afterPickingList.value[i]["order"]["shippingDestination"]
-          , shippingCat: afterPickingList.value[i]["order"]["shippingCategory"]
-          , shippingWay: afterPickingList.value[i]["order"]["shippingWay"]
-          , packing_personincharge: afterPickingList.value[i]["employeeName"]
-          , releaseprintDate: afterPickingList.value[i]["releasePrintDate"]
-          , transactionprintDate: afterPickingList.value[i]["receiptePrintDate"]
-          , inspectionDate: afterPickingList.value[i]["releaseInspectionDate"]
-          , boxQty: afterPickingList.value[i]["release"]["boxQuantity"]
-          // 출고~/
-          , release_personincharge: afterPickingList.value[i]["release"]["employeeName"]
-          , deliveryCompany: afterPickingList.value[i]["release"]["shippingCompany"]
-          , invoiceNo: afterPickingList.value[i]["release"]["invoiceCode"]
-          , etc: ' '
-          // , etc: afterPickingList.value[i]["packing"]["note"]
-        }
-      );
-      console.log('###### i : ' + releaseInspection_Packing_Data2.value.placingorderNo);
-    }
 
     const state = reactive({
       flex: undefined,
