@@ -38,6 +38,8 @@
           :initialized="onInitialized"
           :autoRowHeights="true"
           :autoGenerateColumns="false"
+          :selectionChanged="onSelectionChanged"
+          ref="flexxx"
         > <!-- :autoRowHeights="true" -->
           <wj-flex-grid-column :binding="'no'" :header="'No'" :allowMerging="true" :width=40 align="center"/>
           <wj-flex-grid-column :binding="'clientName'" :header="'거래처'" :allowMerging="true" :width=100 align="center"/>
@@ -193,54 +195,71 @@
 
 <script>
 import { ref, reactive, toRefs, watch, toRaw, onMounted } from 'vue';
-import { SimpleMergeManager } from '@/utils/wijmo.grid';
+import { SimpleMergeManager} from '@/utils/wijmo.grid';
 import releaseInspectionApi from '@/api/releaseInspectionApi';
+import {format} from '@grapecity/wijmo';
 
 export default {
   setup() {
     const state = reactive({
-      flex: undefined,  //wj-flex-grid의 정보를 flex에 담아서 사용
+      flex: null,  //wj-flex-grid의 정보를 flex에 담아서 사용
+      currentSelection: null,
     });
+    const flexxx = ref(null);
 
     //grid 병합 처리 >> custom merge
     const onInitialized = (flex) => {
+      console.log("flex1===========================================")
+      console.log(state.flex);
       const config = {
         groupingColumns: ["clientName"],
         mergedColumns : [0,1,2,3,4,5,'releasePrintDate','boxQty',14,15,16],        
       };
       flex.mergeManager = new SimpleMergeManager(config);
+      // onSelectionChanged(flex);
     };
+
+    // update aggregates when selection changes
+    function onSelectionChanged() {
+      console.log("flex2===========================================")
+      console.log(flex);
+      currentSelection = new format("({row},{col})-({row2},{col2})", state.flex);
+      console.log("currentSelection")
+      console.log(currentSelection);
+    }
+
+    onSelectionChanged();
 
     //ref 활용해서 전체 데이터 가져오기
     const releaseInspectionData = ref([]);
 
-    const getReleaseInspectionList = async () => {
-      console.log('111111111111111111111111~~~~~~~~~~~~~~~~~~~~~~~~~~');
-      const list = await releaseInspectionApi.getReleaseInspectionList();
-      //const list = await releaseInspectionApi.getFilterList(['긴급']);
+    // const getReleaseInspectionList = async () => {
+    //   console.log('111111111111111111111111~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    //   const list = await releaseInspectionApi.getReleaseInspectionList();
+    //   //const list = await releaseInspectionApi.getFilterList(['긴급']);
 
-      //데이터 처리
-      console.log(list);
-      console.log("데이터 크기");
-      console.log(list.length);
-      for(let i=0; i<list.length; i++){
-        if(list[i].boxQty === 0){
-          list[i].boxQty = " ";
-        }
-        if(list[i].releasePrintDate === null){
-          list[i].releasePrintDate = " ";
-        }
-        if(list[i].receiptePrintDate === null){
-          list[i].receiptePrintDate = " ";
-        }
-      }
-      console.log('222222222222222222222222~~~~~~~~~~~~~~~~~~~~~~~~~~');
-      console.log(list);
-      releaseInspectionData.value = list;
+    //   //데이터 처리
+    //   console.log(list);
+    //   console.log("데이터 크기");
+    //   console.log(list.length);
+    //   for(let i=0; i<list.length; i++){
+    //     if(list[i].boxQty === 0){
+    //       list[i].boxQty = " ";
+    //     }
+    //     if(list[i].releasePrintDate === null){
+    //       list[i].releasePrintDate = " ";
+    //     }
+    //     if(list[i].receiptePrintDate === null){
+    //       list[i].receiptePrintDate = " ";
+    //     }
+    //   }
+    //   console.log('222222222222222222222222~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    //   console.log(list);
+    //   releaseInspectionData.value = list;
 
-    };
+    // };
 
-    getReleaseInspectionList();
+    //getReleaseInspectionList();
 
     //필터링된 정보만 가져오기
     const releaseInspectionFilterData = ref([]);
@@ -253,14 +272,10 @@ export default {
     
     console.log("emptyGroup==> ", emptyGroup)
 
-    // update aggregates when selection changes
-    function sellectionChanged() {
-      
-      //calculate aggregates
-      let tally = {pickingQty:0, releaseInspectionQuantity:0, }
-    }
-
-    // const data = new CollectionView(list, {sortDescriptions: ["country", "active"]});
+    // const onSelectClick = function() {
+    //   selectionMode.text = "CellRange";
+    //   flex.selection = new wjGrid.CellRange(0, 0, 1, 1);
+    // }
 
     //Filter
     const checkboxGroup5 = ref([ { name : '긴급', value : '긴급'} , { name : '일반', value : '일반'}]);
@@ -335,11 +350,12 @@ export default {
      })
 
     return {
-      ...toRefs(state, s),
+      ...toRefs(state),
       onInitialized,
       releaseInspectionData,
       checkboxGroup5,
-      emptyGroup
+      emptyGroup,
+      onSelectionChanged
     }
   },
 
