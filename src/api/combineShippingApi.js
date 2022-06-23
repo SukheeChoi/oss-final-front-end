@@ -1,11 +1,14 @@
 // 합배송품목 수령및전달 페이지에서의 통신.
 
 import axios from "axios";
+
 //수령/전달 날짜 필터링 유무로 나눠진 API 합치기!!
 async function getVendorList(dateList) {
   let vendorList = null;
   try {
-    const response = await axios.post(`/combineShipping/getVendorList`, dateList);
+    let params = new URLSearchParams();
+    params.append('dateList', Array.from(dateList));
+    const response = await axios.post(`/combineShipping/getVendorList`, params);
     vendorList = response.data;
   } catch(error) {
     console.log(error);
@@ -73,11 +76,14 @@ async function getDeliveryList(employeeId, dateList) {
   return deliveryList;
 }
 
+// 수령한 항목 update.
+
+
 // 전달된 항목 update.
 async function updateDeliveryList(deliveredList) {
   let result = null;
   try {
-    const response = await axios.post(`/combineShipping/updateDelivery`, Array.from(deliveredList));
+    const response = await axios.put(`/combineShipping/delivery`, Array.from(deliveredList));
     result = response.data.result;
   } catch(error) {
     console.log(error);

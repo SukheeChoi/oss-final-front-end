@@ -9,7 +9,7 @@
       <!-- 담당자 이름 filter -->
       <div class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 270px;">
-        <!-- <div v-show="assigneeList" class="ow-filter" style="width: 270px;"> -->
+        <!-- <div v-show="assigneeList != null" class="ow-filter" style="width: 270px;"> -->
           <button class="ow-filter-btn-move prev">&lt;</button>
           <ul class="ow-filter-list assignee-list">
             <!-- <div v-for="(assignee, index) in assigneeList" :key="index">
@@ -129,19 +129,20 @@ export default {
 
     //수령 탭
     // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
-    const getVendorList = async () => {
-      const result = await combineShippingApi.getVendorList(['2022-06-10', '2022-06-25']);
+    const getVendorList = async (dateList) => {
+      const result = await combineShippingApi.getVendorList(dateList)
+          .then((result) => {
+            console.log('getVendorList - JSON.stringify(result) : ' + JSON.stringify(result));
+            vendorList.value = result.list;
+            console.log('vendorList.value.length : ' + vendorList.value.length);
+            // 담당 업체명
+            console.log('vendorList.value[0].vendorNo : ' + vendorList.value[0].vendorNo);
+            console.log('vendorList.value[0].vendorName : ' + vendorList.value[0].vendorName);
+            console.log('vendorList.value[0]["vendorNo"] : ' + vendorList.value[0]['vendorNo']);
+          });
       return result;
     };
-    getVendorList().then((result) => {
-      console.log('getVendorList - JSON.stringify(result) : ' + JSON.stringify(result));
-      vendorList.value = result.list;
-      console.log('vendorList.value.length : ' + vendorList.value.length);
-      // 담당 업체명
-      console.log('vendorList.value[0].vendorNo : ' + vendorList.value[0].vendorNo);
-      console.log('vendorList.value[0].vendorName : ' + vendorList.value[0].vendorName);
-      console.log('vendorList.value[0]["vendorNo"] : ' + vendorList.value[0]['vendorNo']);
-    });
+    getVendorList(['2022-06-10', '2022-06-25']);
 
 
     // (수령예정) 기간으로 필터링한 수령 목록 조회.
@@ -157,59 +158,62 @@ export default {
 
     //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
     const getAssigneeList = async () => {
-      const result = await combineShippingApi.getAssigneeList();
+      const result = await combineShippingApi.getAssigneeList()
+          .then((result) => {
+            if(result.list != null) {
+              console.log('inside if');
+              console.log('getAssigneeList - result : ' + result);
+              console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
+              assigneeList.value = result.list;
+              console.log('assigneeList.value[0]["orderItem"] : ' + assigneeList.value[0]['orderItem']);
+              console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
+            }
+          });
       return result;
     };
-    // axios.all([getAssigneeList()]).then((result) => {
-    //   console.log('getAssigneeList - result : ' + result);
-    //   console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
-    //   assigneeList.value = result.list;
-    //   console.log('assigneeList.value[0]["employeeId"] : ' + assigneeList.value[0]['employeeId']);
-    //   console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
-    // });
 
-    getAssigneeList().then((result) => {
-      console.log('getAssigneeList - result : ' + result);
-      console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
-      assigneeList.value = result.list;
-      console.log('assigneeList.value[0]["orderItem"] : ' + assigneeList.value[0]['orderItem']);
-      console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
-    });
+    getAssigneeList();
 
     // '수령'탭에 바인딩할 데이터를 불러옴.
     // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
     // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
     const getReceiptList = async (employeeId, dateList=[]) => {
-      const result = await combineShippingApi.getReceiptList(employeeId, Array.from(dateList));
-    console.log('dsfksugfhnm,dlk' + result);
+      const result = await combineShippingApi.getReceiptList(employeeId, Array.from(dateList))
+          .then((result) => {
+            if(result.receiptList != null) {
+              console.log('result : ' + result);
+              receiptList.value = result.receiptList;
+              console.log('result.receiptList : ' + result.receiptList);
+              console.log('result.receiptList[0] : ' + result.receiptList[0]);
+              console.log('result.receiptList[0]["orderItemNo"] : ' + result.receiptList[0]['orderItemNo']);
+              console.log('receiptList.value[0]// : ' + receiptList.value[0]);
+              console.log('receiptList.value[0]["orderItemNo"]// : ' + receiptList.value[0]['orderItemNo']);
+              console.log('JSON.stringify(receiptList.value[0]) : ' + JSON.stringify(receiptList.value[0]));
+            }
+          });
       return result;
     };
-    getReceiptList('E2').then(result => {
-      console.log('result : ' + result);
-      receiptList.value = result.receiptList;
-      console.log('result.receiptList : ' + result.receiptList);
-      console.log('result.receiptList[0] : ' + result.receiptList[0]);
-      console.log('result.receiptList[0]["orderItemNo"] : ' + result.receiptList[0]['orderItemNo']);
-      console.log('receiptList.value[0]// : ' + receiptList.value[0]);
-      console.log('receiptList.value[0]["orderItemNo"]// : ' + receiptList.value[0]['orderItemNo']);
-      console.log('JSON.stringify(receiptList.value[0]) : ' + JSON.stringify(receiptList.value[0]));
-    });
+    getReceiptList('E2');
 
     // '전달' 탭에서 바인딩할 데이터를 불러옴.
     const getDeliveryList = async (employeeId, dateList=[]) => {
-      const result = await combineShippingApi.getDeliveryList(employeeId, Array.from(dateList));
+      const result = await combineShippingApi.getDeliveryList(employeeId, Array.from(dateList))
+          .then((result) => {
+            if(result.deliveryList != null) {
+              console.log('getDeliveryList - result : ' + result);
+              console.log('result.deliveryList : ' + result.deliveryList);
+              console.log('result.deliveryList[0] : ' + result.deliveryList[0]);
+              console.log('result.deliveryList[0]["orderItemNo"] : ' + result.deliveryList[0]['orderItemNo']);
+              deliveryList.value = result.deliveryList;
+              console.log('deliveryList.value[0]// : ' + deliveryList.value[0]);
+              console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
+              console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
+            }
+          });
+
       return result;
     };
-    getDeliveryList('E1', ['2022-06-10', '2022-06-25']).then(result => {
-      console.log('getDeliveryList - result : ' + result);
-      console.log('result.deliveryList : ' + result.deliveryList);
-      console.log('result.deliveryList[0] : ' + result.deliveryList[0]);
-      console.log('result.deliveryList[0]["orderItemNo"] : ' + result.deliveryList[0]['orderItemNo']);
-      deliveryList.value = result.deliveryList;
-      console.log('deliveryList.value[0]// : ' + deliveryList.value[0]);
-      console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
-      console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
-    });
+    getDeliveryList('E1', ['2022-06-10', '2022-06-25']);
 
     // 전달된 항목 정보 update.
     deliveredList.value.push(

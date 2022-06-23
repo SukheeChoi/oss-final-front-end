@@ -35,7 +35,7 @@
         <!-- <div class="item"> -->
           <div>
             <div class="title-field" style="margin-right: 10px; margin-left: 5px">배송구분</div>
-            <ow-filter-checkbox name="checkboxGp4" v-bind:items="checkboxGroup1" />
+            <ow-filter-checkbox name="checkboxGp4" v-bind:items="checkboxGroup1" v-model="emptyGroup" />
           </div>
           <div>
             <div class="title-field" style="margin-right: 10px; margin-left: 5px">배송방식</div>
@@ -332,9 +332,10 @@
 <script>
 import OwSearch from '../../../components/common/OwSearch.vue';
 import OwSearchInput from '../../com/components/input/OwSearchInput.vue';
+import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-import { reactive, toRefs } from 'vue';
+import { ref, reactive, toRefs, onBeforeMount } from 'vue';
 
 function getRandomCount(i = 1500) {
   return Math.round(Math.random() * i);
@@ -355,6 +356,76 @@ const ITEM_VENDORS = [
 export default {
   name: 'releaseInspection_packing',
   setup() {
+    const filterList =  reactive({
+      // shippingCategory: null
+      shippingCategory: '일반'
+      , shippingWay: '합배송'
+      , released: '출고'
+      , assignee: '최'
+      , orderNo: -1
+      , clientName: null
+      , shippingDestination: null
+    });
+    const afterPickingList = ref([]);
+
+    onBeforeMount(() => {
+      console.log('~~~~~~~~~~~~');
+    });
+
+    // 리스트 전체 조회.
+    const getAfterPickingList = async (filterList) => {
+      const result = await afterPickingApi.getAfterPickingList(filterList)
+        .then((result) => {
+          console.log('getAfterPickingList - JSON.stringify(result) : ' + JSON.stringify(result));
+          afterPickingList.value = result.list;
+          console.log('afterPickingList.value.length : ' + afterPickingList.value.length);
+          // 출고번호
+          console.log('afterPickingList.value[0]["release"]["releaseNo"] : ' + afterPickingList.value[0]["release"]["releaseNo"]);
+          // 품목명
+          console.log('afterPickingList.value[0]["item"]["itemName"] : ' + afterPickingList.value[0]["item"]["itemName"]);
+          // 품목코드
+          console.log('afterPickingList.value[0]["item"]["itemCode"] : ' + afterPickingList.value[0]["item"]["itemCode"]);
+          // 피킹수량
+          console.log('afterPickingList.value[0]["picking"]["pickingQty"] : ' + afterPickingList.value[0]["picking"]["pickingQty"]);
+          // 검수수량
+          console.log('afterPickingList.value[0]["releaseInspectionQuantity"] : ' + afterPickingList.value[0]["releaseInspectionQuantity"]);
+          // 출고검수 - 미출고수량
+          console.log('afterPickingList.value[0]["unReleased"] : ' + afterPickingList.value[0]["unReleased"]);
+          // 패킹 - 미출고수량
+          console.log('afterPickingList.value[0]["packing"]["unrelease"] : ' + afterPickingList.value[0]["packing"]["unrelease"]);
+          // 거래처
+          console.log('afterPickingList.value[0]["vendor"]["vendorName"] : ' + afterPickingList.value[0]["vendor"]["vendorName"]);
+          // 배송지
+          console.log('afterPickingList.value[0]["order"]["shippingDestination"] : ' + afterPickingList.value[0]["order"]["shippingDestination"]);
+          // 배송구분
+          console.log('afterPickingList.value[0]["order"]["shippingCategory"] : ' + afterPickingList.value[0]["order"]["shippingCategory"]);
+          // 배송방식
+          console.log('afterPickingList.value[0]["order"]["shippingWay"] : ' + afterPickingList.value[0]["order"]["shippingWay"]);
+          // 출고검수 - 담당자
+          console.log('afterPickingList.value[0]["employeeName"] : ' + afterPickingList.value[0]["employeeName"]);
+          // 출고요청서 출력일시
+          console.log('afterPickingList.value[0]["releasePrintDate"] : ' + afterPickingList.value[0]["releasePrintDate"]);
+          // 거래명세서 출력일시
+          console.log('afterPickingList.value[0]["receiptePrintDate"] : ' + afterPickingList.value[0]["receiptePrintDate"]);
+          // 검수일시
+          console.log('afterPickingList.value[0]["releaseInspectionDate"] : ' + afterPickingList.value[0]["releaseInspectionDate"]);
+          // 출고 - 담당자
+          console.log('afterPickingList.value[0]["release"]["employeeName"] : ' + afterPickingList.value[0]["release"]["employeeName"]);
+          // 택배사
+          console.log('afterPickingList.value[0]["release"]["shippingCompany"] : ' + afterPickingList.value[0]["release"]["shippingCompany"]);
+          // 송장번호
+          console.log('afterPickingList.value[0]["release"]["invoiceCode"] : ' + afterPickingList.value[0]["release"]["invoiceCode"]);
+          // 출고검수 - 비고
+          console.log('afterPickingList.value[0]["releaseInspectionNote"] : ' + afterPickingList.value[0]["releaseInspectionNote"]);
+          // 패킹 - 비고
+          console.log('afterPickingList.value[0]["packing"]["note"] : ' + afterPickingList.value[0]["packing"]["note"]);
+          // 출고 - 비고
+          console.log('afterPickingList.value[0]["release"]["note"] : ' + afterPickingList.value[0]["release"]["note"]);
+        });
+      return result;
+    };
+    getAfterPickingList(filterList);
+
     const state = reactive({
       flex: undefined,
       //
@@ -372,6 +443,7 @@ export default {
       ...toRefs(state),
       onInitialized,
     };
+
   },
 
   components: {
@@ -380,18 +452,20 @@ export default {
   },
   data() {
     return {
+      emptyGroup: []
+      ,
       data: [],
       checkboxGroup1: [
-        { name: '긴급', checked: true },
-        { name: '일반', checked: true },
+        { name: '긴급', value: '긴급' },
+        { name: '일반', value: '일반' },
       ],
       checkboxGroup2: [
-        { name: '오스템', checked: true },
-        { name: '합배송', checked: true },
+        { name: '오스템', value: '오스템' },
+        { name: '합배송', value: '합배송' },
       ],
       checkboxGroup3: [
-        { name: '출고', checked: true },
-        { name: '미출고', checked: true },
+        { name: '출고', value: '출고' },
+        { name: '미출고', value: '미출고' },
       ],
       releaseInspection_Packing_Data: [
         {
@@ -415,6 +489,7 @@ export default {
           release_personincharge: '이가을',
           deliveryCompany: '대한통운',
           invoiceNo: '18374650',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_002',
@@ -436,6 +511,7 @@ export default {
           release_personincharge: '이가을',
           deliveryCompany: '대한통운',
           invoiceNo: '18374650',
+          etc: ' '
         },
         {
           placingorderNo: 'E_02_001',
@@ -457,6 +533,7 @@ export default {
           release_personincharge: '김수환',
           deliveryCompany: '우체국',
           invoiceNo: '38471625',
+          etc: ' '
         },
         {
           placingorderNo: 'E_02_001',
@@ -478,6 +555,7 @@ export default {
           release_personincharge: '김수환',
           deliveryCompany: '우체국',
           invoiceNo: '38471625',
+          etc: ' '
         },
         {
           placingorderNo: 'E_02_001',
@@ -499,6 +577,7 @@ export default {
           release_personincharge: '김수환',
           deliveryCompany: '우체국',
           invoiceNo: '38471625',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -520,6 +599,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -541,6 +621,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -562,6 +643,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -583,6 +665,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ''
         },
         {
           placingorderNo: 'C_03_001',
@@ -604,6 +687,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -625,6 +709,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_001',
@@ -646,6 +731,7 @@ export default {
           release_personincharge: '김예원',
           deliveryCompany: '대한통운',
           invoiceNo: '045836156',
+          etc: ' '
         },
         ///
         {
@@ -668,6 +754,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -689,6 +776,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -710,6 +798,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -731,6 +820,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -752,6 +842,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -773,6 +864,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -794,6 +886,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -815,6 +908,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -836,6 +930,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -857,6 +952,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -878,6 +974,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -899,6 +996,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -920,6 +1018,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -941,6 +1040,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -962,6 +1062,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
         {
           placingorderNo: 'C_03_003',
@@ -983,6 +1084,7 @@ export default {
           release_personincharge: '신현주',
           deliveryCompany: '우체국',
           invoiceNo: '92846255',
+          etc: ' '
         },
       ],
     };

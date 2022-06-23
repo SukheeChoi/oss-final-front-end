@@ -1,6 +1,6 @@
 <template>
   <div>
-    <template v-if="isNotBlank">
+    <!-- <template v-if="isNotBlank">
       <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
         <slot name="left">
           <h1 class="h1">그리드</h1>
@@ -11,20 +11,20 @@
           </template>
         </slot>
       </div>
-    </template>
-    <div class="ow-grid-wrap mt-8 mb-8">
+    </template> -->
+    <div class="ow-grid-wrap">
       <ow-flex-grid :initialized="initialize" v-bind="$attrs">
         <slot></slot>
       </ow-flex-grid>
     </div>
-    <div class="d-flex justify-content-end align-items-center">
+    <!-- <div class="d-flex justify-content-end align-items-center">
       <div>전체 {{ totalCount }} 건</div>
     </div>
     <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
       <template #default="item">
         <slot name="editor" :item="item.data"> </slot>
       </template>
-    </ow-flex-grid-editor>
+    </ow-flex-grid-editor> -->
   </div>
 </template>
 
@@ -127,6 +127,7 @@ export default {
     const setPage = (c) => {
       const { grid: s, totalItemCount } = c;
       state.totalCount = totalItemCount;
+      //셀이 접히는 단계를 설정함(0이면 다 접힌 상태, 1이면 하나만 펼쳐진 상태)
       s.collapseGroupsToLevel(1);
     };
 
@@ -244,9 +245,9 @@ export default {
 
     onMounted(async () => {
       await nextTick();
-      const el = header.value;
-      const textContent = el.textContent.trim();
-      state.isNotBlank = textContent !== '';
+      // const el = header.value;
+      // const textContent = el.textContent.trim();
+      // state.isNotBlank = textContent !== '';
     });
 
     return {
