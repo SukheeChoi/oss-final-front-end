@@ -7,10 +7,10 @@
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">주문 : <strong>10</strong>건</div>
-            <div class="state-item">피킹지시 : <strong>10</strong>건</div>
-            <div class="state-item">출고검수/패킹 : <strong>5</strong>건</div>
-            <div class="state-item color-type-1">미출고 : <strong class="color-type-1">0</strong>건</div>
+            <div class="state-item">주문 : <strong>{{summaryList.status.progressOrderNo}}</strong>건</div>
+            <div class="state-item">피킹지시 : <strong>{{summaryList.status.pickingDirectionNo}}</strong>건</div>
+            <div class="state-item">출고검수/패킹 : <strong>{{summaryList.status.releaseInspectionNo}}</strong>건</div>
+            <div class="state-item color-type-1">미출고 : <strong class="color-type-1">{{summaryList.delivery.unreleasedNo}}</strong>건</div>
           </div>
         </div>
 
@@ -20,7 +20,13 @@
         <div class="item">
           <div class="state">
             <div class="state-item">
-              출고검수(긴급/일반) : <strong>5</strong>건 (<strong>3</strong>건/<strong>2</strong>건)
+              출고검수(긴급/일반) : 
+              <strong>{{summaryList.status.releaseInspectionNo}}</strong>
+              건 (
+              <strong>{{summaryList.delivery.expressShippingNo}}</strong>
+              건/
+              <strong>{{summaryList.delivery.normalShippingNo}}</strong>
+              건)
             </div>
           </div>
         </div>
@@ -335,7 +341,7 @@ import OwSearchInput from '../../com/components/input/OwSearchInput.vue';
 import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-import { ref, reactive, toRefs, onBeforeMount } from 'vue';
+import { ref, reactive, toRefs, beforeCreate, onBeforeMount } from 'vue';
 
 function getRandomCount(i = 1500) {
   return Math.round(Math.random() * i);
@@ -365,14 +371,48 @@ export default {
       , orderNo: -1
       , clientName: null
       , shippingDestination: null
+      , vendorName: null
+    });
+    const summaryList = reactive({
+      status: {
+        progressOrderNo: '100'
+        // progressOrderNo: null
+        , pickingDirectionNo: null
+        , releaseInspectionNo: null
+      }
+      , delivery: {
+        unreleasedNo: null
+        , expressShippingNo: null
+        , normalShippingNo: null
+      }
     });
     const afterPickingList = ref([]);
 
-    onBeforeMount(() => {
-      console.log('~~~~~~~~~~~~');
-    });
+    // 현황/배송구분 정보 불러오기.(새로고침 시에만 통신.)
+    const getSummary = async () => {
+      const result = await afterPickingApi.getSummary()
+        .then((result) => {
+          summaryList.status.progressOrderNo = result.summaryMap.progressOrderNo;
+          summaryList.status.pickingDirectionNo = result.summaryMap.pickingDirectionNo;
+          summaryList.status.releaseInspectionNo = result.summaryMap.releaseInspectionNo;
+          summaryList.delivery.unreleasedNo = result.summaryMap.unreleasedNo;
+          summaryList.delivery.expressShippingNo = result.summaryMap.expressShippingNo;
+          summaryList.delivery.normalShippingNo = result.summaryMap.normalShippingNo;
 
-    // 리스트 전체 조회.
+          console.log('summaryList.status.progressOrderNo : ' + summaryList.status.progressOrderNo);
+          console.log('summaryList.status.pickingDirectionNo : ' + summaryList.status.pickingDirectionNo);
+          console.log('result.summaryMap.unreleasedNo : ' + result.summaryMap.unreleasedNo);
+          console.log('result.summaryMap : ' + result.summaryMap);
+          console.log('result.summaryMap.expressShippingNo : ' + result.summaryMap.expressShippingNo);
+          console.log('result.summaryMap.normalShippingNo : ' + result.summaryMap.normalShippingNo);
+          console.log('result.summaryMap.progressOrderNo : ' + result.summaryMap.progressOrderNo);
+          console.log('result.summaryMap.pickingDirectionNo : ' + result.summaryMap.pickingDirectionNo);
+          console.log('result.summaryMap.releaseInspectionNo : ' + result.summaryMap.releaseInspectionNo);
+      });
+    };
+    getSummary();
+
+    // 리스트 전체 조회.(페이지네이션 필요.)
     const getAfterPickingList = async (filterList) => {
       const result = await afterPickingApi.getAfterPickingList(filterList)
         .then((result) => {
@@ -422,7 +462,7 @@ export default {
           // 출고 - 비고
           console.log('afterPickingList.value[0]["release"]["note"] : ' + afterPickingList.value[0]["release"]["note"]);
         });
-      return result;
+      // return result;
     };
     getAfterPickingList(filterList);
 
@@ -440,8 +480,9 @@ export default {
       flex.mergeManager = new SimpleMergeManager(config);
     };
     return {
-      ...toRefs(state),
-      onInitialized,
+      ...toRefs(state)
+      , onInitialized
+      , summaryList
     };
 
   },
@@ -452,22 +493,23 @@ export default {
   },
   data() {
     return {
+      // summaryList: summaryList
+      // ,
       emptyGroup: []
-      ,
-      data: [],
-      checkboxGroup1: [
+      , data: []
+      , checkboxGroup1: [
         { name: '긴급', value: '긴급' },
         { name: '일반', value: '일반' },
-      ],
-      checkboxGroup2: [
+      ]
+      , checkboxGroup2: [
         { name: '오스템', value: '오스템' },
         { name: '합배송', value: '합배송' },
-      ],
-      checkboxGroup3: [
+      ]
+      , checkboxGroup3: [
         { name: '출고', value: '출고' },
         { name: '미출고', value: '미출고' },
-      ],
-      releaseInspection_Packing_Data: [
+      ]
+      , releaseInspection_Packing_Data: [
         {
           // 출고검수/패킹~
           placingorderNo: 'C_03_002',

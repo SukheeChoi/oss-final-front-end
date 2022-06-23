@@ -2,6 +2,18 @@
 
 import axios from "axios";
 
+async function getSummary() {
+  let summaryList = null;
+  try {
+    const response = await axios.get(`/afterPicking/summary`);
+    summaryList = response.data;
+    console.log('summaryList : ' + summaryList);
+  } catch(error) {
+    console.log(error);
+  }
+  return summaryList;
+}
+
 // 조회.
 // params:
   // mainCategory(int): 1(배송구분-String), 2(배송방식-String), 3(미출고-String), 4(출고검수/패킹담당자), 5(주문번호/거래처/배송지/업체명)
@@ -29,6 +41,7 @@ async function getAfterPickingList(filterList) {
     params.append('orderNo', filterList.orderNo);
     params.append('clientName', filterList.clientName);
     params.append('shippingDestination', filterList.shippingDestination);
+    params.append('vendorName', filterList.vendorName);
     const response = await axios.post(`/afterPicking/`, params);
     afterPickingList = response.data;
   } catch(error) {
@@ -39,5 +52,6 @@ async function getAfterPickingList(filterList) {
 
 
 export default {
-  getAfterPickingList
+  getSummary
+  , getAfterPickingList
 };
