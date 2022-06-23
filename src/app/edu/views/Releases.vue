@@ -35,7 +35,7 @@
         <!-- <div class="item"> -->
           <div>
             <div class="title-field" style="margin-right: 10px; margin-left: 5px">배송구분</div>
-            <ow-filter-checkbox name="checkboxGp4" v-bind:items="checkboxGroup1" />
+            <ow-filter-checkbox name="checkboxGp4" v-bind:items="checkboxGroup1" v-model="emptyGroup" />
           </div>
           <div>
             <div class="title-field" style="margin-right: 10px; margin-left: 5px">배송방식</div>
@@ -335,7 +335,7 @@ import OwSearchInput from '../../com/components/input/OwSearchInput.vue';
 import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-import { ref, reactive, toRefs } from 'vue';
+import { ref, reactive, toRefs, onBeforeMount } from 'vue';
 
 function getRandomCount(i = 1500) {
   return Math.round(Math.random() * i);
@@ -356,10 +356,25 @@ const ITEM_VENDORS = [
 export default {
   name: 'releaseInspection_packing',
   setup() {
+    const filterList =  reactive({
+      // shippingCategory: null
+      shippingCategory: '일반'
+      , shippingWay: '합배송'
+      , released: '출고'
+      , assignee: '최'
+      , orderNo: -1
+      , clientName: null
+      , shippingDestination: null
+    });
     const afterPickingList = ref([]);
+
+    onBeforeMount(() => {
+      console.log('~~~~~~~~~~~~');
+    });
+
     // 리스트 전체 조회.
-    const getAfterPickingList = async () => {
-      const result = await afterPickingApi.getAfterPickingList()
+    const getAfterPickingList = async (filterList) => {
+      const result = await afterPickingApi.getAfterPickingList(filterList)
         .then((result) => {
           console.log('getAfterPickingList - JSON.stringify(result) : ' + JSON.stringify(result));
           afterPickingList.value = result.list;
@@ -409,7 +424,7 @@ export default {
         });
       return result;
     };
-    getAfterPickingList();
+    getAfterPickingList(filterList);
 
     const state = reactive({
       flex: undefined,
@@ -437,18 +452,20 @@ export default {
   },
   data() {
     return {
+      emptyGroup: []
+      ,
       data: [],
       checkboxGroup1: [
-        { name: '긴급', checked: true },
-        { name: '일반', checked: true },
+        { name: '긴급', value: '긴급' },
+        { name: '일반', value: '일반' },
       ],
       checkboxGroup2: [
-        { name: '오스템', checked: true },
-        { name: '합배송', checked: true },
+        { name: '오스템', value: '오스템' },
+        { name: '합배송', value: '합배송' },
       ],
       checkboxGroup3: [
-        { name: '출고', checked: true },
-        { name: '미출고', checked: true },
+        { name: '출고', value: '출고' },
+        { name: '미출고', value: '미출고' },
       ],
       releaseInspection_Packing_Data: [
         {

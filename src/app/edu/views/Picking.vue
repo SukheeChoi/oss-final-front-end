@@ -129,7 +129,7 @@ export default {
 
     //수령 탭
     // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
-    const getVendorList = async () => {
+    const getVendorList = async (dateList) => {
       const result = await combineShippingApi.getVendorList(dateList)
           .then((result) => {
             console.log('getVendorList - JSON.stringify(result) : ' + JSON.stringify(result));

@@ -18,10 +18,18 @@ import axios from "axios";
   // 5-2. 거래처: 부분만 일치해도 검색되도록.
   // 5-3. 배송지: 부분만 일치해도 검색되도록.
   // 5-4. 업체명: 부분만 일치해도 검색되도록.
-async function getAfterPickingList() {
+async function getAfterPickingList(filterList) {
   let afterPickingList = null;
   try {
-    const response = await axios.get(`/afterPicking/`);
+    let params = new URLSearchParams();
+    params.append('shippingCategory', filterList.shippingCategory);
+    params.append('shippingWay', filterList.shippingWay);
+    params.append('released', filterList.released);
+    params.append('assignee', filterList.assignee);
+    params.append('orderNo', filterList.orderNo);
+    params.append('clientName', filterList.clientName);
+    params.append('shippingDestination', filterList.shippingDestination);
+    const response = await axios.post(`/afterPicking/`, params);
     afterPickingList = response.data;
   } catch(error) {
     console.log(error);
