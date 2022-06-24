@@ -8,11 +8,11 @@
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">전체 : <strong>11111111</strong>건</div>
-            <div class="state-item">오스템 : <strong>360</strong>건</div>
-            <div class="state-item">협력사합배송 : <strong>530</strong>건</div>
-            <div class="state-item">협력사직배송 : <strong>470</strong>건</div>
-            <div class="state-item" style="color: red">미출고 : <strong class="color-type-1">2</strong>건</div>
+            <div class="state-item">전체 : <strong>{{statusBar.total}}</strong>건</div>
+            <div class="state-item">오스템 : <strong>{{statusBar.osstem}}</strong>건</div>
+            <div class="state-item">협력사합배송 : <strong>{{statusBar.vendorShippingPlus}}</strong>건</div>
+            <div class="state-item">협력사직배송 : <strong>{{statusBar.vendorShippingDir}}</strong>건</div>
+            <div class="state-item" style="color: red">미출고 : <strong class="color-type-1">{{statusBar.unreleased}}</strong>건</div>
           </div>
         </div>
       </div>
@@ -247,7 +247,13 @@ import orderApi from '@/api/orderApi';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
 const response = ref(null);
-const statusBar = ref(null);
+const statusBar = reactive({
+  total: null,
+  osstem: null,
+  vendorShippingPlus: null,
+  vendorShippingDir: null,
+  unreleased: null,
+});
 const searchSelected = ref(null);
 const searchContent = ref(null);
 const dummy = ref(null);
@@ -260,8 +266,15 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
 
 //전체 데이터 가져오는 함수
 async function getTotal() {
-  const result = await orderApi.getTotal();
-  return result;
+  const result = await orderApi.getTotal()
+  .then((data) => {
+    statusBar.total = data.total;
+    statusBar.osstem = data.osstem;
+    statusBar.vendorShippingPlus = data.vendorShippingPlus;
+    statusBar.vendorShippingDir = data.vendorShippingDir;
+    statusBar.unreleased = data.unreleased;
+    console.log(data);
+  });
 }
 
 export default {
@@ -303,15 +316,9 @@ export default {
       flex.mergeManager = new SimpleMergeManager(config);
     };
 
-    // 그리드 선택하기 위한 설정
-    // const selectionChanged = async (grid, event) => {
-    //   console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', grid);
-    //   console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', event);
-    // };
-
     //체크된 데이터 감시해서 api요청
     watch(
-      () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, searchSelected, searchContent],
+      () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
       (newGroup, oldGroup) => {
         const list = newGroup.map((data) => {
           return data.value;
@@ -331,13 +338,16 @@ export default {
         getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
           response.value = data.data.list;
         });
+        dummy.value = false;
       },
       { deep: true }
     );
 
     function getSearchList() {
-
+      dummy.value = true;
     }
+
+    getTotal();
 
     return {
       ...toRefs(state),
