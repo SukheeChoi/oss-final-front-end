@@ -52,109 +52,24 @@
             <ow-filter-checkbox name="checkboxGp4" v-bind:items="checkboxGroup3" />
           </div>
 
-          <!-- <div class="ow-flex-wrap item-size-content" style="--gap: 10px"> -->
-
           <div class="item align-to-right" style="--gap-item: 6px">
-            <div class="title-field">출고검수/패킹담당자</div>
-            <div class="ow-select" style="--width: 97px">
-              <ow-select name="" id="">
-                <option value="200">200건</option>
-                <option value="500">500건</option>
-                <option value="1000">1000건</option>
+            <!-- 출고검수/패킹 담당자 필터링 드롭박스 -->
+            <div style="--width: 90px">
+              <ow-select :label="selectAssigneeLabel" :items="selectAssigneeList" :modelValue="selectedAssignee">
               </ow-select>
             </div>
-            <div class="title-field">검색</div>
-            <div class="ow-select" style="--width: 97px">
-              <ow-select name="" id="">
-                <option value="200">200건</option>
-                <option value="500">500건</option>
-                <option value="1000">1000건</option>
+            <!-- 검색기준 드롭박스 -->
+            <div style="--width: 97px">
+              <ow-select :label="selectSearchLabel" :items="selectSearchList" v-model="selectedSearchCategory">
               </ow-select>
             </div>
+            <!-- 검색바 -->
             <div class="ow-input type-button" style="--width: 200px">
               <input type="text" placeholder="검색어를 입력하세요." />
               <input type="submit" class="btn-search" />
             </div>
           </div>
           <!-- </div> -->
-
-          <!-- 
-          <div class="ow-input type-button" style="--gap-item: 6px">
-            <input type="text" placeholder="입력" />
-            <input type="submit" class="btn-search" />
-          </div> -->
-        <!-- </div> -->
-
-        <!-- <div class="item" style="--gap-item: 6px">
-          <div class="title-field">보기</div>
-          <div class="checkbox-group has-btn">
-            <button type="button" class="btn-check-all">전체</button>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk4" />
-              <label for="ow-chk4">오스템 상품</label>
-            </div>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk5" checked />
-              <label for="ow-chk5">협력사상품</label>
-            </div>
-          </div>
-        </div>
-        <div class="item" style="--gap-item: 6px">
-          <div class="title-field">배송구분</div>
-          <div class="checkbox-group has-btn">
-            <button type="button" class="btn-check-all">전체</button>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk6" />
-              <label for="ow-chk6">긴급</label>
-            </div>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk7" />
-              <label for="ow-chk7">일반(영업지점)</label>
-            </div>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk8" />
-              <label for="ow-chk8">일반(거래처)</label>
-            </div>
-          </div>
-        </div>
-
-        
-        <div class="item align-to-right" style="--gap-item: 6px">
-          <div class="title-field">지점별 보기</div>
-          <button class="ow-btn type-flat-base">지점선택(전체)</button>
-        </div>
-        <div class="item-bar size-small" style="--gap-bar: 0px"></div>
-        <div class="item" style="--gap-item: 6px">
-          <div class="title-field">주문수보기</div>
-          <div class="ow-select">
-            <select name="" id="">
-              <option value="" selected hidden>선택</option>
-              <option value="200">200건</option>
-              <option value="500">500건</option>
-              <option value="1000">1000건</option>
-            </select>
-          </div>
-          <div class="ow-checkbox">
-            <input type="checkbox" id="ow-chk1" />
-            <label for="ow-chk1">재고없음 제외</label>
-          </div>
-        </div>
-        <div class="item-bar size-small" style="--gap-bar: 0px"></div>
-        <div class="item" style="--gap-item: 6px">
-          <div class="title-field">검색</div>
-          <div class="ow-select" style="--width: 97px">
-            <select name="" id="">
-              <option value="" selected hidden>선택</option>
-              <option value="200">200건</option>
-              <option value="500">500건</option>
-              <option value="1000">1000건</option>
-            </select>
-          </div>
-          <div class="ow-input type-button" style="--width: 200px">
-            <input type="text" placeholder="검색어를 입력하세요." />
-            <input type="submit" class="btn-search" />
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -335,32 +250,21 @@
 </template>
 
 <script>
-import OwSearch from '../../../components/common/OwSearch.vue';
-import OwSearchInput from '../../com/components/input/OwSearchInput.vue';
 import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-import { ref, reactive, toRefs, beforeCreate, onBeforeMount, onMounted } from 'vue';
-
-function getRandomCount(i = 1500) {
-  return Math.round(Math.random() * i);
-}
-function getVendorName(code) {
-  const vendor = ITEM_VENDORS.filter((o) => o.code == code)[0];
-  return vendor ? vendor.name : '';
-}
-
-const ITEM_VENDORS = [
-  { code: 0, name: '현대바이오랜드', placingorderNo: 1 },
-  { code: 1, name: 'KaVo Dental GmbH', placingorderNo: 2 },
-  { code: 2, name: '엔에스케이덴탈코리아 (주)', placingorderNo: 3 },
-  { code: 3, name: '(주)가나시이스', placingorderNo: 4 },
-  { code: 4, name: '디메가', placingorderNo: 5 },
-];
+import { ref, reactive, toRefs } from 'vue';
 
 export default {
   name: 'releaseInspection_packing',
   setup() {
+    // 선택된 출고검수/패킹담당자
+    const selectedAssignee = ref(null);
+    console.log('selectedAssignee.value : ' + selectedAssignee.value);
+    // 선택된 검색기준
+    const selectedSearchCategory = ref(null);
+    // watch()
+
     const filterList =  reactive({
       // shippingCategory: null
       shippingCategory: '일반'
@@ -466,7 +370,6 @@ export default {
 ///////
           console.log('*******afterPickingList.value.length : ' + afterPickingList.value.length);
           for(let i=0; i<afterPickingList.value.length; i++) {
-              console.log('inside for loop');
               releaseInspection_Packing_Data2.value.push(
                 {
                   placingorderNo: afterPickingList.value[i]["release"]["releaseNo"]
@@ -486,7 +389,8 @@ export default {
                   , releaseprintDate: afterPickingList.value[i]["releasePrintDate"]
                   , transactionprintDate: afterPickingList.value[i]["receiptePrintDate"]
                   , inspectionDate: afterPickingList.value[i]["releaseInspectionDate"]
-                  , boxQty: afterPickingList.value[i]["release"]["boxQuantity"]
+                  , boxQty: ' '
+                  // , boxQty: afterPickingList.value[i]["release"]["boxQuantity"]
                   // 출고~/
                   , release_personincharge: afterPickingList.value[i]["release"]["employeeName"]
                   , deliveryCompany: afterPickingList.value[i]["release"]["shippingCompany"]
@@ -495,7 +399,6 @@ export default {
                   // , etc: afterPickingList.value[i]["packing"]["note"]
                 }
               );
-              console.log('###### ' + i + ' : ' + releaseInspection_Packing_Data2.value[i].placingorderNo);
             }
 /////
         });
@@ -517,25 +420,39 @@ export default {
       flex.mergeManager = new SimpleMergeManager(config);
     };
 
+    //
+    const selectAssigneeLabel = '출고검수/패킹담당자';
+    const selectAssigneeList = [
+      { name: '전체', value: '0' }
+      , { name: '최숙희', value: '1' }
+      , { name: '이동현', value: '2' }
+    ];
+    const selectSearchLabel = '검색';
+    const selectSearchList = [
+      { name: '주문번호', value: '1' }
+      , { name: '거래처', value: '2' }
+      , { name: '배송지', value: '3' }
+      , { name: '업체명', value: '4' }
+    ];
 
     return {
       ...toRefs(state)
       , onInitialized
       , summaryList
       , releaseInspection_Packing_Data2
+      , selectAssigneeLabel
+      , selectAssigneeList
+      , selectSearchLabel
+      , selectSearchList
     };
 
   },
 
   components: {
-    // OwSearch,
-    // OwSearchInput
+
   },
   data() {
-    // const item = releaseInspection_Packing_Data2;
     return {
-      // releaseInspection_Packing_Data2: releaseInspection_Packing_Data2,
-      // ,
       emptyGroup: []
       , data: []
       , checkboxGroup1: [
@@ -1171,58 +1088,7 @@ export default {
         },
       ],
     };
-  },
-
-  // methods: {
-  //   getData() {
-  //     let data = ITEM_VENDORS.reduce(
-  //       (acc, cur) => [
-  //         ...acc,
-  //         ...[
-  //           {
-  //             ...cur,
-  //             ...{
-  //               placingorderNo: getPlacingorderNo(),
-  //               release_personincharge: getRandomCount(),
-  //               count: getRandomCount(),
-  //               price: getRandomCount(),
-  //               mItemCount: 0,
-  //               mCount: 0,
-  //               mPrice: 0,
-  //               etc: getVendorName(cur.etc),
-  //             },
-  //           },
-  //         ],
-  //       ],
-  //       []
-  //     );
-
-  //     data.splice(
-  //       0,
-  //       0,
-  //       data.reduce(
-  //         (acc, cur) => {
-  //           Object.keys(cur).forEach((k) => {
-  //             if (k !== 'vendor') acc[k] += cur[k];
-  //           });
-  //           return acc;
-  //         },
-  //         { vendor: '전체', itemCount: 0, count: 0, price: 0, mItemCount: 0, mCount: 0, mPrice: 0 }
-  //       )
-  //     );
-
-  //     return data;
-  //   },
-  //   onloadedRows(grid) {
-  //     console.log('onloadedRows in', grid.rows[0]);
-  //     if (grid.rows && grid.rows.length) {
-  //       grid.rows[0].cssClass = 'cell-total';
-  //     }
-  //   },
-  // },
-  // created() {
-  //   this.data = this.getData();
-  // },
+  }
 };
 </script>
 

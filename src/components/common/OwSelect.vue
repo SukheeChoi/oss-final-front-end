@@ -29,6 +29,7 @@ export default {
     WjComboBox,
   },
   props: {
+    // 드롭박스 앞에 붙는 타이틀 격.
     label: String,
     unique: {
       type: String,
@@ -41,6 +42,7 @@ export default {
       default: '',
     },
     readonly: Boolean,
+    // 드롭박스에서 선택할 수 있는 List!
     items: {
       type: [Array, CollectionView, DataMap],
       default: () => {
@@ -54,6 +56,8 @@ export default {
 
     const dataMap = computed(() => {
       const selectedValue = props.modelValue;
+      // wijmo의 combobox는 itemSource를 이용하고,
+      // Owselect는 props의 items를 itemSource로 전달하는 구조.
       let itemsSource = props.items;
       let displayMemberPath = 'name';
       let selectedValuePath = 'value';

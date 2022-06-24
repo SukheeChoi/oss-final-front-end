@@ -77,7 +77,17 @@ async function getDeliveryList(employeeId, dateList) {
 }
 
 // 수령한 항목 update.
-
+async function updateReceiptList(receiptedList) {
+  let result = null;
+  console.log('모듈 - updateReceiptList - before try');
+  try {
+    const response = await axios.put(`/combineShipping/receipt`, Array.from(receiptedList));
+    result = response.data.result;
+  } catch(error) {
+    console.log(error);
+  }
+  return result; //"success" || "fail"
+}
 
 // 전달된 항목 update.
 async function updateDeliveryList(deliveredList) {
@@ -85,6 +95,7 @@ async function updateDeliveryList(deliveredList) {
   try {
     const response = await axios.put(`/combineShipping/delivery`, Array.from(deliveredList));
     result = response.data.result;
+    console.log('모듈 - updateDeliveryList');
   } catch(error) {
     console.log(error);
   }
@@ -97,6 +108,7 @@ export default {
   , getReceiptListByDate
   , getAssigneeList
   , getReceiptList
+  , updateReceiptList
   , getDeliveryList
   , updateDeliveryList
 };
