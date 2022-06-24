@@ -256,13 +256,18 @@ const statusBar = reactive({
 });
 const searchSelected = ref(null);
 const searchContent = ref(null);
+const searchContent2 = ref(null);
 const dummy = ref(null);
 
 //필터 처리된 데이터 가져오는 함수
-async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent) {
-  const result = await orderApi.getFilterList(company, shippingway, unreleased, searchSelected.value, searchContent.value);
+async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent2) {
+  const result = await orderApi.getFilterList(company, shippingway, unreleased, searchSelected.value, searchContent2.value);
   return result;
 }
+
+const summary = reactive({
+  total: null
+});
 
 //전체 데이터 가져오는 함수
 async function getTotal() {
@@ -320,6 +325,8 @@ export default {
     watch(
       () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
       (newGroup, oldGroup) => {
+        console.log('newGroup.length : ' + newGroup.length);
+        console.log('typeof(newGroup[0]) : ' + typeof(newGroup[0]));
         const list = newGroup.map((data) => {
           return data.value;
         });
@@ -335,7 +342,8 @@ export default {
         });
 
         console.log('newGroupnewGroupnewGroupnewGroup', newGroup);
-        getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
+        // getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
+        getFilterList(company, shippingway, unreleased, searchSelected, searchContent2).then((data) => {
           response.value = data.data.list;
         });
         dummy.value = false;
@@ -356,6 +364,7 @@ export default {
       statusBar,
       searchSelected,
       searchContent,
+      searchContent2,
       getSearchList,
       checkboxGroup1,
       checkboxGroup2,
@@ -363,6 +372,7 @@ export default {
       checkboxGroup4,
       checkboxGroup5,
       checkboxGroup6,
+      summary
     };
   },
 };
