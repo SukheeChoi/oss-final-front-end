@@ -187,7 +187,7 @@ export default {
     // '수령'탭에 바인딩할 데이터를 불러옴.
     // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
     // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
-    const getReceiptList = async (employeeId, dateList=[]) => {
+    const getReceiptList = async (employeeId='', dateList=[]) => {
       const result = await combineShippingApi.getReceiptList(employeeId, Array.from(dateList))
           .then((result) => {
             if(result.receiptList != null) {
@@ -221,7 +221,7 @@ export default {
     updateReceiptList(receiptListForUpdate);
 
     // '전달' 탭에서 바인딩할 데이터를 불러옴.
-    const getDeliveryList = async (employeeId=null, dateList=[]) => {
+    const getDeliveryList = async (employeeId='', dateList=[]) => {
       const result = await combineShippingApi.getDeliveryList(employeeId, Array.from(dateList))
           .then((result) => {
             if(result.deliveryList != null) {
@@ -234,7 +234,7 @@ export default {
               console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
               console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
             }
-          });
+        });
     };
     getDeliveryList();
     // getDeliveryList('E1', ['2022-06-10', '2022-06-25']);

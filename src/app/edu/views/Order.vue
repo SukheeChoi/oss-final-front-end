@@ -8,7 +8,7 @@
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">전체 : <strong>11111111</strong>건</div>
+            <div class="state-item">전체 : <strong>{{summary.total}}//11111111</strong>건</div>
             <div class="state-item">오스템 : <strong>360</strong>건</div>
             <div class="state-item">협력사합배송 : <strong>530</strong>건</div>
             <div class="state-item">협력사직배송 : <strong>470</strong>건</div>
@@ -250,18 +250,28 @@ const response = ref(null);
 const statusBar = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
+const searchContent2 = ref(null);
 const dummy = ref(null);
 
 //필터 처리된 데이터 가져오는 함수
-async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent) {
-  const result = await orderApi.getFilterList(company, shippingway, unreleased, searchSelected.value, searchContent.value);
+async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent2) {
+  const result = await orderApi.getFilterList(company, shippingway, unreleased, searchSelected.value, searchContent2.value);
   return result;
 }
 
+const summary = reactive({
+  total: null
+});
+
 //전체 데이터 가져오는 함수
 async function getTotal() {
-  const result = await orderApi.getTotal();
-  return result;
+  const result = await orderApi.getTotal()
+  .then((result) => {
+    console.log('result.total : ' + result.total);
+    summary.total = result.total;
+  });
+
+  // return result;
 }
 
 export default {
@@ -309,10 +319,14 @@ export default {
     //   console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', event);
     // };
 
-    //체크된 데이터 감시해서 api요청
+/////////
+
     watch(
-      () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, searchSelected, searchContent],
+      () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, searchContent2],
+      // () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, searchSelected, searchContent],
       (newGroup, oldGroup) => {
+        console.log('newGroup.length : ' + newGroup.length);
+        console.log('typeof(newGroup[0]) : ' + typeof(newGroup[0]));
         const list = newGroup.map((data) => {
           return data.value;
         });
@@ -328,7 +342,8 @@ export default {
         });
 
         console.log('newGroupnewGroupnewGroupnewGroup', newGroup);
-        getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
+        // getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
+        getFilterList(company, shippingway, unreleased, searchSelected, searchContent2).then((data) => {
           response.value = data.data.list;
         });
       },
@@ -336,8 +351,10 @@ export default {
     );
 
     function getSearchList() {
-
+      searchContent2.value = searchContent.value;
     }
+
+    getTotal();
 
     return {
       ...toRefs(state),
@@ -346,6 +363,7 @@ export default {
       statusBar,
       searchSelected,
       searchContent,
+      searchContent2,
       getSearchList,
       checkboxGroup1,
       checkboxGroup2,
@@ -353,6 +371,7 @@ export default {
       checkboxGroup4,
       checkboxGroup5,
       checkboxGroup6,
+      summary
     };
   },
 };
