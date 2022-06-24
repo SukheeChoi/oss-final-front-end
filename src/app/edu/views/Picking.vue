@@ -113,7 +113,7 @@
 
 <script>
 import combineShippingApi from '../../../api/combineShippingApi';
-import { ref, reactive, beforeCreate, onMouted } from 'vue';
+import { ref, reactive } from 'vue';
 import OwNGrid from '@/components/grid/new/OwNGrid';
 export default {
   name: 'TheOwNewGrid',
@@ -126,6 +126,16 @@ export default {
     const receiptList = ref([]);
     const deliveryList = ref([]);
     const deliveredList = ref([]);
+    const receiptListForUpdate = ref([
+      {
+        orderItemNo: 1
+        , receiveUnrelease: 0
+      }
+      , {
+        orderItemNo: 2
+        , receiveUnrelease: 0
+      }
+    ]);
 
     //수령 탭
     // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
@@ -177,7 +187,7 @@ export default {
     // '수령'탭에 바인딩할 데이터를 불러옴.
     // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
     // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
-    const getReceiptList = async (employeeId, dateList=[]) => {
+    const getReceiptList = async (employeeId='', dateList=[]) => {
       const result = await combineShippingApi.getReceiptList(employeeId, Array.from(dateList))
           .then((result) => {
             if(result.receiptList != null) {
@@ -195,8 +205,23 @@ export default {
     };
     getReceiptList('E2');
 
+    // 수령 Update.
+    console.log('before updateReceiptList');
+    const updateReceiptList = async (receiptListForUpdate) => {
+      const result = await combineShippingApi.updateReceiptList(Array.from(receiptListForUpdate.value))
+        .then((result => {
+          console.log('updateReceiptList - result : ' + result);
+
+        }));
+      // return result;
+    };
+    // receiptListForUpdate.value.length = 0;
+    console.log('receiptListForUpdate.value.length : ' + receiptListForUpdate.value.length);
+    console.log('receiptListForUpdate.value.length : ' + receiptListForUpdate.value.length);
+    updateReceiptList(receiptListForUpdate);
+
     // '전달' 탭에서 바인딩할 데이터를 불러옴.
-    const getDeliveryList = async (employeeId, dateList=[]) => {
+    const getDeliveryList = async (employeeId='', dateList=[]) => {
       const result = await combineShippingApi.getDeliveryList(employeeId, Array.from(dateList))
           .then((result) => {
             if(result.deliveryList != null) {
@@ -209,11 +234,10 @@ export default {
               console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
               console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
             }
-          });
-
-      return result;
+        });
     };
-    getDeliveryList('E1', ['2022-06-10', '2022-06-25']);
+    getDeliveryList();
+    // getDeliveryList('E1', ['2022-06-10', '2022-06-25']);
 
     // 전달된 항목 정보 update.
     deliveredList.value.push(
@@ -412,6 +436,7 @@ export default {
       remove,
       state,
       start,
+      receiptListForUpdate
     };
   },
 };

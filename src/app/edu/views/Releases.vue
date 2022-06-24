@@ -7,10 +7,10 @@
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">주문 : <strong>10</strong>건</div>
-            <div class="state-item">피킹지시 : <strong>10</strong>건</div>
-            <div class="state-item">출고검수/패킹 : <strong>5</strong>건</div>
-            <div class="state-item color-type-1">미출고 : <strong class="color-type-1">0</strong>건</div>
+            <div class="state-item">주문 : <strong>{{summaryList.status.progressOrderNo}}</strong>건</div>
+            <div class="state-item">피킹지시 : <strong>{{summaryList.status.pickingDirectionNo}}</strong>건</div>
+            <div class="state-item">출고검수/패킹 : <strong>{{summaryList.status.releaseInspectionNo}}</strong>건</div>
+            <div class="state-item color-type-1">미출고 : <strong class="color-type-1">{{summaryList.delivery.unreleasedNo}}</strong>건</div>
           </div>
         </div>
 
@@ -20,7 +20,13 @@
         <div class="item">
           <div class="state">
             <div class="state-item">
-              출고검수(긴급/일반) : <strong>5</strong>건 (<strong>3</strong>건/<strong>2</strong>건)
+              출고검수(긴급/일반) : 
+              <strong>{{summaryList.status.releaseInspectionNo}}</strong>
+              건 (
+              <strong>{{summaryList.delivery.expressShippingNo}}</strong>
+              건/
+              <strong>{{summaryList.delivery.normalShippingNo}}</strong>
+              건)
             </div>
           </div>
         </div>
@@ -46,109 +52,24 @@
             <ow-filter-checkbox name="checkboxGp4" v-bind:items="checkboxGroup3" />
           </div>
 
-          <!-- <div class="ow-flex-wrap item-size-content" style="--gap: 10px"> -->
-
           <div class="item align-to-right" style="--gap-item: 6px">
-            <div class="title-field">출고검수/패킹담당자</div>
-            <div class="ow-select" style="--width: 97px">
-              <ow-select name="" id="">
-                <option value="200">200건</option>
-                <option value="500">500건</option>
-                <option value="1000">1000건</option>
+            <!-- 출고검수/패킹 담당자 필터링 드롭박스 -->
+            <div style="--width: 90px">
+              <ow-select :label="selectAssigneeLabel" :items="selectAssigneeList" :modelValue="selectedAssignee">
               </ow-select>
             </div>
-            <div class="title-field">검색</div>
-            <div class="ow-select" style="--width: 97px">
-              <ow-select name="" id="">
-                <option value="200">200건</option>
-                <option value="500">500건</option>
-                <option value="1000">1000건</option>
+            <!-- 검색기준 드롭박스 -->
+            <div style="--width: 97px">
+              <ow-select :label="selectSearchLabel" :items="selectSearchList" v-model="selectedSearchCategory">
               </ow-select>
             </div>
+            <!-- 검색바 -->
             <div class="ow-input type-button" style="--width: 200px">
               <input type="text" placeholder="검색어를 입력하세요." />
               <input type="submit" class="btn-search" />
             </div>
           </div>
           <!-- </div> -->
-
-          <!-- 
-          <div class="ow-input type-button" style="--gap-item: 6px">
-            <input type="text" placeholder="입력" />
-            <input type="submit" class="btn-search" />
-          </div> -->
-        <!-- </div> -->
-
-        <!-- <div class="item" style="--gap-item: 6px">
-          <div class="title-field">보기</div>
-          <div class="checkbox-group has-btn">
-            <button type="button" class="btn-check-all">전체</button>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk4" />
-              <label for="ow-chk4">오스템 상품</label>
-            </div>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk5" checked />
-              <label for="ow-chk5">협력사상품</label>
-            </div>
-          </div>
-        </div>
-        <div class="item" style="--gap-item: 6px">
-          <div class="title-field">배송구분</div>
-          <div class="checkbox-group has-btn">
-            <button type="button" class="btn-check-all">전체</button>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk6" />
-              <label for="ow-chk6">긴급</label>
-            </div>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk7" />
-              <label for="ow-chk7">일반(영업지점)</label>
-            </div>
-            <div class="ow-checkbox">
-              <input type="checkbox" id="ow-chk8" />
-              <label for="ow-chk8">일반(거래처)</label>
-            </div>
-          </div>
-        </div>
-
-        
-        <div class="item align-to-right" style="--gap-item: 6px">
-          <div class="title-field">지점별 보기</div>
-          <button class="ow-btn type-flat-base">지점선택(전체)</button>
-        </div>
-        <div class="item-bar size-small" style="--gap-bar: 0px"></div>
-        <div class="item" style="--gap-item: 6px">
-          <div class="title-field">주문수보기</div>
-          <div class="ow-select">
-            <select name="" id="">
-              <option value="" selected hidden>선택</option>
-              <option value="200">200건</option>
-              <option value="500">500건</option>
-              <option value="1000">1000건</option>
-            </select>
-          </div>
-          <div class="ow-checkbox">
-            <input type="checkbox" id="ow-chk1" />
-            <label for="ow-chk1">재고없음 제외</label>
-          </div>
-        </div>
-        <div class="item-bar size-small" style="--gap-bar: 0px"></div>
-        <div class="item" style="--gap-item: 6px">
-          <div class="title-field">검색</div>
-          <div class="ow-select" style="--width: 97px">
-            <select name="" id="">
-              <option value="" selected hidden>선택</option>
-              <option value="200">200건</option>
-              <option value="500">500건</option>
-              <option value="1000">1000건</option>
-            </select>
-          </div>
-          <div class="ow-input type-button" style="--width: 200px">
-            <input type="text" placeholder="검색어를 입력하세요." />
-            <input type="submit" class="btn-search" />
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -160,12 +81,11 @@
       allowSorting="None"
       selectionMode="None"
       class="ow-grid type-header-group"
-      :items-source="releaseInspection_Packing_Data"
+      :items-source="releaseInspection_Packing_Data2"
       :initialized="onInitialized"
       :allowMerging="'Cells'"
       style="display: flex"
     >
-      <!-- :itemsSource="releaseInspection_Packing_Data" -->
       <!-- :allowResizing="Row" -->
       <!--화이팅 이라구요! 언니 힘내라구요! -->
       <!-- :loadedRows="onloadedRows" -->
@@ -330,32 +250,21 @@
 </template>
 
 <script>
-import OwSearch from '../../../components/common/OwSearch.vue';
-import OwSearchInput from '../../com/components/input/OwSearchInput.vue';
 import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-import { ref, reactive, toRefs, onBeforeMount } from 'vue';
-
-function getRandomCount(i = 1500) {
-  return Math.round(Math.random() * i);
-}
-function getVendorName(code) {
-  const vendor = ITEM_VENDORS.filter((o) => o.code == code)[0];
-  return vendor ? vendor.name : '';
-}
-
-const ITEM_VENDORS = [
-  { code: 0, name: '현대바이오랜드', placingorderNo: 1 },
-  { code: 1, name: 'KaVo Dental GmbH', placingorderNo: 2 },
-  { code: 2, name: '엔에스케이덴탈코리아 (주)', placingorderNo: 3 },
-  { code: 3, name: '(주)가나시이스', placingorderNo: 4 },
-  { code: 4, name: '디메가', placingorderNo: 5 },
-];
+import { ref, reactive, toRefs } from 'vue';
 
 export default {
   name: 'releaseInspection_packing',
   setup() {
+    // 선택된 출고검수/패킹담당자
+    const selectedAssignee = ref(null);
+    console.log('selectedAssignee.value : ' + selectedAssignee.value);
+    // 선택된 검색기준
+    const selectedSearchCategory = ref(null);
+    // watch()
+
     const filterList =  reactive({
       // shippingCategory: null
       shippingCategory: '일반'
@@ -365,16 +274,52 @@ export default {
       , orderNo: -1
       , clientName: null
       , shippingDestination: null
+      , vendorName: null
+    });
+    const summaryList = reactive({
+      status: {
+        progressOrderNo: '100'
+        // progressOrderNo: null
+        , pickingDirectionNo: null
+        , releaseInspectionNo: null
+      }
+      , delivery: {
+        unreleasedNo: null
+        , expressShippingNo: null
+        , normalShippingNo: null
+      }
     });
     const afterPickingList = ref([]);
+        // 통신을 통한 데이터 바인딩.
+    const releaseInspection_Packing_Data2 = ref([]);
 
-    onBeforeMount(() => {
-      console.log('~~~~~~~~~~~~');
-    });
+    // 현황/배송구분 정보 불러오기.(새로고침 시에만 통신.)
+    const getSummary = async () => {
+      const result = await afterPickingApi.getSummary()
+        .then((result) => {
+          summaryList.status.progressOrderNo = result.summaryMap.progressOrderNo;
+          summaryList.status.pickingDirectionNo = result.summaryMap.pickingDirectionNo;
+          summaryList.status.releaseInspectionNo = result.summaryMap.releaseInspectionNo;
+          summaryList.delivery.unreleasedNo = result.summaryMap.unreleasedNo;
+          summaryList.delivery.expressShippingNo = result.summaryMap.expressShippingNo;
+          summaryList.delivery.normalShippingNo = result.summaryMap.normalShippingNo;
 
-    // 리스트 전체 조회.
-    const getAfterPickingList = async (filterList) => {
-      const result = await afterPickingApi.getAfterPickingList(filterList)
+          console.log('summaryList.status.progressOrderNo : ' + summaryList.status.progressOrderNo);
+          console.log('summaryList.status.pickingDirectionNo : ' + summaryList.status.pickingDirectionNo);
+          console.log('result.summaryMap.unreleasedNo : ' + result.summaryMap.unreleasedNo);
+          console.log('result.summaryMap : ' + result.summaryMap);
+          console.log('result.summaryMap.expressShippingNo : ' + result.summaryMap.expressShippingNo);
+          console.log('result.summaryMap.normalShippingNo : ' + result.summaryMap.normalShippingNo);
+          console.log('result.summaryMap.progressOrderNo : ' + result.summaryMap.progressOrderNo);
+          console.log('result.summaryMap.pickingDirectionNo : ' + result.summaryMap.pickingDirectionNo);
+          console.log('result.summaryMap.releaseInspectionNo : ' + result.summaryMap.releaseInspectionNo);
+      });
+    };
+    getSummary();
+
+    // 리스트 전체 조회.(페이지네이션 필요.)
+    const getAfterPickingList = (filterList) => {
+      const result = afterPickingApi.getAfterPickingList(filterList)
         .then((result) => {
           console.log('getAfterPickingList - JSON.stringify(result) : ' + JSON.stringify(result));
           afterPickingList.value = result.list;
@@ -421,8 +366,43 @@ export default {
           console.log('afterPickingList.value[0]["packing"]["note"] : ' + afterPickingList.value[0]["packing"]["note"]);
           // 출고 - 비고
           console.log('afterPickingList.value[0]["release"]["note"] : ' + afterPickingList.value[0]["release"]["note"]);
+
+///////
+          console.log('*******afterPickingList.value.length : ' + afterPickingList.value.length);
+          for(let i=0; i<afterPickingList.value.length; i++) {
+              releaseInspection_Packing_Data2.value.push(
+                {
+                  placingorderNo: afterPickingList.value[i]["release"]["releaseNo"]
+                  , itemName: afterPickingList.value[i]["item"]["itemName"]
+                  , itemCode: afterPickingList.value[i]["item"]["itemCode"]
+                  , pickingQty: afterPickingList.value[i]["picking"]["pickingQty"]
+                  , inspectionQty: afterPickingList.value[i]["releaseInspectionQuantity"]
+                  , packing_unrelease: (
+                    afterPickingList.value[i]["unReleased"]
+                    + afterPickingList.value[i]["packing"]["unrelease"]
+                  )
+                  , orderClient: afterPickingList.value[i]["vendor"]["vendorName"]
+                  , shippingDest: afterPickingList.value[i]["order"]["shippingDestination"]
+                  , shippingCat: afterPickingList.value[i]["order"]["shippingCategory"]
+                  , shippingWay: afterPickingList.value[i]["order"]["shippingWay"]
+                  , packing_personincharge: afterPickingList.value[i]["employeeName"]
+                  , releaseprintDate: afterPickingList.value[i]["releasePrintDate"]
+                  , transactionprintDate: afterPickingList.value[i]["receiptePrintDate"]
+                  , inspectionDate: afterPickingList.value[i]["releaseInspectionDate"]
+                  , boxQty: ' '
+                  // , boxQty: afterPickingList.value[i]["release"]["boxQuantity"]
+                  // 출고~/
+                  , release_personincharge: afterPickingList.value[i]["release"]["employeeName"]
+                  , deliveryCompany: afterPickingList.value[i]["release"]["shippingCompany"]
+                  , invoiceNo: afterPickingList.value[i]["release"]["invoiceCode"]
+                  , etc: ' '
+                  // , etc: afterPickingList.value[i]["packing"]["note"]
+                }
+              );
+            }
+/////
         });
-      return result;
+      // return result;
     };
     getAfterPickingList(filterList);
 
@@ -439,35 +419,55 @@ export default {
 
       flex.mergeManager = new SimpleMergeManager(config);
     };
+
+    //
+    const selectAssigneeLabel = '출고검수/패킹담당자';
+    const selectAssigneeList = [
+      { name: '전체', value: '0' }
+      , { name: '최숙희', value: '1' }
+      , { name: '이동현', value: '2' }
+    ];
+    const selectSearchLabel = '검색';
+    const selectSearchList = [
+      { name: '주문번호', value: '1' }
+      , { name: '거래처', value: '2' }
+      , { name: '배송지', value: '3' }
+      , { name: '업체명', value: '4' }
+    ];
+
     return {
-      ...toRefs(state),
-      onInitialized,
+      ...toRefs(state)
+      , onInitialized
+      , summaryList
+      , releaseInspection_Packing_Data2
+      , selectAssigneeLabel
+      , selectAssigneeList
+      , selectSearchLabel
+      , selectSearchList
     };
 
   },
 
   components: {
-    // OwSearch,
-    // OwSearchInput
+
   },
   data() {
     return {
       emptyGroup: []
-      ,
-      data: [],
-      checkboxGroup1: [
+      , data: []
+      , checkboxGroup1: [
         { name: '긴급', value: '긴급' },
         { name: '일반', value: '일반' },
-      ],
-      checkboxGroup2: [
+      ]
+      , checkboxGroup2: [
         { name: '오스템', value: '오스템' },
         { name: '합배송', value: '합배송' },
-      ],
-      checkboxGroup3: [
+      ]
+      , checkboxGroup3: [
         { name: '출고', value: '출고' },
         { name: '미출고', value: '미출고' },
-      ],
-      releaseInspection_Packing_Data: [
+      ]
+      , releaseInspection_Packing_Data: [
         {
           // 출고검수/패킹~
           placingorderNo: 'C_03_002',
@@ -1088,58 +1088,7 @@ export default {
         },
       ],
     };
-  },
-
-  // methods: {
-  //   getData() {
-  //     let data = ITEM_VENDORS.reduce(
-  //       (acc, cur) => [
-  //         ...acc,
-  //         ...[
-  //           {
-  //             ...cur,
-  //             ...{
-  //               placingorderNo: getPlacingorderNo(),
-  //               release_personincharge: getRandomCount(),
-  //               count: getRandomCount(),
-  //               price: getRandomCount(),
-  //               mItemCount: 0,
-  //               mCount: 0,
-  //               mPrice: 0,
-  //               etc: getVendorName(cur.etc),
-  //             },
-  //           },
-  //         ],
-  //       ],
-  //       []
-  //     );
-
-  //     data.splice(
-  //       0,
-  //       0,
-  //       data.reduce(
-  //         (acc, cur) => {
-  //           Object.keys(cur).forEach((k) => {
-  //             if (k !== 'vendor') acc[k] += cur[k];
-  //           });
-  //           return acc;
-  //         },
-  //         { vendor: '전체', itemCount: 0, count: 0, price: 0, mItemCount: 0, mCount: 0, mPrice: 0 }
-  //       )
-  //     );
-
-  //     return data;
-  //   },
-  //   onloadedRows(grid) {
-  //     console.log('onloadedRows in', grid.rows[0]);
-  //     if (grid.rows && grid.rows.length) {
-  //       grid.rows[0].cssClass = 'cell-total';
-  //     }
-  //   },
-  // },
-  // created() {
-  //   this.data = this.getData();
-  // },
+  }
 };
 </script>
 
