@@ -38,8 +38,7 @@
           :initialized="onInitialized"
           :autoRowHeights="true"
           :autoGenerateColumns="false"
-          :selectionChanged="onSelectionChanged"
-          ref="flexxx"
+          :selectionChanged="SelectionChanged"
         > <!-- :autoRowHeights="true" -->
           <wj-flex-grid-column :binding="'no'" :header="'No'" :allowMerging="true" :width=40 align="center"/>
           <wj-flex-grid-column :binding="'clientName'" :header="'거래처'" :allowMerging="true" :width=100 align="center"/>
@@ -197,20 +196,17 @@
 import { ref, reactive, toRefs, watch, toRaw, onMounted } from 'vue';
 import { SimpleMergeManager} from '@/utils/wijmo.grid';
 import releaseInspectionApi from '@/api/releaseInspectionApi';
-import {format} from '@grapecity/wijmo';
+import { CollectionView, format } from '@grapecity/wijmo';
 
 export default {
   setup() {
     const state = reactive({
       flex: null,  //wj-flex-grid의 정보를 flex에 담아서 사용
-      currentSelection: null,
+      //currentSelection: null,
     });
-    const flexxx = ref(null);
 
     //grid 병합 처리 >> custom merge
     const onInitialized = (flex) => {
-      console.log("flex1===========================================")
-      console.log(state.flex);
       const config = {
         groupingColumns: ["clientName"],
         mergedColumns : [0,1,2,3,4,5,'releasePrintDate','boxQty',14,15,16],        
@@ -218,17 +214,6 @@ export default {
       flex.mergeManager = new SimpleMergeManager(config);
       // onSelectionChanged(flex);
     };
-
-    // update aggregates when selection changes
-    function onSelectionChanged() {
-      console.log("flex2===========================================")
-      console.log(flex);
-      currentSelection = new format("({row},{col})-({row2},{col2})", state.flex);
-      console.log("currentSelection")
-      console.log(currentSelection);
-    }
-
-    onSelectionChanged();
 
     //ref 활용해서 전체 데이터 가져오기
     const releaseInspectionData = ref([]);
@@ -265,7 +250,6 @@ export default {
     const releaseInspectionFilterData = ref([]);
 
     const getFilterList = async(newGroup) => {
-      console.log("지금 들어가는 newGroup", newGroup);
       const list = await releaseInspectionApi.getFilterList(newGroup);
       return list;
     };
@@ -280,11 +264,6 @@ export default {
     //Filter
     const checkboxGroup5 = ref([ { name : '긴급', value : '긴급'} , { name : '일반', value : '일반'}]);
     const emptyGroup = ref([]);
-
-    function getEmptyGroup() {
-      console.log("=== emptyGroup ===");
-      console.log(emptyGroup);
-    }
 
     const s = reactive({
       item: undefined,  //wj-flex-grid의 정보를 flex에 담아서 사용
@@ -349,25 +328,40 @@ export default {
        );
      })
 
+    const SelectionChanged = async(grid, e) => {
+      console.log("=======================");
+      console.log(grid.collectionView);
+      var item = grid.collectionView.currentItem;
+      console.log("============item===========");
+      console.log(item);
+
+      console.log(grid.selectedRanges);
+
+      // console.log(e._p);
+      // console.log(e._p._activeCell["wj-cell-index"].panel._activeCell);
+      //console.log(e._p._activeCell["wj-cell-index"]["panel"]["_rng"]["_row2"]);
+
+      // e._p._activeCell["wj-cell-index"]["rng"]["_col1"] = 16;
+      // e._p._activeCell["wj-cell-index"]["rng"]["_col2"] = 16;
+      // console.log("===========바꼈니??============");
+      // console.log(e._p._activeCell["wj-cell-index"]["rng"]);
+    
+      console.log("=======================")
+      console.log("grid")
+      console.log(grid);
+      console.log(e);
+    }
+
     return {
       ...toRefs(state),
       onInitialized,
       releaseInspectionData,
       checkboxGroup5,
       emptyGroup,
-      onSelectionChanged
+      SelectionChanged,
+      //onSelectionChanged
     }
   },
-
-
-
-  // created() {
-  //   this.getReleaseInspectionList();
-  // },
-
-  // components: {
-  //   WjFlexGrid,
-  // },
 };
 </script>
 
@@ -381,44 +375,5 @@ export default {
 .wj-cell.wj-header.wj-wrap.wj-align-center {
     line-height: inherit;
 }
-/* .wj-cell.wj-align-center {
-    max-height: 300px;
-} */
 
-/* .wj-cell.wj-header {
-    max-height: 300px;
-} */
-
-/* .wj-header{
-  height: 300px;
-}
-
-.wj-cell.wj-header.wj-align-center {
-    height: 50px;
-}
-
-.wj-cell.wj-align-center {
-    height: 30px;
-} */
-
-
-    /* .wj-header {
-      color: nth($clrs-achromatic, 2);
-      background-color: #fff;
-      &:not(:last-child) { 
-        border-right : 0 ; 
-        &:after {
-          content :"" ; 
-          display: block;
-          width: 1px ; 
-          position: absolute;
-          right : 0 ; top: 7px; bottom: 7px ;  
-          background-color: nth($clrs-border, 1);
-        }
-      }
-      // 헤더 정렬 클래스 ( 태그에 cssClassAll="" 로 적용 필요 )
-      &.ta-c { text-align: center ; }
-      &.ta-l { text-align: left ; }
-      &.ta-r { text-align: right ; }
-    } */
 </style>
