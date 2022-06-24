@@ -4,14 +4,15 @@
       <div class="ow-flex-wrap">
         <div class="item size-fix" style="--gap-item: 6px">
           <div class="title-field">현황</div>
+          <div>{{ searchSelected }}</div>
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">전체 : <strong>1360</strong>건</div>
-            <div class="state-item">오스템 : <strong>360</strong>건</div>
-            <div class="state-item">협력사합배송 : <strong>530</strong>건</div>
-            <div class="state-item">협력사직배송 : <strong>470</strong>건</div>
-            <div class="state-item" style="color: red">미출고 : <strong class="color-type-1">2</strong>건</div>
+            <div class="state-item">전체 : <strong>{{statusBar.total}}</strong>건</div>
+            <div class="state-item">오스템 : <strong>{{statusBar.osstem}}</strong>건</div>
+            <div class="state-item">협력사합배송 : <strong>{{statusBar.vendorShippingPlus}}</strong>건</div>
+            <div class="state-item">협력사직배송 : <strong>{{statusBar.vendorShippingDir}}</strong>건</div>
+            <div class="state-item" style="color: red">미출고 : <strong class="color-type-1">{{statusBar.unreleased}}</strong>건</div>
           </div>
         </div>
       </div>
@@ -28,20 +29,20 @@
       <ow-filter-checkbox name="checkboxGp2" :items="checkboxGroup2" v-model="checkboxGroup5" :label="`배송구분`" />
       <ow-filter-checkbox name="checkboxGp3" :items="checkboxGroup3" v-model="checkboxGroup6" :label="`미출고`" />
       <div class="title-field">지점별 보기</div>
-      <button class="ow-btn type-util" @click="postData()">지점선택(전체)</button>
+      <button class="ow-btn type-util">지점선택(전체)</button>
 
       <div class="item align-to-right" style="--gap-item: 6px">
         <div class="title-field">검색</div>
         <div class="ow-select" style="--width: 97px">
-          <ow-select name="" id="">
-            <option value="200">200건</option>
-            <option value="500">500건</option>
-            <option value="1000">1000건</option>
-          </ow-select>
+          <select name="" id="" v-model="searchSelected">
+            <option value="" selected hidden>선택</option>
+            <option value="주문번호">주문번호</option>
+            <option value="거래처">거래처</option>
+          </select>
         </div>
         <div class="ow-input type-button" style="--width: 200px">
-          <input type="text" placeholder="검색어를 입력하세요." />
-          <input type="submit" class="btn-search" />
+          <input type="text" v-model="searchContent" placeholder="검색어를 입력하세요." />
+          <input type="submit" class="btn-search" @click="getSearchList()" />
         </div>
       </div>
     </div>
@@ -153,35 +154,35 @@
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="협력사">
         <wj-flex-grid-column-group
-          binding="count3-1"
+          binding="orderShippingWay"
           header="배송방식"
           width="*"
           align="center"
           cssClassAll="border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="count3-2"
+          binding="orderCheckDate"
           header="주문확인일시"
           :width="100"
           align="center"
           cssClassAll="border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="count3-3"
+          binding="releaseQuantity"
           header="출고수량"
           width="*"
           align="center"
           cssClassAll="border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="count3-4"
+          binding="releaseScheduleDate"
           header="출고예정일자"
           :width="100"
           align="center"
           cssClassAll="border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="count3-4"
+          binding="recieveDate"
           header="수령일시"
           width="*"
           align="center"
@@ -241,13 +242,39 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs, watch, computed } from 'vue';
+import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import orderApi from '@/api/orderApi';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
-async function postData(filter) {
-  const model = await orderApi.postData(filter);
-  console.log(model);
+const response = ref(null);
+const statusBar = reactive({
+  total: null,
+  osstem: null,
+  vendorShippingPlus: null,
+  vendorShippingDir: null,
+  unreleased: null,
+});
+const searchSelected = ref(null);
+const searchContent = ref(null);
+const dummy = ref(null);
+
+//필터 처리된 데이터 가져오는 함수
+async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent) {
+  const result = await orderApi.getFilterList(company, shippingway, unreleased, searchSelected.value, searchContent.value);
+  return result;
+}
+
+//전체 데이터 가져오는 함수
+async function getTotal() {
+  const result = await orderApi.getTotal()
+  .then((data) => {
+    statusBar.total = data.total;
+    statusBar.osstem = data.osstem;
+    statusBar.vendorShippingPlus = data.vendorShippingPlus;
+    statusBar.vendorShippingDir = data.vendorShippingDir;
+    statusBar.unreleased = data.unreleased;
+    console.log(data);
+  });
 }
 
 export default {
@@ -258,31 +285,28 @@ export default {
     });
 
     const checkboxGroup1 = ref([
-      { name: '오스템제품', value: 'osstem' },
-      { name: '오스템상품', value: 'osstemproduct' },
-      { name: '협력사상품(합배송)', value: 'vendorproduct' },
+      { name: '오스템제품', value: 'osstemItem' },
+      { name: '오스템상품', value: 'osstemProduct' },
+      { name: '협력사상품(합배송)', value: 'vendorproductPlus' },
       { name: '협력사상품(직배송)', value: 'vendorproductDir' },
     ]);
 
     const checkboxGroup2 = ref([
-      { name: '긴급', value: 'a' },
-      { name: '일반', value: 'b' },
+      { name: '긴급', value: 'emergency' },
+      { name: '일반', value: 'normal' },
     ]);
 
     const checkboxGroup3 = ref([
-      { name: '출고', value: 'c' },
-      { name: '미출고', value: 'd' },
+      { name: '출고', value: 'released' },
+      { name: '미출고', value: 'unreleased' },
     ]);
+
     const checkboxGroup4 = ref([]);
     const checkboxGroup5 = ref([]);
     const checkboxGroup6 = ref([]);
 
     const onInitialized = (flex) => {
       state.flex = flex;
-      console.log('flex.onCellEditEnded', flex.onCellEditEnded);
-      flex.onCellEditEnded = (...args) => {
-        console.log('argsssssssssssssssssssss', args);
-      };
 
       const config = {
         groupingColumns: ['orderDate'],
@@ -292,17 +316,9 @@ export default {
       flex.mergeManager = new SimpleMergeManager(config);
     };
 
-    const response = ref(null);
-
-    async function getList() {
-      const result = await orderApi.getAllList();
-      response.value = result.list;
-    }
-
-    getList();
-
+    //체크된 데이터 감시해서 api요청
     watch(
-      () => [checkboxGroup4, checkboxGroup5, checkboxGroup6],
+      () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
       (newGroup, oldGroup) => {
         const list = newGroup.map((data) => {
           return data.value;
@@ -318,23 +334,29 @@ export default {
           return data;
         });
 
-        const jsonData = {
-          company: company,
-          shippingway: shippingway,
-          unreleased: unreleased,
-        };
-
-        console.log(jsonData);
-        // postData(jsonData);
+        console.log('newGroupnewGroupnewGroupnewGroup', newGroup);
+        getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
+          response.value = data.data.list;
+        });
+        dummy.value = false;
       },
       { deep: true }
     );
+
+    function getSearchList() {
+      dummy.value = true;
+    }
+
+    getTotal();
 
     return {
       ...toRefs(state),
       onInitialized,
       response,
-      postData,
+      statusBar,
+      searchSelected,
+      searchContent,
+      getSearchList,
       checkboxGroup1,
       checkboxGroup2,
       checkboxGroup3,
