@@ -58,6 +58,11 @@ export default [
             name: 'test1',
             component: () => import('@@/edu/views/Test1')
         },
+        {
+            path: 'Picking1',
+            name: 'DISTSub4',
+            component: () => import('@@/edu/views/Picking1')
+        },
       ]
   }
 ]

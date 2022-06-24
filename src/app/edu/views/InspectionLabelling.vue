@@ -7,11 +7,19 @@
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">전체 : <strong>1360</strong>건</div>
-            <div class="state-item">오스템 : <strong>360</strong>건</div>
-            <div class="state-item">협력사합배송 : <strong>530</strong>건</div>
-            <div class="state-item">협력사직배송 : <strong>470</strong>건</div>
-            <div class="state-item" style="color: red">미출고 : <strong class="color-type-1">2</strong>건</div>
+            <div class="state-item">물품수령 : <strong>26</strong>품목/<string>538</string>개</div>
+            <div class="state-item">검품검수 : <strong>8</strong>품목/<string>283</string>개</div>
+            <div class="state-item">라벨링 : <strong>4</strong>품목/<string>120</string>개</div>
+          </div>
+        </div>
+        <div class="item size-fix" style="--gap-item: 6px">
+          <div class="title-field">검품검수현황</div>
+        </div>
+        <div class="item">
+          <div class="state">
+            <div class="state-item">양품 : <strong>8</strong>품목/<string>280</string>개</div>
+            <div class="state-item">누락 : <strong>1</strong>품목/<string>1</string>개</div>
+            <div class="state-item">파손 : <strong>4</strong>품목/<string>2</string>개</div>
           </div>
         </div>
       </div>
@@ -33,7 +41,7 @@
       </ow-tree-grid>
     </div>
     <!-- Right -->
-    <div class="right-side flex-grow-1">
+    <div class="right-side">
       <div class="d-flex justify-content-end">
         <div class="item align-to-right" style="--gap-item: 6px">
           <div class="title-field">검색</div>
@@ -52,7 +60,7 @@
       </div>
       <div class="ow-panel">
         <div class="ow-panel-header">
-          <div class="ow-panel-title">주문</div>
+          <div class="ow-panel-title">■[이가을]검품검수 및 라벨링 내역</div>
         </div>
         <div class="ow-panel-body">
           <div class="ow-grid-wrap">
