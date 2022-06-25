@@ -4,7 +4,6 @@
       <div class="ow-flex-wrap">
         <div class="item size-fix" style="--gap-item: 6px">
           <div class="title-field">현황</div>
-          <div>{{ searchSelected }}</div>
         </div>
         <div class="item">
           <div class="state">
@@ -17,7 +16,7 @@
         </div>
       </div>
     </div>
-
+<hr>
     <!-- 배열을 이용한 동적 헤더  -->
     <div class="ow-flex-wrap item-size-content" style="--gap: 10px">
       <ow-filter-checkbox
@@ -265,8 +264,8 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
 }
 
 //전체 데이터 가져오는 함수
-async function getTotal() {
-  const result = await orderApi.getTotal()
+async function getStatus() {
+  const result = await orderApi.getStatus()
   .then((data) => {
     statusBar.total = data.total;
     statusBar.osstem = data.osstem;
@@ -347,7 +346,7 @@ export default {
       dummy.value = true;
     }
 
-    getTotal();
+    getStatus();
 
     return {
       ...toRefs(state),
