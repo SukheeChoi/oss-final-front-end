@@ -55,12 +55,12 @@
           <div class="item align-to-right" style="--gap-item: 6px">
             <!-- 출고검수/패킹 담당자 필터링 드롭박스 -->
             <div style="--width: 90px">
-              <ow-select :label="selectAssigneeLabel" :items="selectAssigneeList" :modelValue="selectedAssignee">
+              <ow-select :label="dropboxAssigneeLabel" :items="dropboxAssigneeList" :modelValue="selectedAssignee">
               </ow-select>
             </div>
             <!-- 검색기준 드롭박스 -->
             <div style="--width: 97px">
-              <ow-select :label="selectSearchLabel" :items="selectSearchList" v-model="selectedSearchCategory">
+              <ow-select :label="selectSearchLabel" :items="selectSearchList" :modelValue="selectedSearchCategory">
               </ow-select>
             </div>
             <!-- 검색바 -->
@@ -259,7 +259,7 @@ export default {
   name: 'releaseInspection_packing',
   setup() {
     // 선택된 출고검수/패킹담당자
-    const selectedAssignee = ref(null);
+    const selectedAssignee = ref([null]);
     console.log('selectedAssignee.value : ' + selectedAssignee.value);
     // 선택된 검색기준
     const selectedSearchCategory = ref(null);
@@ -421,11 +421,13 @@ export default {
     };
 
     //
-    const selectAssigneeLabel = '출고검수/패킹담당자';
-    const selectAssigneeList = [
+    const dropboxAssigneeLabel = '출고검수/패킹담당자';
+    const dropboxAssigneeList = [
       { name: '전체', value: '0' }
       , { name: '최숙희', value: '1' }
       , { name: '이동현', value: '2' }
+      , { name: '김예원', value: '3' }
+      , { name: '신현주', value: '4' }
     ];
     const selectSearchLabel = '검색';
     const selectSearchList = [
@@ -440,8 +442,8 @@ export default {
       , onInitialized
       , summaryList
       , releaseInspection_Packing_Data2
-      , selectAssigneeLabel
-      , selectAssigneeList
+      , dropboxAssigneeLabel
+      , dropboxAssigneeList
       , selectSearchLabel
       , selectSearchList
     };

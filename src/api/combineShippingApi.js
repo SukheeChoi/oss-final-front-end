@@ -62,7 +62,7 @@ async function getReceiptList(employeeId, dateList) {
 
 // param: 담당자 코드, pageNo
 // '전달'탭에서 표시할 list.
-async function getDeliveryList(toDo=1, employeeId, dateList) {
+async function getDeliveryList(toDo=1, employeeId='', dateList=Array.from([])) {
   let deliveryList = null;
   try {
     let params = new URLSearchParams();
