@@ -10,8 +10,8 @@
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <!-- <approval-grid :transportData="transportData" ref="animateEvent" /> -->
-              <span data-value="85" style="width: 85%">85%</span>
-              <progress :value="85" max="100"></progress>
+              <span :data-value="status" :style="`width: ${status}%`">{{ status }}%</span>
+              <progress :value="status" :max="100"></progress>
             </div>
           </div>
           <hr />
@@ -33,8 +33,8 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span data-value="85" style="width: 85%">85%</span>
-              <progress :value="85" max="100"></progress>
+              <span :data-value="status" :style="`width: ${status}%`">{{ status }}%</span>
+              <progress :value="status" :max="100"></progress>
             </div>
           </div>
           <hr />
@@ -56,8 +56,8 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span data-value="85" style="width: 85%">85%</span>
-              <progress :value="85" max="100"></progress>
+              <span :data-value="status" :style="`width: ${status}%`">{{ status }}%</span>
+              <progress :value="status" :max="100"></progress>
             </div>
           </div>
           <hr />
@@ -79,8 +79,8 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span data-value="85" style="width: 85%">85%</span>
-              <progress :value="85" max="100"></progress>
+              <span :data-value="status" :style="`width: ${status}%`">{{ status }}%</span>
+              <progress :value="status" :max="100"></progress>
             </div>
           </div>
           <hr />
@@ -102,8 +102,8 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span data-value="85" style="width: 85%">85%</span>
-              <progress :value="85" max="100"></progress>
+              <span :data-value="status" :style="`width: ${status}%`">{{ status }}%</span>
+              <progress :value="status" :max="100"></progress>
             </div>
           </div>
           <hr />
@@ -280,8 +280,8 @@ export default {
 //db에서 데이터 불러오기
 const dummy = async () => {
   let list = await clientApi.getClientInfo();
-  console.log('list[0]["clientName"] : ' + list[0]['clientName']);
-  console.log('list[0]["order"]["status"] : ' + list[0]['order']['status']);
+  // console.log('list[0]["clientName"] : ' + list[0]['clientName']);
+  // console.log('list[0]["order"]["status"] : ' + list[0]['order']['status']);
   return list;
 };
 
@@ -289,8 +289,8 @@ dummy().then((list) => {
   console.log('list[0] : ' + list[0]['clientName']);
   for (let i = 0; i < list.length; i++) {
     items.push({
-      client: list[i]['clientName'],
-      level: list[i]['order']['status'],
+      client: list[i]['client']['clientName'],
+      level: list[i]['status'],
     });
     console.log('~~~~~~~~~~~~~~~~' + items);
   }

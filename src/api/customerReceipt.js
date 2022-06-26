@@ -6,8 +6,8 @@ async function getClientInfo() {
   try {
     const response = await axios.get(`/client/`);
     receiptList = response.data.list;
-    console.log('receiptList[0]["clientName"] : ' + receiptList[0]['clientName']);
-    console.log('receiptList[0]["order"]["status"] : ' + receiptList[0]['order']['status']);
+    // console.log('receiptList[0]["clientName"] : ' + receiptList[0]['client']['clientName']);
+    // console.log('receiptList[0]["order"]["status"] : ' + receiptList[0]['status']);
   } catch (error) {
     console.log(error);
   }
