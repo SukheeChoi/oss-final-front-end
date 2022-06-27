@@ -106,6 +106,7 @@
     :remove="remove"
     :visible-rows-count="state.visibleRowsCount"
   >
+  <template #left>&nbsp;</template>
     <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
@@ -131,6 +132,7 @@
     :remove="remove"
     :visible-rows-count="state.visibleRowsCount"
   >
+    <template #left>&nbsp;</template>
     <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
@@ -155,6 +157,7 @@
     :remove="remove"
     :visible-rows-count="state.visibleRowsCount"
   >
+    <template #left>&nbsp;</template>
     <!-- draggable -->
     <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
