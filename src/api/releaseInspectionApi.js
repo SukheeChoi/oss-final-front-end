@@ -18,8 +18,7 @@ async function getReleaseInspectionList(){
 async function getFilterList(newGroup){
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/getFilterList`, newGroup)
-    console.log("response >> 일단 통신은 됐다.")
+    response = await axios.post(`/releaseInspection/getFilterList`, newGroup);
     console.log(response)
   }catch(error){
     console.log("#######/releaseInspection/getFilterList 통신 실패######")
@@ -28,7 +27,55 @@ async function getFilterList(newGroup){
   return response.data;
 }
 
+// codes 내용: {"releaseCode":xxx, "scannedBarcode":xxx}
+// 검수처리
+async function releaseInspectionQtyUpdate(codes){
+  let response = null;
+  try{
+    response = await axios.post(`/releaseInspection/RIQtyUpdate`, codes);
+    console.log("releaseInspectionQtyUpdate >> 일단 통신은 됐다.");
+    console.log(response);
+  }catch(error){
+    console.log("#######/releaseInspection/releaseInspectionQtyUpdate 통신 실패######")
+    console.log(error);
+  }
+  return response.data;
+}
+
+// codes 내용: {"releaseCode":xxx, "scannedBarcode":xxx}
+// 미출고처리
+async function unReleaseQtyUpdate(codes) {
+  let response = null;
+  try{
+    response = await axios.post(`/releaseInspection/unRleaseQtyUpdate`, codes);
+    console.log("unRleaseQtyUpdate >> 일단 통신은 됐다.");
+    console.log(response);
+  }catch(error){
+    console.log("#######/releaseInspection/unRleaseQtyUpdate 통신 실패######")
+    console.log(error);
+  }
+  return response.data;
+}
+
+//스캔 버튼 눌렀을 때,
+async function scan(releaseCode) {
+  let response = null;
+  console.log("releaseCode", releaseCode);
+  try{
+    response = await axios.get(`/releaseInspection/scanBtnClick?releaseCode=${releaseCode}`);
+    console.log("scanBtnClick >> 일단 통신은 됐다.");
+  }catch(error){
+    console.log("#######/releaseInspection/scanBtnClick 통신 실패######")
+    console.log(error);
+  }
+  return response.data;
+}
+
+
 export default{
   getReleaseInspectionList,
-  getFilterList
+  getFilterList,
+  releaseInspectionQtyUpdate,
+  unReleaseQtyUpdate,
+  scan
 };
