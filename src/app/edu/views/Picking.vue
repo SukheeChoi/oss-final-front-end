@@ -68,15 +68,15 @@
       <div class="item align-to-right" style="gap: 6px;">
         <!-- 할일/한일 -->
         <div>
-          <button class="ow-btn type-group active"><span>할일</span></button>
-          <button class="ow-btn type-group"><span>한일</span></button>
+          <button class="ow-btn type-group" @click="handleChangeToTodo" v-bind:class="{ active: toDo==1 }"><span>할일</span></button>
+          <button class="ow-btn type-group" @click="handleChangeToDone" v-bind:class="{ active: toDo==0 }"><span>한일</span></button>
         </div>
         <!-- 날짜 선택 -->
         <div>
           <div class="ow-input">
-            <ow-input-date id="theDate" :modelValue="startDate" @update:modelValue="updateStartDate" />
+            <ow-input-date :modelValue="startDate" @update:modelValue="updateStartDate" />
             <span style="margin: 4px;">~</span>
-            <ow-input-date id="theDate" :modelValue="endDate" @update:modelValue="updateEndDate" />
+            <ow-input-date :modelValue="endDate" @update:modelValue="updateEndDate" />
             <!-- <wj-input-date id="theDate" :initialized="initDate" class="ow-calendar" @change="handleStartDate"></wj-input-date>
             <span style="margin: 4px;">~</span>
             <wj-input-date id="theDate" :initialized="initDate" class="ow-calendar" @change="handleEndDate"></wj-input-date> -->
@@ -84,7 +84,7 @@
         </div>
         <div>
           <!-- 조회 -->
-          <button class="ow-btn type-util" @click="showListBetweenDateList">조회</button>
+          <button class="ow-btn type-util" @click="handleClickSearch">조회</button>
           <!-- 품목전달(선택된 갯수) -->
           <button class="ow-btn type-util">품목전달(0)</button>  
         </div>
@@ -109,8 +109,8 @@
     <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo=1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo=0" header="수령수량" binding="receiptQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==0" header="수령수량" binding="receiptQuantity" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
     <wj-flex-grid-column header="수령여부" binding="receipted" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell">
@@ -176,12 +176,13 @@
   import { ref, reactive, watch } from 'vue';
   import OwNGrid from '@/components/grid/new/OwNGrid';
 
-  const receiptKey = ref(1);
+  const receiptKey = ref(0);
   const selectedEmployeeId = ref('');
+  const showReceipt = ref(true);
   const toDo = ref(1);
   const startDate = ref(new Date());
   const endDate = ref(new Date());
-  const showReceipt = ref(true);
+  const clickSearch = ref(false);
   const vendorList = ref([]);
   const assigneeList = ref([
     {
@@ -215,7 +216,7 @@
       , disabled: false
     }
   ]);
-  const dateList = ref([]);
+  const dateList = ref([startDate.value, endDate.value]);
   const receiptList = ref([]);
   const deliveryList = ref([]);
   const deliveredList = ref([]);
@@ -272,10 +273,9 @@
             console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
           }
         });
-    return result;
+    // return result;
   };
-
-  getAssigneeList();
+  // getAssigneeList();
 
   const retrieve = (param) => {
     console.log('param', param);
@@ -373,8 +373,8 @@
   // '수령'탭에 바인딩할 데이터를 불러옴.
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
-  const getReceiptList = async (employeeId='', dateList=[]) => {
-    const result = await combineShippingApi.getReceiptList(employeeId, Array.from(dateList))
+  const getReceiptList = async (toDo=1, employeeId='', dateList=[]) => {
+    const result = await combineShippingApi.getReceiptList(toDo, employeeId, Array.from(dateList))
         .then((result) => {
           if(result.receiptList != null) {
             console.log('result : ' + result);
@@ -385,8 +385,7 @@
             console.log('receiptList.value[0]// : ' + receiptList.value[0]);
             console.log('receiptList.value[0]["orderItemNo"]// : ' + receiptList.value[0]['orderItemNo']);
             console.log('JSON.stringify(receiptList.value[0]) : ' + JSON.stringify(receiptList.value[0]));
-            // console.log('2222222222222222');
-            initialize();
+            // initialize();
             read();
           }
         });
@@ -407,11 +406,11 @@
   // receiptListForUpdate.value.length = 0;
   console.log('receiptListForUpdate.value.length : ' + receiptListForUpdate.value.length);
   console.log('receiptListForUpdate.value.length : ' + receiptListForUpdate.value.length);
-  updateReceiptList(receiptListForUpdate);
+  // updateReceiptList(receiptListForUpdate);
 
   // '전달' 탭에서 바인딩할 데이터를 불러옴.
-  const getDeliveryList = async (employeeId='', dateList=[]) => {
-    const result = await combineShippingApi.getDeliveryList(employeeId, Array.from(dateList))
+  const getDeliveryList = async (toDo=1, employeeId='', dateList=[]) => {
+    const result = await combineShippingApi.getDeliveryList(toDo, employeeId, Array.from(dateList))
         .then((result) => {
           if(result.deliveryList != null) {
             console.log('getDeliveryList - result : ' + result);
@@ -426,7 +425,7 @@
           }
       });
   };
-  getDeliveryList();
+  // getDeliveryList();
   // getDeliveryList('E1', ['2022-06-10', '2022-06-25']);
 
   // 전달된 항목 정보 update.
@@ -502,19 +501,75 @@
   //   , {No: 24, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
   // ];
 
-  watch([showReceipt, dateList]
-    , ([newShowReceipt, newDateList], [oldShowReceipt, oldDateList]) => {
-      console.log('oldShowReceipt : ' + oldShowReceipt);
-      console.log('newShowReceipt : ' + newShowReceipt);
-      if(newShowReceipt === true) {
-        getReceiptList();
-        // read(receipt=1);
-      }
-      if(newShowReceipt === false) {
-        getDeliveryList();
-        // read(receipt=0);
-      }
+  watch(() => showReceipt.value
+  , (newShowReceipt, oldShowReceipt) => {
+    if(newShowReceipt === true) {
+      getReceiptList();
+      receiptKey.value++;
+    } else {
+      getDeliveryList();
+      receiptKey.value++;
+    }
   });
+  watch(() => toDo.value
+  , (newToDo, oldToDo) => {
+    console.log('toDo watch');
+    console.log('toDo watch - newToDo : ' + newToDo);
+    if(showReceipt.value === true) {
+      getReceiptList(newToDo, '', Array.from(dateList.value));
+      receiptKey.value++;
+    } else {
+      getDeliveryList(newToDo, '', Array.from(dateList.value));
+      receiptKey.value++;
+    }
+  });
+  watch(() => clickSearch.value
+  , (newClickSearch, oldClickSearch) => {
+    console.log('clickSearch watch');
+    console.log('clickSearch watch - newClickSearch : ' + newClickSearch);
+    if(showReceipt.value === true) {
+      getReceiptList(toDo.value, '', Array.from(dateList.value));
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      receiptKey.value++;
+    } else {
+      console.log('dateList.value : ' + dateList.value);
+      getDeliveryList(toDo.value, '', Array.from(dateList.value));
+      receiptKey.value++;
+    }
+    clickSearch.value = false;
+  });
+
+  // watch(
+  //   () => [selectedEmployeeId, showReceipt, toDo, clickSearch]
+  //   , (newGroup, oldGroup) => {
+  //     console.log('selectedEmployeeId.value : ' + selectedEmployeeId.value);
+  //     console.log('showReceipt.value : ' + showReceipt.value);
+  //     console.log('newGroup.length : ' + newGroup.length);
+  //     console.log('toDo.value : ' + toDo.value);
+  //     console.log('clickSearch.value : ' + clickSearch.value);
+  //   }
+  //   , {deep: true}
+  // );
+
+  // watch([selectedEmployeeId, showReceipt, toDo, clickSearch]
+  //   , ([newSelectedEmployeeId, newShowReceipt, newTodo, newClickSearch]
+  //   , [oldSelectedEmployeeId, oldShowReceipt, oldTodo, oldClickSearch]) => {
+  //     console.log('watch');
+  //     console.log('showReceipt.value : ' + showReceipt.value);
+  //     console.log('toDo.value : ' + toDo.value);
+  //     console.log('selectedEmployeeId.value : ' + selectedEmployeeId.value);
+  //     console.log('dateList.value : ' + dateList.value);
+  //     if(showReceipt.value === true) {
+  //       getReceiptList(toDo.value, selectedEmployeeId.value, dateList.value);
+  //       receiptKey.value++;
+  //     }
+  //     if(showReceipt.value === false) {
+  //       getDeliveryList(toDo.value, selectedEmployeeId.value, dateList.value);
+  //       receiptKey.value++;
+  //     }
+  //   }
+  //   // , {deep:true}
+  // );
 
   async function insert(item) {
     items.push(item);
@@ -562,6 +617,14 @@
   function handleChangeToDelivery() {
     showReceipt.value = false;
   }
+  // 할 일 탭 클릭시.
+  function handleChangeToTodo() {
+    toDo.value = 1;
+  }
+  // 한 일 탭 클릭시.
+  function handleChangeToDone() {
+    toDo.value = 0;
+  }
 
   // 날짜 변경 핸들러.
   function updateStartDate(event) {
@@ -572,21 +635,16 @@
     console.log('event - startDate.value : ' + startDate.value);
     // 할당해주지 않으면 바인딩 객체의 값이 바뀌진 않음.
     startDate.value = event;
+    dateList.value[0] = startDate.value;
   }
   function updateEndDate(event) {
     endDate.value = event;
+    dateList.value[1] = endDate.value;
   }
-  // 통신 parameter에 dateList 추가.
-  function showListBetweenDateList() {
-    if(showReceipt.value === true) {
-      console.log('!!!!!!!!!!!!');
-      receiptKey.value++;
-      getReceiptList(selectedEmployeeId.value
-          , [startDate.value, endDate.value]);
-      // initialize();
-    } else {
 
-    }
+  function handleClickSearch() {
+    // clickSearch.value = !clickSearch.value;
+    clickSearch.value = true;
   }
 
 </script>
