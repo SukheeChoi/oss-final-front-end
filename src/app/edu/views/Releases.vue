@@ -1,6 +1,5 @@
 <template>
   <div class="ow-flex-wrap dir-col" style="--gap: 10px">
-    <!-- <div class="item"> -->
       <div class="ow-flex-wrap item-size-content">
         <div class="item size-fix" style="--gap-item: 6px">
           <div class="title-field">현황</div>
@@ -31,14 +30,11 @@
           </div>
         </div>
       </div>
-    <!-- </div> -->
 
     <hr />
 
     <div class="item">
       <div class="ow-flex-wrap item-size-content">
-        <!-- <div class="ow-flex-wrap item-size-content" style="--gap: 10px"> -->
-        <!-- <div class="item"> -->
           <div>
             <div class="title-field" style="margin-right: 10px; margin-left: 5px">배송구분</div>
             <ow-filter-checkbox name="checkboxGp4" v-bind:items="checkboxGroup1" v-model="emptyGroup" />
@@ -69,7 +65,6 @@
               <input type="submit" class="btn-search" />
             </div>
           </div>
-          <!-- </div> -->
       </div>
     </div>
   </div>
@@ -81,7 +76,7 @@
       allowSorting="None"
       selectionMode="None"
       class="ow-grid type-header-group"
-      :items-source="releaseInspection_Packing_Data2"
+      :items-source="releaseInspection_Packing_Data"
       :initialized="onInitialized"
       :allowMerging="'Cells'"
       style="display: flex"
@@ -96,7 +91,7 @@
       <!-- 출고검수/패킹 탭 -->
       <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm">
         <wj-flex-grid-column-group
-          binding="placingorderNo"
+          binding="releaseNo"
           header="출고번호"
           align="center"
           :width="85"
@@ -130,7 +125,7 @@
           cssClassAll="ta-c border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="packing_unrelease"
+          binding="packingUnrelease"
           header="미출고수량"
           align="center"
           width="*"
@@ -169,7 +164,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="packing_personincharge"
+          binding="packingPersonincharge"
           header="담당자"
           align="center"
           width="*"
@@ -177,7 +172,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="releaseprintDate"
+          binding="releasePrintDate"
           header="출고요청서 출력일시"
           align="center"
           :width="110"
@@ -186,7 +181,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="transactionprintDate"
+          binding="receiptPrintDate"
           header="거래명세서 출력일시"
           align="center"
           :width="110"
@@ -287,7 +282,8 @@
     }
   });
   const afterPickingList = ref([]);
-      // 통신을 통한 데이터 바인딩.
+  // 통신을 통한 데이터 바인딩.
+  const releaseInspection_Packing_Data = ref(null);
   const releaseInspection_Packing_Data2 = ref([]);
 
   // 현황/배송구분 정보 불러오기.(새로고침 시에만 통신.)
@@ -369,22 +365,23 @@
         for(let i=0; i<afterPickingList.value.length; i++) {
             releaseInspection_Packing_Data2.value.push(
               {
-                placingorderNo: afterPickingList.value[i]["release"]["releaseNo"]
+                releaseNo: afterPickingList.value[i]["release"]["releaseNo"]
                 , itemName: afterPickingList.value[i]["item"]["itemName"]
                 , itemCode: afterPickingList.value[i]["item"]["itemCode"]
                 , pickingQty: afterPickingList.value[i]["picking"]["pickingQty"]
                 , inspectionQty: afterPickingList.value[i]["releaseInspectionQuantity"]
-                , packing_unrelease: (
-                  afterPickingList.value[i]["unReleased"]
-                  + afterPickingList.value[i]["packing"]["unrelease"]
+                , packingUnrelease: (
+                  parseInt(afterPickingList.value[i]["unReleased"])
+                  +
+                  parseInt(afterPickingList.value[i]["packing"]["unrelease"])
                 )
                 , orderClient: afterPickingList.value[i]["vendor"]["vendorName"]
                 , shippingDest: afterPickingList.value[i]["order"]["shippingDestination"]
                 , shippingCat: afterPickingList.value[i]["order"]["shippingCategory"]
                 , shippingWay: afterPickingList.value[i]["order"]["shippingWay"]
-                , packing_personincharge: afterPickingList.value[i]["employeeName"]
-                , releaseprintDate: afterPickingList.value[i]["releasePrintDate"]
-                , transactionprintDate: afterPickingList.value[i]["receiptePrintDate"]
+                , packingPersonincharge: afterPickingList.value[i]["employeeName"]
+                , releasePrintDate: afterPickingList.value[i]["releasePrintDate"]
+                , receiptPrintDate: afterPickingList.value[i]["receiptPrintDate"]
                 , inspectionDate: afterPickingList.value[i]["releaseInspectionDate"]
                 , boxQty: ' '
                 // , boxQty: afterPickingList.value[i]["release"]["boxQuantity"]
@@ -397,7 +394,7 @@
               }
             );
           }
-/////
+          releaseInspection_Packing_Data.value = releaseInspection_Packing_Data2.value;
       });
     // return result;
   };
