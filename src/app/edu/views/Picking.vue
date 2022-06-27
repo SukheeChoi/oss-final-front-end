@@ -388,7 +388,8 @@
             console.log('receiptList.value[0]["orderItemNo"]// : ' + receiptList.value[0]['orderItemNo']);
             console.log('JSON.stringify(receiptList.value[0]) : ' + JSON.stringify(receiptList.value[0]));
             read();
-
+            // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+            receiptKey.value++;
           }
         });
     // return result;
@@ -424,6 +425,7 @@
             console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
             console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
             read();
+            deliveryKey.value++;
           }
       });
   };
@@ -531,13 +533,10 @@
     console.log('clickSearch watch - newClickSearch : ' + newClickSearch);
     if(showReceipt.value === true) {
       getReceiptList(toDo.value, '', Array.from(dateList.value));
-      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-      receiptKey.value++;
     } else {
       console.log('toDo.value : ' + toDo.value);
       console.log('dateList.value : ' + dateList.value);
       getDeliveryList(toDo.value, '', Array.from(dateList.value));
-      deliveryKey.value++;
     }
     clickSearch.value = false;
   });
