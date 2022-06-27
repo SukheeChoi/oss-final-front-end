@@ -12,7 +12,7 @@
             <div class="state-item">오스템 : <strong>{{statusBar.osstem}}</strong>건</div>
             <div class="state-item">협력사합배송 : <strong>{{statusBar.vendorShippingPlus}}</strong>건</div>
             <div class="state-item">협력사직배송 : <strong>{{statusBar.vendorShippingDir}}</strong>건</div>
-            <div class="state-item" style="color: red">미출고 : <strong class="color-type-1">{{statusBar.unreleased}}</strong>건</div>
+            <div class="state-item" style="color: red">미출고 : <strong>{{statusBar.unreleased}}</strong>건</div>
           </div>
         </div>
       </div>
