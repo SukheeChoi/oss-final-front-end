@@ -14,6 +14,18 @@ async function getStatus() {
   return response.data.status;
 }
 
+//왼쪽쪽 화면
+async function getTreeList() {
+  let response = null;
+    try {
+      response = await axios.get("/label/getListLeft");
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  return response.data.item;
+}
+
 //오른쪽 화면
 async function getListByEmployeeName(employeeName, searchSelected, searchContent) {
   let response = null;
@@ -32,5 +44,6 @@ async function getListByEmployeeName(employeeName, searchSelected, searchContent
 
 export default {
   getStatus,
+  getTreeList,
   getListByEmployeeName,
 };

@@ -55,21 +55,21 @@
           <button class="ow-btn type-util">예정시간수정</button>
           <button class="ow-btn type-util">추가</button>
         </div>
-        <ow-tree-grid :initialized="initialize" :read="read" :query="['name']" :childItemsPath="childItemsPath">
+        <ow-tree-grid :read="read" :childItemsPath="['child', 'childrennn']" :selectionChanged="selectLee(p, e)">
           <!-- childitem 순서대로 입력하기 children(albert)아래 children(anton) -->
-          <wj-flex-grid-column header="담당자/업체명" binding="name" :width="100"></wj-flex-grid-column>
-          <wj-flex-grid-column header="수령일" binding="country" :width="100" :is-required="true"></wj-flex-grid-column>
-          <wj-flex-grid-column header="수령품목" binding="sales" :width="30" format="n2"></wj-flex-grid-column>
-          <wj-flex-grid-column header="수령수량" binding="expenses" :width="30" format="n2"></wj-flex-grid-column>
-          <wj-flex-grid-column header="예정시간" binding="1" :width="50"></wj-flex-grid-column>
-          <wj-flex-grid-column header="시작시간" binding="2" :width="50" :is-required="true"></wj-flex-grid-column>
-          <wj-flex-grid-column header="작업시간" binding="3" :width="50" format="n2"></wj-flex-grid-column>
-          <wj-flex-grid-column header="진행률" binding="4" :width="50" format="n2"></wj-flex-grid-column>
-          <wj-flex-grid-column header="상태" binding="5" :width="50"></wj-flex-grid-column>
-          <wj-flex-grid-column header="지연시간" binding="6" :width="50" :is-required="true"></wj-flex-grid-column>
-          <wj-flex-grid-column header="검수수량" binding="7" :width="50" format="n2"></wj-flex-grid-column>
-          <wj-flex-grid-column header="양품수량" binding="8" :width="50" format="n2"></wj-flex-grid-column>
-          <wj-flex-grid-column header="라벨링수량" binding="9" :width="50" format="n2"></wj-flex-grid-column>
+          <wj-flex-grid-column header="담당자/업체명" binding="employeeName" :width="130"></wj-flex-grid-column>
+          <wj-flex-grid-column header="수령일" binding="receiveHourMinute" :width="100" ></wj-flex-grid-column>
+          <wj-flex-grid-column header="수령품목" binding="receiveItem" :width="60" :wordWrap="true" :multiline="true"></wj-flex-grid-column>
+          <wj-flex-grid-column header="수령수량" binding="receiveQuantity" :width="50" :wordWrap="true" :multiline="true"></wj-flex-grid-column>
+          <wj-flex-grid-column header="예정시간" binding="scheduledStartTime" :width="50"></wj-flex-grid-column>
+          <wj-flex-grid-column header="시작시간" binding="startTime" :width="50" ></wj-flex-grid-column>
+          <wj-flex-grid-column header="작업시간" binding="workTime" :width="50" ></wj-flex-grid-column>
+          <wj-flex-grid-column header="진행률" binding="progressRate" :width="50"></wj-flex-grid-column>
+          <wj-flex-grid-column header="상태" binding="status" :width="50"></wj-flex-grid-column>
+          <wj-flex-grid-column header="지연시간" binding="lateTime" :width="50" :wordWrap="true" :multiline="true"></wj-flex-grid-column>
+          <wj-flex-grid-column header="검수수량" binding="inspectionQuantity" :width="50" :wordWrap="true" :multiline="true"></wj-flex-grid-column>
+          <wj-flex-grid-column header="양품수량" binding="passItemQuantity" :width="50" :wordWrap="true" :multiline="true"></wj-flex-grid-column>
+          <wj-flex-grid-column header="라벨링수량" binding="labelingItemQuantity" :width="50" :wordWrap="true" :multiline="true"></wj-flex-grid-column>
         </ow-tree-grid>
       </div>
       <!-- 오른쪽 화면 -->
@@ -213,68 +213,69 @@ import WjFlexGrid from '@grapecity/wijmo.vue2.grid';
 import { CollectionView } from '@grapecity/wijmo';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
 
-const childItemsPath = ['children', 'children'];
+const childItemsPath = ['child', 'childrennn'];
+
 const items = [
   {
     name: '전체',
-    children: [
+    receiveHourMinute: '03-23 09:00',
+    receiveItem: '20',
+    receiveQuantity: '479',
+
+    child: [
       {
         name: '이가을',
-        sales: '20',
-        children: [{ name: '오성엠엔디' }, { name: 'NSK 덴탈' }],
+        receiveHourMinute: '03-23 09:00',
+        receiveItem: '20',
+        receiveQuantity: '479',
+        LEE: 'LEE',
+        childrennn: [
+            { name: '오성엠엔디',       
+              receiveHourMinute: '03-23 09:00',
+              receiveItem: '4',
+              receiveQuantity: '244',
+            }, 
+            { name: 'NSK 덴탈',
+              receiveHourMinute: '03-23 09:00',
+              receiveItem: '2',
+              receiveQuantity: '70', 
+            }
+          ],
       },
       {
         name: '안병희',
-        children: [
-          {
-            name: '태화메디칼',
-            children: [{ name: 'Billy' }, { name: 'Bernard' }],
-          },
+        childrennn: [
           { name: '다온덴탈' },
           { name: 'Bob' },
         ],
       },
       {
         name: '최민정',
-        children: [{ name: 'ivoclar vivadent' }, { name: 'Meisinger' }, { name: 'Carrie' }],
+        childrennn: [{ name: 'ivoclar vivadent' }, { name: 'Meisinger' }, { name: 'Carrie' }],
       },
       {
         name: 'Douglas',
-        children: [{ name: 'Dinah' }, { name: 'Donald' }],
+        childrennn: [{ name: 'Dinah' }, { name: 'Donald' }],
       },
     ],
   },
 ];
 
 console.log(items);
-const retrieve = (param) => {
-  console.log('param', param);
-  let filteredItems = _.cloneDeep(items);
-  const totalCount = filteredItems.length;
-  console.log('param', filteredItems);
-  return Promise.resolve({
-    data: filteredItems,
-    status: 200,
-    code: 'OK',
-    message: 'Success',
-    totalCount,
-  });
-};
 
 async function read(query, pageNo, pageSize) {
-  const result = await retrieve({
-    ...query,
-    pageNo,
-    pageSize,
-  });
+  const treeList = await inspectionLabelingApi.getTreeList();
+  console.log('queryqueryqueryquery', query);
   console.log('result', result);
+  const result = {
+    totalCount: 1,
+    data: treeList,
+  };
   return result;
 }
 
 async function getListByEmployeeName() {
   employeeName.value = '이동현';
-  // const searchSelected = '업체명';
-  // const searchContent = '최숙희회사';
   const result = await inspectionLabelingApi.getListByEmployeeName(employeeName.value, searchSelected.value, searchContent.value)
   .then((data) => {
     response.value = data.data;
@@ -283,7 +284,13 @@ async function getListByEmployeeName() {
   });
 }
 
+function selectLee(props, event) {
+  console.log(props);
+  console.log(event);
+}
+
 const response = ref(null);
+const treeResponse = ref(null);
 const employeeName = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
@@ -346,7 +353,9 @@ export default {
       employeeName,
       searchSelected, 
       searchContent,
+      childItemsPath,
       getListByEmployeeName,
+      selectLee
     };
   },
 };

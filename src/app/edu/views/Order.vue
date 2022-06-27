@@ -263,7 +263,7 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
   return result;
 }
 
-//전체 데이터 가져오는 함수
+//현황 가져오는 함수
 async function getStatus() {
   const result = await orderApi.getStatus()
   .then((data) => {
@@ -348,6 +348,7 @@ export default {
 
     getStatus();
 
+    console.log("responseresponseresponse", response);
     return {
       ...toRefs(state),
       onInitialized,
