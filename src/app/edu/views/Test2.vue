@@ -55,7 +55,13 @@
           <button class="ow-btn type-util">예정시간수정</button>
           <button class="ow-btn type-util" @click="getListByEmployeeName()">추가</button>
         </div>
-        <ow-tree-grid :read="read" :childItemsPath="['child', 'childrennn']" :initialized="onInitialized">
+        <ow-tree-grid
+          :read="read"
+          selectionMode="None"
+          :childItemsPath="['child', 'childrennn']"
+          :initialized="treeInitialized"
+          :selectionChanged="selectLee"
+        >
           <!-- childitem 순서대로 입력하기 children(albert)아래 children(anton) -->
           <wj-flex-grid-column
             header="담당자/업체명"
@@ -118,7 +124,7 @@
         </ow-tree-grid>
       </div>
       <!-- 오른쪽 화면 -->
-      <div class="right flex-fill">
+      <div class="right">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <div class="item align-to-right" style="--gap-item: 6px">
             <div class="title-field">검색</div>
@@ -257,7 +263,7 @@ import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import WjFlexGrid from '@grapecity/wijmo.vue2.grid';
 import { CollectionView } from '@grapecity/wijmo';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
-
+import { selectionMode } from '@grapecity/wijmo.grid';
 const childItemsPath = ['child', 'childrennn'];
 
 async function read(query, pageNo, pageSize) {
@@ -282,8 +288,8 @@ async function getListByEmployeeName() {
     });
 }
 
-function selectLee(event) {
-  console.log(event);
+function selectLee() {
+  console.log();
 }
 
 const response = ref(null);
@@ -291,6 +297,7 @@ const treeResponse = ref(null);
 const employeeName = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
+const selectRows = ref(null); 
 
 const statusBar = reactive({
   receiveItem: null,
@@ -337,14 +344,35 @@ async function getStatus() {
 
 export default {
   setup() {
-    const onInitialized = (grid) => {
+
+    //트리 그리드 설정
+    const treeInitialized = (grid) => {
       console.log(grid);
       grid.autoSizeRow(0, true);
+
       grid.formatItem.addHandler((flex, e) => {
         if (e.panel == flex.columnHeaders) {
           e.cell.innerHTML = e.cell.textContent;
         }
       });
+      grid.selectionMode = 3;
+      const lee = grid.onSelectionChanged(null);
+      console.log(lee);
+      console.log('grid.selectionMode', selectionMode);
+    };
+
+    //일반 그리드 설정
+    const onInitialized = (grid) => {
+      console.log(grid);
+      grid.autoSizeRow(0, true);
+
+      grid.formatItem.addHandler((flex, e) => {
+        if (e.panel == flex.columnHeaders) {
+          e.cell.innerHTML = e.cell.textContent;
+        }
+      });
+      grid.selectionMode = 0;
+      console.log('grid.selectionMode', selectionMode);
     };
 
     getStatus();
@@ -352,6 +380,7 @@ export default {
 
     return {
       onInitialized,
+      treeInitialized,
       read,
       statusBar,
       response,
@@ -377,9 +406,9 @@ export default {
   padding: var(--ow-gutter);
 }
 .wj-cell.wj-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: inherit;
 }
 </style>

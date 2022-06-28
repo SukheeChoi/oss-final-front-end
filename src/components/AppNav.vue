@@ -27,6 +27,7 @@ import { Menu } from '@/model';
 
 const MenuList2 = [
   Menu.create('메인', 'main'),
+
   Menu.create('공통관리', 'COMROOT', [
     Menu.create('배치관리', 'COMBT', [
       Menu.create('배치작업', 'COMBT001'),
@@ -34,6 +35,7 @@ const MenuList2 = [
       Menu.create('배치변경이력', 'COMBT003'),
     ]),
   ]),
+  
   Menu.create('물류', 'DIST', [
     Menu.create('주문-고객수취', 'DISTSub', [
       Menu.create('주문확인', 'DISTSub1'),
