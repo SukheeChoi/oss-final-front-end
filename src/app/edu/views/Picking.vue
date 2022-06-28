@@ -243,7 +243,8 @@
         });
     // return result;
   };
-  getAssigneeList(toDo.value, ['2022-06-01', '2022-06-28']);
+  getAssigneeList(toDo.value, dateList.value);
+  // getAssigneeList(toDo.value, ['2022-06-01', '2022-06-28']);
 
   const retrieve = (param) => {
     console.log('param', param);
@@ -449,7 +450,7 @@
       receiptKey.value++;
     } else {
       getDeliveryList().then();
-      receiptKey.value++;
+      deliveryKey.value++;
     }
   });
   watch(() => toDo.value
@@ -475,6 +476,12 @@
       getAssigneeList(toDo.value, Array.from(dateList.value));
     }
     clickSearch.value = false;
+  });
+  // selectedEmployeeId
+  watch(() => selectedEmployeeId.value
+    , (newSelectedEmployeeId, oldSelectedEmployeeId) => {
+      console.log('## newSelectedEmployeeId : ', newSelectedEmployeeId);
+      // 전달 목록 조회하는 통신 수행하기.
   });
 
   // watch(
