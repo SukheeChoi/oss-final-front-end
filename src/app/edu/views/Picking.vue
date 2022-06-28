@@ -7,14 +7,14 @@
         <button class="ow-btn type-group" @click="handleChangeToDelivery" v-bind:class="{ active: !showReceipt }"><span>전달</span></button>
       </div>
       <!-- 수령 대상 업체 필터링 -->
-      <div v-if="showReceipt && vendorList[0]!=null" class="item size-fix" style="--gap-item: 6px">
+      <div v-if="showReceipt && vendorList!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 370px;">
           <ow-filter-radio :items="vendorList" :step="5"/>
         </div>
       </div>
 
       <!-- 전달 담당자 이름 filter -->
-      <div v-if="!showReceipt && assigneeList[0]!=null" class="item size-fix" style="--gap-item: 6px">
+      <div v-if="!showReceipt && assigneeList!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 270px;">
           <ow-filter-radio :items="assigneeList" :step="4"/>
         </div>
@@ -124,8 +124,8 @@
   const startDate = ref(new Date());
   const endDate = ref(new Date());
   const clickSearch = ref(false);
-  const vendorList = ref([]);
-  const assigneeList = ref([]);
+  const vendorList = ref(null);
+  const assigneeList = ref(null);
   const dateList = ref([startDate.value, endDate.value]);
   const receiptList = ref([]);
   const deliveryList = ref([]);
@@ -153,12 +153,12 @@
             }
             vendorList.value = dbVendor;
           } else {
-            vendorList.value = [];
+            vendorList.value = null;
           }
         });
     // return result;
   };
-  // getVendorList(toDo.value, Array.from(['2022-06-01', '2022-06-28']));
+  getVendorList(toDo.value, Array.from(['2022-06-01', '2022-06-28']));
 
   //담당자 조회. 페이지네이션 고려X.
   // 할 일: 해당기간에 수령완료된 이력의 담당자. -> 사실상 '수령 한 일'의 담당자와 같음.
@@ -181,13 +181,12 @@
             }
             assigneeList.value = dbAssignee;
           } else {
-            assigneeList.value = [];
+            assigneeList.value = null;
           }
         });
     // return result;
   };
   getAssigneeList(toDo.value, [new Date(), new Date()]);
-  // getAssigneeList(toDo.value, ['2022-06-01', '2022-06-28']);
 
   const retrieve = (param) => {
     console.log('param', param);
@@ -269,7 +268,6 @@
     if(showReceipt.value === true) {
       label = 'receipt';
       items = receiptList.value;
-      console.log('inside read - receiptList.value.length : ' + receiptList.value.length);
     } else {
       label = 'delivery';
       items = deliveryList.value;
@@ -303,7 +301,7 @@
             // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
             receiptKey.value++;
           }
-          getVendorList(toDo.value, dateList.values);
+          // getVendorList(toDo.value, dateList.values);
         });
     // return result;
   };
@@ -335,7 +333,7 @@
             read();
             deliveryKey.value++;
           }
-          getAssigneeList(toDo.value, dateList.value);
+          // getAssigneeList(toDo.value, dateList.value);
       });
     // return result;
   };
@@ -392,8 +390,10 @@
     checkedDeliveryCount.value = 0;
     if(newShowReceipt === true) {
       getReceiptList(toDo.value, '', dateList.value).then();
+      getVendorList(toDo.value, dateList.value);
     } else {
       getDeliveryList(toDo.value, '', dateList.value).then();
+      getAssigneeList(toDo.value, '', dateList.value);
     }
   });
   // 할일/한일 초기화 관리.
@@ -405,20 +405,26 @@
 
     if(showReceipt.value === true) {
       getReceiptList(newToDo, '', Array.from(dateList.value));
+      getVendorList(toDo.value, '', dateList.value);
       // 담당업체 조회.
     } else {
       getDeliveryList(newToDo, '', Array.from(dateList.value));
-      // getAssigneeList(toDo.value, Array.from(dateList.value));
+      getAssigneeList(toDo.value, Array.from(dateList.value));
     }
   });
   // 조회 감시.
   watch(() => clickSearch.value
   , (newClickSearch, oldClickSearch) => {
+    // update용 count변수 초기화.
+    checkedReceiptCount.value = 0;
+    checkedDeliveryCount.value = 0;
+
     if(showReceipt.value === true) {
       getReceiptList(toDo.value, '', Array.from(dateList.value));
+      getVendorList(toDo.value, '', Array.from(dateList.value));
     } else {
       getDeliveryList(toDo.value, '', Array.from(dateList.value));
-      // getAssigneeList(toDo.value, Array.from(dateList.value));
+      getAssigneeList(toDo.value, Array.from(dateList.value));
     }
     clickSearch.value = false;
   });
