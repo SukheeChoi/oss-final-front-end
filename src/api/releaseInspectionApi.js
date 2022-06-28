@@ -71,11 +71,22 @@ async function scan(releaseCode) {
   return response.data;
 }
 
+//맨 위에 현황 (주문건: 1360건 | 피킹완료건: 530건(긴급5건/일반525건) | 출고검수/패킹건: 0건(긴급3건/일반125건))
+async function getTotal() {
+  let response = null;
+  try {
+    response = await axios.get("/releaseInspection/releaseInspectionStatus");
+  } catch (error) {
+    console.log(error);
+  }
+  return response.data;
+}
 
 export default{
   getReleaseInspectionList,
   getFilterList,
   releaseInspectionQtyUpdate,
   unReleaseQtyUpdate,
-  scan
+  scan,
+  getTotal
 };

@@ -7,13 +7,13 @@
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">주문건 : <strong>1672</strong>건</div>
+            <div class="state-item">주문건 : <strong>{{statusBar.total}}</strong>건</div>
             <div class="state-item">
-              피킹완료건 : <strong>1487</strong>건 (긴급 <strong class="color-type-2">5</strong>건/일반
-              <strong>1482</strong>건)
+              피킹완료건 : <strong>{{statusBar.totalPickingQty}}</strong>건 (긴급 <strong class="color-type-2">{{statusBar.emergencyPickingQty}}</strong>건/일반
+              <strong>{{statusBar.commonPickingQty}}</strong>건)
             </div>
             <div class="state-item">
-              출고검수/패킹건 : 0건 (긴급 <strong class="color-type-2">2</strong>건/일반 <strong>183</strong>건)
+              출고검수/패킹건 : {{statusBar.totalRlsQty}}건 (긴급 <strong class="color-type-2">{{statusBar.emergencyRlsQty}}</strong>건/일반 <strong>{{statusBar.commonRlsQty}}</strong>건)
             </div>
           </div>
         </div>
@@ -282,7 +282,7 @@
                 <wj-flex-grid-column-group header="물품수량" :width="63" >
                   <wj-flex-grid-cell-template cellType="Cell">
                     <div class="ow-input">
-                      <input type="text" placeholder="" value=""/>
+                      <input type="text" placeholder="" :value="boxItemData.releaseInspectionQuantity"/>
                     </div>
                   </wj-flex-grid-cell-template>                  
                 </wj-flex-grid-column-group>
@@ -320,10 +320,34 @@ export default {
       flex.mergeManager = new SimpleMergeManager(config);
     };
 
-    //     const getFilterList = async(newGroup) => {
-    //   const list = await releaseInspectionApi.getFilterList(newGroup);
-    //   return list;
-    // };
+
+    //현황
+    const statusBar = reactive({
+      total: null,                //주문건
+      totalPickingQty: null,      //피킹완료건
+      commonPickingQty: null,     //피킹완료건 -> 일반
+      emergencyPickingQty: null,  //피킹완료건 -> 긴급
+      totalRlsQty: null,          //출고검수/패킹건
+      commonRlsQty: null,         //출고검수/패킹건 -> 일반
+      emergencyRlsQty: null,      //출고검수/패킹건 -> 긴급
+    });
+
+    //전체 데이터 가져오는 함수
+    async function getTotal() {
+      const result = await releaseInspectionApi.getTotal()
+      .then((data) => {
+        statusBar.total               = data.count;
+        statusBar.totalPickingQty     = data.pickingDoneCount;
+        statusBar.commonPickingQty    = data.pickDnCommonCount;
+        statusBar.emergencyPickingQty = data.pickDnEmergencyCount;
+        statusBar.totalRlsQty         = data.rlsInspPackingCount;
+        statusBar.commonRlsQty        = data.rlsInspPackCommonCount;
+        statusBar.emergencyRlsQty     = data.rlsInspPackEmergencyCount;
+        console.log(data);
+      });
+    }
+
+    getTotal();
 
     //검수 버튼 이벤트 함수
     async function inspection(releaseCode, scannedBarcode) {
@@ -627,7 +651,8 @@ export default {
       index,
       emptyBoxArrays,
       boxItemData,
-      clickBoxNum
+      clickBoxNum,
+      statusBar
     };
   },
 };
