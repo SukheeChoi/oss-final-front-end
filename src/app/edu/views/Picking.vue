@@ -6,64 +6,20 @@
         <button class="ow-btn type-group" @click="handleChangeToReceipt" v-bind:class="{ active: showReceipt }"><span>수령</span></button>
         <button class="ow-btn type-group" @click="handleChangeToDelivery" v-bind:class="{ active: !showReceipt }"><span>전달</span></button>
       </div>
-      <!-- 담당자 이름 filter -->
-      <div class="item size-fix" style="--gap-item: 6px">
+      <!-- 수령 대상 업체 필터링 -->
+      <div v-if="showReceipt" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 270px;">
-          <OwFilterRadio>
-            <button class="ow-filter-btn-move prev" :step="5" @click="move">&lt;</button>
-              <ul class="ow-filter-list">
-              <!-- <ul class="ow-filter-list assignee-list"> -->
-                <template v-for="({ name, value, disabled = false }, index) in assigneeList" :key="value">
-                  <li>
-                    <input
-                      type="radio"
-                      :id="`${unique}-${index}`"
-                      :name="unique"
-                      :value="value"
-                      :disabled="disabled"
-                      v-model="checkedValue"
-                    />
-                    <label :for="`${unique}-${index}`" class="ow-filter-button">
-                      {{ name }}
-                    </label>
-                  </li>
-                </template>
-              </ul>
-            <button class="ow-filter-btn-move next" :step="5" @click="move">></button>
-          </OwFilterRadio>
-//////
-        <!-- <div v-show="assigneeList != null" class="ow-filter" style="width: 270px;"> -->
-          <button class="ow-filter-btn-move prev" :step="5" @click="move">&lt;</button>
-          <ul class="ow-filter-list assignee-list">
-            <template v-for="({ name, value, disabled = false }, index) in assigneeList" :key="value">
-              <li>
-                <input
-                  type="radio"
-                  :id="`${unique}-${index}`"
-                  :name="unique"
-                  :value="value"
-                  :disabled="disabled"
-                  v-model="checkedValue"
-                />
-                <label :for="`${unique}-${index}`" class="ow-filter-button">
-                  {{ name }}
-                </label>
-              </li>
-            </template>
-            <!-- <li><input type="radio" id="btn-rd-2-1" name="btn-rd-group2" checked /><label class="ow-filter-button" for="btn-rd-2-1">이상욱</label></li>
-            <li><input type="radio" id="btn-rd-2-2" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-2">박범희</label></li>
-            <li><input type="radio" id="btn-rd-2-3" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-3">전규성</label></li>
-            <li><input type="radio" id="btn-rd-2-4" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-4">소현우</label></li>
-            <li><input type="radio" id="btn-rd-2-5" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-5">김수환</label></li>
-            <li><input type="radio" id="btn-rd-2-6" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-6">이민기</label></li>
-            <li><input type="radio" id="btn-rd-2-7" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-7">이동진</label></li>
-            <li><input type="radio" id="btn-rd-2-8" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-8">김예원</label></li>
-            <li><input type="radio" id="btn-rd-2-9" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-9">신현주</label></li>
-            <li><input type="radio" id="btn-rd-2-10" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-10">이동현</label></li> -->
-          </ul>
-          <button class="ow-filter-btn-move next" :step="5" @click="move">></button>
+          <ow-filter-radio :step="4"/>
         </div>
       </div>
+
+      <!-- 전달 담당자 이름 filter -->
+      <div v-if="!showReceipt" class="item size-fix" style="--gap-item: 6px">
+        <div class="ow-filter" style="width: 270px;">
+          <ow-filter-radio :items="assigneeList" :step="4"/>
+        </div>
+      </div>
+
       <div class="item align-to-right" style="gap: 6px;">
         <!-- 할일/한일 -->
         <div>
@@ -170,36 +126,71 @@
   const clickSearch = ref(false);
   const vendorList = ref([]);
   const assigneeList = ref([
-    {
-      name: '김예원'
-      , value: '1'
-      , disabled: false
-    }
-    , {
-      name: '최숙희'
-      , value: '2'
-      , disabled: false
-    }
-    , {
-      name: '신현주'
-      , value: '3'
-      , disabled: false
-    }
-    , {
-      name: '이동현'
-      , value: '4'
-      , disabled: false
-    }
-    , {
-      name: '공희재'
-      , value: '5'
-      , disabled: false
-    }
-    , {
-      name: '이정민'
-      , value: '6'
-      , disabled: false
-    }
+    // {
+    //   name: '김예원'
+    //   , value: '1'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '최숙희'
+    //   , value: '2'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '신현주'
+    //   , value: '3'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이동현'
+    //   , value: '4'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '공희재'
+    //   , value: '5'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이정민'
+    //   , value: '6'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이정민'
+    //   , value: '6'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이정민'
+    //   , value: '6'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이정민'
+    //   , value: '6'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이정민'
+    //   , value: '6'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이정민'
+    //   , value: '6'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이정민'
+    //   , value: '6'
+    //   , disabled: false
+    // }
+    // , {
+    //   name: '이정민'
+    //   , value: '6'
+    //   , disabled: false
+    // }
   ]);
   const dateList = ref([startDate.value, endDate.value]);
   const receiptList = ref([]);
@@ -233,24 +224,32 @@
         });
     return result;
   };
-  getVendorList(['2022-06-10', '2022-06-25']);
+  getVendorList(['2022-06-01', '2022-06-28']);
 
   //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
-  const getAssigneeList = async () => {
-    const result = await combineShippingApi.getAssigneeList()
+  const getAssigneeList = async (dateList=[]) => {
+    const result = await combineShippingApi.getAssigneeList(dateList)
         .then((result) => {
-          if(result.list != null) {
-            console.log('inside if');
-            console.log('getAssigneeList - result : ' + result);
-            console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
-            assigneeList.value = result.list;
-            console.log('assigneeList.value[0]["orderItem"] : ' + assigneeList.value[0]['orderItem']);
-            console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
+          if(result != null) {
+            let dbAssignee = [];
+            for(let i=0; i<result.list.length; i++) {
+              console.log('## result.list[i] : ', result.list[i]);
+              dbAssignee.push(
+                {
+                  name: result.list[i]
+                  , value: result.list[i]
+                  , disabled: false
+                }
+              );
+            }
+            assigneeList.value = dbAssignee;
+          } else {
+            assigneeList.value = [];
           }
         });
     // return result;
   };
-  getAssigneeList(['2022-06-10', '2022-06-25']);
+  getAssigneeList(['2022-06-01', '2022-06-28']);
 
   const retrieve = (param) => {
     console.log('param', param);
