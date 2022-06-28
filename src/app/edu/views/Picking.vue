@@ -6,64 +6,20 @@
         <button class="ow-btn type-group" @click="handleChangeToReceipt" v-bind:class="{ active: showReceipt }"><span>수령</span></button>
         <button class="ow-btn type-group" @click="handleChangeToDelivery" v-bind:class="{ active: !showReceipt }"><span>전달</span></button>
       </div>
-      <!-- 담당자 이름 filter -->
-      <div class="item size-fix" style="--gap-item: 6px">
-        <div class="ow-filter" style="width: 270px;">
-          <OwFilterRadio>
-            <button class="ow-filter-btn-move prev" :step="5" @click="move">&lt;</button>
-              <ul class="ow-filter-list">
-              <!-- <ul class="ow-filter-list assignee-list"> -->
-                <template v-for="({ name, value, disabled = false }, index) in assigneeList" :key="value">
-                  <li>
-                    <input
-                      type="radio"
-                      :id="`${unique}-${index}`"
-                      :name="unique"
-                      :value="value"
-                      :disabled="disabled"
-                      v-model="checkedValue"
-                    />
-                    <label :for="`${unique}-${index}`" class="ow-filter-button">
-                      {{ name }}
-                    </label>
-                  </li>
-                </template>
-              </ul>
-            <button class="ow-filter-btn-move next" :step="5" @click="move">></button>
-          </OwFilterRadio>
-//////
-        <!-- <div v-show="assigneeList != null" class="ow-filter" style="width: 270px;"> -->
-          <button class="ow-filter-btn-move prev" :step="5" @click="move">&lt;</button>
-          <ul class="ow-filter-list assignee-list">
-            <template v-for="({ name, value, disabled = false }, index) in assigneeList" :key="value">
-              <li>
-                <input
-                  type="radio"
-                  :id="`${unique}-${index}`"
-                  :name="unique"
-                  :value="value"
-                  :disabled="disabled"
-                  v-model="checkedValue"
-                />
-                <label :for="`${unique}-${index}`" class="ow-filter-button">
-                  {{ name }}
-                </label>
-              </li>
-            </template>
-            <!-- <li><input type="radio" id="btn-rd-2-1" name="btn-rd-group2" checked /><label class="ow-filter-button" for="btn-rd-2-1">이상욱</label></li>
-            <li><input type="radio" id="btn-rd-2-2" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-2">박범희</label></li>
-            <li><input type="radio" id="btn-rd-2-3" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-3">전규성</label></li>
-            <li><input type="radio" id="btn-rd-2-4" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-4">소현우</label></li>
-            <li><input type="radio" id="btn-rd-2-5" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-5">김수환</label></li>
-            <li><input type="radio" id="btn-rd-2-6" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-6">이민기</label></li>
-            <li><input type="radio" id="btn-rd-2-7" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-7">이동진</label></li>
-            <li><input type="radio" id="btn-rd-2-8" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-8">김예원</label></li>
-            <li><input type="radio" id="btn-rd-2-9" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-9">신현주</label></li>
-            <li><input type="radio" id="btn-rd-2-10" name="btn-rd-group2" /><label class="ow-filter-button" for="btn-rd-2-10">이동현</label></li> -->
-          </ul>
-          <button class="ow-filter-btn-move next" :step="5" @click="move">></button>
+      <!-- 수령 대상 업체 필터링 -->
+      <div v-if="showReceipt && vendorList!=null" class="item size-fix" style="--gap-item: 6px">
+        <div class="ow-filter" style="width: 370px;">
+          <ow-filter-radio :items="vendorList" :step="5"/>
         </div>
       </div>
+
+      <!-- 전달 담당자 이름 filter -->
+      <div v-if="!showReceipt && assigneeList!=null" class="item size-fix" style="--gap-item: 6px">
+        <div class="ow-filter" style="width: 270px;">
+          <ow-filter-radio :items="assigneeList" :step="4"/>
+        </div>
+      </div>
+
       <div class="item align-to-right" style="gap: 6px;">
         <!-- 할일/한일 -->
         <div>
@@ -107,16 +63,16 @@
     <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==0" header="수령수량" binding="receiptQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column header="미출고" binding="unreleased" :width="60">
+    <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==true && toDo==0" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==1" header="미출고" binding="unreleased" :width="60">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <div class="ow-input">
           <input id="receiptUnreleaseInput" type="text" v-model="cell.item.unreleased"/>
         </div>
       </wj-flex-grid-cell-template>
-    
     </wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==0" header="미출고" binding="unreleased" :width="60" />
     <!-- <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true"> -->
     <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
@@ -143,8 +99,8 @@
     <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==1" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==0" header="전달수량" binding="deliveryQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==false && toDo==1" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==false && toDo==0" header="전달수량" binding="deliveryQuantity" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="delivered" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
@@ -168,89 +124,69 @@
   const startDate = ref(new Date());
   const endDate = ref(new Date());
   const clickSearch = ref(false);
-  const vendorList = ref([]);
-  const assigneeList = ref([
-    {
-      name: '김예원'
-      , value: '1'
-      , disabled: false
-    }
-    , {
-      name: '최숙희'
-      , value: '2'
-      , disabled: false
-    }
-    , {
-      name: '신현주'
-      , value: '3'
-      , disabled: false
-    }
-    , {
-      name: '이동현'
-      , value: '4'
-      , disabled: false
-    }
-    , {
-      name: '공희재'
-      , value: '5'
-      , disabled: false
-    }
-    , {
-      name: '이정민'
-      , value: '6'
-      , disabled: false
-    }
-  ]);
+  const vendorList = ref(null);
+  const assigneeList = ref(null);
   const dateList = ref([startDate.value, endDate.value]);
   const receiptList = ref([]);
   const deliveryList = ref([]);
   const deliveredList = ref([]);
   const checkedReceiptCount = ref(0);
   const checkedDeliveryCount = ref(0);
-  const receiptedList = ref([
-    // {
-    //   orderItemNo: 1
-    //   , receiveUnrelease: 0
-    // }
-    // , {
-    //   orderItemNo: 2
-    //   , receiveUnrelease: 0
-    // }
-  ]);
+  const receiptedList = ref([]);
 
   //수령 탭
   // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
-  const getVendorList = async (dateList) => {
-    const result = await combineShippingApi.getVendorList(dateList)
+  const getVendorList = async (toDo=1, dateList=Array.from([new Date(), new Date()])) => {
+    const result = await combineShippingApi.getVendorList(toDo, dateList)
         .then((result) => {
-          console.log('getVendorList - JSON.stringify(result) : ' + JSON.stringify(result));
-          vendorList.value = result.list;
-          console.log('vendorList.value.length : ' + vendorList.value.length);
-          // 담당 업체명
-          console.log('vendorList.value[0].vendorNo : ' + vendorList.value[0].vendorNo);
-          console.log('vendorList.value[0].vendorName : ' + vendorList.value[0].vendorName);
-          console.log('vendorList.value[0]["vendorNo"] : ' + vendorList.value[0]['vendorNo']);
-        });
-    return result;
-  };
-  getVendorList(['2022-06-10', '2022-06-25']);
-
-  //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
-  const getAssigneeList = async () => {
-    const result = await combineShippingApi.getAssigneeList()
-        .then((result) => {
-          if(result.list != null) {
-            console.log('inside if');
-            console.log('getAssigneeList - result : ' + result);
-            console.log('getAssigneeList - JSON.stringify(result) : ' + JSON.stringify(result));
-            assigneeList.value = result.list;
-            console.log('assigneeList.value[0]["orderItem"] : ' + assigneeList.value[0]['orderItem']);
-            console.log('assigneeList.value[0]["employeeName"] : ' + assigneeList.value[0]['employeeName']);
+          if(result != null && result.list != null) {
+            let dbVendor = [];
+            for(let i=0; i<result.list.length; i++) {
+              console.log('## result.list[i] : ', result.list[i]);
+              dbVendor.push(
+                {
+                  name: result.list[i]['vendorName']
+                  , value: result.list[i]['vendorCode']
+                  , disabled: false
+                }
+              );
+            }
+            vendorList.value = dbVendor;
+          } else {
+            vendorList.value = null;
           }
         });
     // return result;
   };
-  getAssigneeList(['2022-06-10', '2022-06-25']);
+  getVendorList(toDo.value, Array.from(['2022-06-01', '2022-06-28']));
+
+  //담당자 조회. 페이지네이션 고려X.
+  // 할 일: 해당기간에 수령완료된 이력의 담당자. -> 사실상 '수령 한 일'의 담당자와 같음.
+  // 한 일: 해당기간에 전달이력의 담당자.
+  const getAssigneeList = async (toDo=1, dateList=[]) => {
+    const result = await combineShippingApi.getAssigneeList(toDo, dateList)
+        .then((result) => {
+          console.log('## getAssigneeList result : ', result);
+          if(result != null && result.list != null) {
+            let dbAssignee = [];
+            for(let i=0; i<result.list.length; i++) {
+              console.log('## result.list[i] : ', result.list[i]);
+              dbAssignee.push(
+                {
+                  name: result.list[i]
+                  , value: result.list[i]
+                  , disabled: false
+                }
+              );
+            }
+            assigneeList.value = dbAssignee;
+          } else {
+            assigneeList.value = null;
+          }
+        });
+    // return result;
+  };
+  getAssigneeList(toDo.value, [new Date(), new Date()]);
 
   const retrieve = (param) => {
     console.log('param', param);
@@ -267,7 +203,7 @@
           , 'itemName': receiptList.value[i]["item"]["itemName"]
           , 'itemCode': receiptList.value[i]["item"]["itemCode"]
           , 'releaseQuantity': receiptList.value[i]["releaseQuantity"]
-          , 'receiptQuantity': receiptList.value[i]["receiptQuantity"]
+          , 'receiveQuantity': receiptList.value[i]["receiveQuantity"]
           , 'unreleased': receiptList.value[i]["receiveUnrelease"]
           , 'receipted': receiptList.value[i]["receiveCheck"]
 
@@ -332,7 +268,6 @@
     if(showReceipt.value === true) {
       label = 'receipt';
       items = receiptList.value;
-      console.log('inside read - receiptList.value.length : ' + receiptList.value.length);
     } else {
       label = 'delivery';
       items = deliveryList.value;
@@ -366,6 +301,7 @@
             // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
             receiptKey.value++;
           }
+          // getVendorList(toDo.value, dateList.values);
         });
     // return result;
   };
@@ -397,6 +333,7 @@
             read();
             deliveryKey.value++;
           }
+          // getAssigneeList(toDo.value, dateList.value);
       });
     // return result;
   };
@@ -441,20 +378,25 @@
       });
     // return result;
   };
-  
+  //수령/전달 탭 전환 관리.
   watch(() => showReceipt.value
   , (newShowReceipt, oldShowReceipt) => {
+    // 수령/전달 탭 변경시에 담당업체/담당자 목록 초기화.
+    assigneeList.value = [];
+    vendorList.value = [];
+
     // update용 count변수 초기화.
     checkedReceiptCount.value = 0;
     checkedDeliveryCount.value = 0;
     if(newShowReceipt === true) {
-      getReceiptList().then();
-      receiptKey.value++;
+      getReceiptList(toDo.value, '', dateList.value).then();
+      getVendorList(toDo.value, dateList.value);
     } else {
-      getDeliveryList().then();
-      receiptKey.value++;
+      getDeliveryList(toDo.value, '', dateList.value).then();
+      getAssigneeList(toDo.value, '', dateList.value);
     }
   });
+  // 할일/한일 초기화 관리.
   watch(() => toDo.value
   , (newToDo, oldToDo) => {
     // update용 count변수 초기화.
@@ -463,20 +405,34 @@
 
     if(showReceipt.value === true) {
       getReceiptList(newToDo, '', Array.from(dateList.value));
-      // receiptKey.value++;
+      getVendorList(toDo.value, '', dateList.value);
+      // 담당업체 조회.
     } else {
       getDeliveryList(newToDo, '', Array.from(dateList.value));
-      // deliveryKey.value++;
+      getAssigneeList(toDo.value, Array.from(dateList.value));
     }
   });
+  // 조회 감시.
   watch(() => clickSearch.value
   , (newClickSearch, oldClickSearch) => {
+    // update용 count변수 초기화.
+    checkedReceiptCount.value = 0;
+    checkedDeliveryCount.value = 0;
+
     if(showReceipt.value === true) {
       getReceiptList(toDo.value, '', Array.from(dateList.value));
+      getVendorList(toDo.value, '', Array.from(dateList.value));
     } else {
       getDeliveryList(toDo.value, '', Array.from(dateList.value));
+      getAssigneeList(toDo.value, Array.from(dateList.value));
     }
     clickSearch.value = false;
+  });
+  // selectedEmployeeId
+  watch(() => selectedEmployeeId.value
+    , (newSelectedEmployeeId, oldSelectedEmployeeId) => {
+      console.log('## newSelectedEmployeeId : ', newSelectedEmployeeId);
+      // 전달 목록 조회하는 통신 수행하기.
   });
 
   // watch(
