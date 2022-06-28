@@ -82,8 +82,8 @@
           <!-- 조회 -->
           <button class="ow-btn type-util" @click="handleClickSearch">조회</button>
           <!-- 품목전달(선택된 갯수) -->
-          <button v-if="showReceipt" class="ow-btn type-util">품목수령({{checkedReceiptCount}})</button>  
-          <button v-if="!showReceipt" class="ow-btn type-util" @click="updateDeliveryList(deliveredList)">품목전달({{checkedDeliveryCount}})</button>  
+          <button v-if="showReceipt && toDo===1" class="ow-btn type-util" @click="updateReceiptList()">품목수령({{checkedReceiptCount}})</button>  
+          <button v-if="!showReceipt && toDo===1" class="ow-btn type-util" @click="updateDeliveryList()">품목전달({{checkedDeliveryCount}})</button>  
         </div>
       </div>
 
@@ -198,7 +198,7 @@
   const deliveredList = ref([]);
   const checkedReceiptCount = ref(0);
   const checkedDeliveryCount = ref(0);
-  const receiptListForUpdate = ref([
+  const receiptedList = ref([
     // {
     //   orderItemNo: 1
     //   , receiveUnrelease: 0
@@ -364,8 +364,8 @@
 
   // 수령 Update.
   console.log('before updateReceiptList');
-  const updateReceiptList = async (receiptListForUpdate) => {
-    const result = await combineShippingApi.updateReceiptList(Array.from(receiptListForUpdate.value))
+  const updateReceiptList = async () => {
+    const result = await combineShippingApi.updateReceiptList(Array.from(receiptedList.value))
       .then((result) => {
         console.log('updateReceiptList - result : ' + result);
       });
@@ -422,7 +422,7 @@
   //   }
   // );
 
-  const updateDeliveryList = async (deliveredList) => {
+  const updateDeliveryList = async () => {
     const result = await combineShippingApi.updateDeliveryList(deliveredList);
     window.location.reload(true);
     // return result;
