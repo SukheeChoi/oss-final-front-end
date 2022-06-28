@@ -72,185 +72,75 @@
       class="ow-grid type-header-group"
       :initialized="onInitialized"
       :autoRowHeights="true"
-      formatItem="{formatItem}"
     >
       <wj-flex-grid-column-group header="주문">
         <wj-flex-grid-column-group
           binding="orderDate"
           header="주문일시"
-          width="*"
+          :width="90"
           align="center"
           :allowMerging="true"
-          cssClassAll="border-right-sm"
+          cssClassAll="border-center"
         />
         <wj-flex-grid-column-group
           binding="orderNo"
           header="주문번호"
-          width="*"
-          align="center"
+          :width="90"
+          align="left"
           :allowMerging="true"
-          cssClassAll="border-right-sm"
+          cssClassAll="border-center"
         />
         <wj-flex-grid-column-group
           binding="clientName"
           header="거래처"
           width="*"
-          align="center"
+          align="left"
           :allowMerging="true"
-          cssClassAll="border-right-sm"
+          cssClassAll="border-center"
         />
         <wj-flex-grid-column-group
           binding="itemName"
           header="품목명"
-          width="*"
-          align="center"
-          wordWrap="true"
-          multiLine="true"
-          cssClassAll="border-right-sm"
+          :width="130"
+          :wordWrap="true"
+          :multiLine="true"
+          cssClassAll="border-left"
         />
-        <wj-flex-grid-column-group
-          binding="itemCode"
-          header="품목코드"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="orderItemQuantity"
-          header="주문수량"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="orderCategory"
-          header="배송구분"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="vendorName"
-          header="업체명"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="itemCode" header="품목코드" :width="110" align="left" />
+        <wj-flex-grid-column-group binding="orderItemQuantity" header="주문수량" :width="50" align="right" />
+        <wj-flex-grid-column-group binding="shippingCategory" header="배송구분" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="vendorName" header="업체명" :width="90" align="left" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="피킹지시">
-        <wj-flex-grid-column-group
-          binding="pickingDirectionAttempt"
-          header="차수"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="pickingDirectionDate"
-          header="지시일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="pickingDirectionQuantity"
-          header="지시수량"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="pickingDirectionUnrelease"
-          header="미출고"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="pickingDirectionAttempt" header="차수" :width="30" align="center" />
+        <wj-flex-grid-column-group binding="pickingDirectionDate" header="지시일시" :width="90" align="center" />
+        <wj-flex-grid-column-group binding="pickingDirectionQuantity" header="지시수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingDirectionUnrelease" header="미출고" :width="50" align="center" />
+      </wj-flex-grid-column-group>
+      <wj-flex-grid-column-group header="피킹">
+        <wj-flex-grid-column-group binding="count3-1" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="count3-2" header="피킹수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="count3-3" header="피킹일시" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="count3-4" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="협력사">
-        <wj-flex-grid-column-group
-          binding="orderShippingWay"
-          header="배송방식"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="orderCheckDate"
-          header="주문확인<br>일시"
-          :width="100"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="releaseQuantity"
-          header="출고수량"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="releaseScheduleDate"
-          header="출고예정<br>일자"
-          :width="100"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="recieveDate"
-          header="수령일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="orderShippingWay" header="배송방식" :width="60" align="center" />
+        <wj-flex-grid-column-group binding="orderCheckDate" header="주문확인<br>일시" :width="100" align="center" />
+        <wj-flex-grid-column-group binding="releaseQuantity" header="출고수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="releaseScheduleDate" header="출고예정<br>일자" :width="60" align="center" />
+        <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="100" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고검수/패킹">
-        <wj-flex-grid-column-group
-          binding="count4-1"
-          header="담당자"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="count4-2"
-          header="검수일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="count4-1" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="count4-2" header="검수일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고">
-        <wj-flex-grid-column-group
-          binding="count5-1"
-          header="담당자"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="count5-2"
-          header="출고일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="count5-1" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="count5-2" header="출고일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="인계">
-        <wj-flex-grid-column-group
-          binding="count6-1"
-          header="담당자"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="count6-2"
-          header="인계일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="count6-1" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="count6-2" header="인계일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
     </wj-flex-grid>
   </div>
@@ -356,6 +246,8 @@ export default {
           return data.value;
         });
 
+        console.log('checkboxGroup4checkboxGroup4', checkboxGroup4);
+
         const company = list[0].map((data) => {
           return data;
         });
@@ -365,7 +257,7 @@ export default {
         const unreleased = list[2].map((data) => {
           return data;
         });
-
+        console.log('oldGroupoldGroupoldGroupoldGroupoldGroup', oldGroup);
         console.log('newGroupnewGroupnewGroupnewGroup', newGroup);
         getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
           response.value = data.data.list;
@@ -403,9 +295,21 @@ export default {
 </script>
 <style>
 .wj-cell.wj-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: inherit;
 }
-  </style>
+
+.wj-cell.border-left {
+  display: flex;
+  align-items: center;
+  line-height: inherit;
+}
+
+.wj-cell.border-center {
+  display: flex;
+  align-items: center;
+  line-height: inherit;
+}
+</style>

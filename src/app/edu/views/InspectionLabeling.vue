@@ -55,7 +55,7 @@
           <button class="ow-btn type-util">예정시간수정</button>
           <button class="ow-btn type-util" @click="getListByEmployeeName()">추가</button>
         </div>
-        <ow-tree-grid :read="read" :childItemsPath="['child', 'childrennn']" :initialized="onInitialized">
+        <ow-tree-grid :read="read" selectionMode="None" :childItemsPath="['child', 'childrennn']" :initialized="onInitialized">
           <!-- childitem 순서대로 입력하기 children(albert)아래 children(anton) -->
           <wj-flex-grid-column
             header="담당자/업체명"
@@ -118,7 +118,7 @@
         </ow-tree-grid>
       </div>
       <!-- 오른쪽 화면 -->
-      <div class="right flex-fill">
+      <div class="right">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <div class="item align-to-right" style="--gap-item: 6px">
             <div class="title-field">검색</div>

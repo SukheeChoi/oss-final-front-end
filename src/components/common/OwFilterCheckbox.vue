@@ -91,7 +91,7 @@ export default {
       if (!state.isAllChecked) {
         state.checkedValues = state.enabledValues.map((item) => item.value);
       }
-      console.log("isAllChecked", state.isAllChecked);
+      console.log("isAllChecked", isAllChecked);
       console.log("checkedValues", state.checkedValues);
     };
     
