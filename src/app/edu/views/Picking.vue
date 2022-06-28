@@ -8,8 +8,8 @@
       </div>
       <!-- 수령 대상 업체 필터링 -->
       <div v-if="showReceipt" class="item size-fix" style="--gap-item: 6px">
-        <div class="ow-filter" style="width: 270px;">
-          <ow-filter-radio :step="4"/>
+        <div class="ow-filter" style="width: 370px;">
+          <ow-filter-radio :items="vendorList" :step="5"/>
         </div>
       </div>
 
@@ -63,8 +63,8 @@
     <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==0" header="수령수량" binding="receiptQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==true && toDo==0" header="수령수량" binding="receiptQuantity" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column header="미출고" binding="unreleased" :width="60">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <div class="ow-input">
@@ -99,8 +99,8 @@
     <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==1" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==0" header="전달수량" binding="deliveryQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==false && toDo==1" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==false && toDo==0" header="전달수량" binding="deliveryQuantity" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="delivered" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
@@ -202,20 +202,25 @@
 
   //수령 탭
   // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
-  const getVendorList = async (dateList) => {
-    const result = await combineShippingApi.getVendorList(dateList)
+  const getVendorList = async (toDo=1, dateList=Array.from([new Date(), new Date()])) => {
+    const result = await combineShippingApi.getVendorList(toDo, dateList)
         .then((result) => {
-          console.log('getVendorList - JSON.stringify(result) : ' + JSON.stringify(result));
-          vendorList.value = result.list;
-          console.log('vendorList.value.length : ' + vendorList.value.length);
-          // 담당 업체명
-          console.log('vendorList.value[0].vendorNo : ' + vendorList.value[0].vendorNo);
-          console.log('vendorList.value[0].vendorName : ' + vendorList.value[0].vendorName);
-          console.log('vendorList.value[0]["vendorNo"] : ' + vendorList.value[0]['vendorNo']);
+          let dbVendor = [];
+          for(let i=0; i<result.list.length; i++) {
+            console.log('## result.list[i] : ', result.list[i]);
+            dbVendor.push(
+              {
+                name: result.list[i]['vendorName']
+                , value: result.list[i]['vendorCode']
+                , disabled: false
+              }
+            );
+          }
+          vendorList.value = dbVendor;
         });
-    return result;
+    // return result;
   };
-  getVendorList(['2022-06-01', '2022-06-28']);
+  // getVendorList(toDo.value, Array.from(['2022-06-01', '2022-06-28']));
 
   //담당자 조회. 페이지네이션 고려X.
   // 할 일: 해당기간에 수령완료된 이력의 담당자. -> 사실상 '수령 한 일'의 담당자와 같음.
@@ -224,7 +229,7 @@
     const result = await combineShippingApi.getAssigneeList(toDo, dateList)
         .then((result) => {
           console.log('## getAssigneeList result : ', result);
-          if(result != null) {
+          if(result != null && result.list != null) {
             let dbAssignee = [];
             for(let i=0; i<result.list.length; i++) {
               console.log('## result.list[i] : ', result.list[i]);
@@ -243,7 +248,7 @@
         });
     // return result;
   };
-  getAssigneeList(toDo.value, dateList.value);
+  getAssigneeList(toDo.value, [new Date(), new Date()]);
   // getAssigneeList(toDo.value, ['2022-06-01', '2022-06-28']);
 
   const retrieve = (param) => {
@@ -360,6 +365,7 @@
             // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
             receiptKey.value++;
           }
+          getVendorList(toDo.value, dateList.values);
         });
     // return result;
   };
@@ -391,6 +397,7 @@
             read();
             deliveryKey.value++;
           }
+          getAssigneeList(toDo.value, dateList.value);
       });
     // return result;
   };
@@ -435,7 +442,7 @@
       });
     // return result;
   };
-  
+  //수령/전달 탭 전환 관리.
   watch(() => showReceipt.value
   , (newShowReceipt, oldShowReceipt) => {
     // 수령/전달 탭 변경시에 담당업체/담당자 목록 초기화.
@@ -446,13 +453,12 @@
     checkedReceiptCount.value = 0;
     checkedDeliveryCount.value = 0;
     if(newShowReceipt === true) {
-      getReceiptList().then();
-      receiptKey.value++;
+      getReceiptList(toDo.value, '', dateList.value).then();
     } else {
-      getDeliveryList().then();
-      deliveryKey.value++;
+      getDeliveryList(toDo.value, '', dateList.value).then();
     }
   });
+  // 할일/한일 초기화 관리.
   watch(() => toDo.value
   , (newToDo, oldToDo) => {
     // update용 count변수 초기화.
@@ -461,12 +467,13 @@
 
     if(showReceipt.value === true) {
       getReceiptList(newToDo, '', Array.from(dateList.value));
-      // receiptKey.value++;
+      // 담당업체 조회.
     } else {
       getDeliveryList(newToDo, '', Array.from(dateList.value));
-      // deliveryKey.value++;
+      getAssigneeList(toDo.value, Array.from(dateList.value));
     }
   });
+  // 조회 감시.
   watch(() => clickSearch.value
   , (newClickSearch, oldClickSearch) => {
     if(showReceipt.value === true) {

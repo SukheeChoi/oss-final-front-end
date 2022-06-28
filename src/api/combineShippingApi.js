@@ -3,13 +3,15 @@
 import axios from "axios";
 
 //수령/전달 날짜 필터링 유무로 나눠진 API 합치기!!
-async function getVendorList(dateList) {
+async function getVendorList(toDo=1, dateList=Array.from([])) {
   let vendorList = null;
   try {
     let params = new URLSearchParams();
+    params.append('toDo', toDo);
     params.append('dateList', Array.from(dateList));
     const response = await axios.post(`/combineShipping/getVendorList`, params);
     vendorList = response.data;
+    console.log('## vendorList : ', vendorList);
   } catch(error) {
     console.log(error);
   }
