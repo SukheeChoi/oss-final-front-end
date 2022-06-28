@@ -7,14 +7,14 @@
         <button class="ow-btn type-group" @click="handleChangeToDelivery" v-bind:class="{ active: !showReceipt }"><span>전달</span></button>
       </div>
       <!-- 수령 대상 업체 필터링 -->
-      <div v-if="showReceipt" class="item size-fix" style="--gap-item: 6px">
+      <div v-if="showReceipt && vendorList[0]!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 370px;">
           <ow-filter-radio :items="vendorList" :step="5"/>
         </div>
       </div>
 
       <!-- 전달 담당자 이름 filter -->
-      <div v-if="!showReceipt" class="item size-fix" style="--gap-item: 6px">
+      <div v-if="!showReceipt && assigneeList[0]!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 270px;">
           <ow-filter-radio :items="assigneeList" :step="4"/>
         </div>
@@ -64,15 +64,15 @@
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="showReceipt==true && toDo==0" header="수령수량" binding="receiptQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column header="미출고" binding="unreleased" :width="60">
+    <wj-flex-grid-column v-if="showReceipt==true && toDo==0" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==1" header="미출고" binding="unreleased" :width="60">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <div class="ow-input">
           <input id="receiptUnreleaseInput" type="text" v-model="cell.item.unreleased"/>
         </div>
       </wj-flex-grid-cell-template>
-    
     </wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==0" header="미출고" binding="unreleased" :width="60" />
     <!-- <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true"> -->
     <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
@@ -125,73 +125,7 @@
   const endDate = ref(new Date());
   const clickSearch = ref(false);
   const vendorList = ref([]);
-  const assigneeList = ref([
-    // {
-    //   name: '김예원'
-    //   , value: '1'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '최숙희'
-    //   , value: '2'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '신현주'
-    //   , value: '3'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이동현'
-    //   , value: '4'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '공희재'
-    //   , value: '5'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이정민'
-    //   , value: '6'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이정민'
-    //   , value: '6'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이정민'
-    //   , value: '6'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이정민'
-    //   , value: '6'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이정민'
-    //   , value: '6'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이정민'
-    //   , value: '6'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이정민'
-    //   , value: '6'
-    //   , disabled: false
-    // }
-    // , {
-    //   name: '이정민'
-    //   , value: '6'
-    //   , disabled: false
-    // }
-  ]);
+  const assigneeList = ref([]);
   const dateList = ref([startDate.value, endDate.value]);
   const receiptList = ref([]);
   const deliveryList = ref([]);
@@ -205,18 +139,22 @@
   const getVendorList = async (toDo=1, dateList=Array.from([new Date(), new Date()])) => {
     const result = await combineShippingApi.getVendorList(toDo, dateList)
         .then((result) => {
-          let dbVendor = [];
-          for(let i=0; i<result.list.length; i++) {
-            console.log('## result.list[i] : ', result.list[i]);
-            dbVendor.push(
-              {
-                name: result.list[i]['vendorName']
-                , value: result.list[i]['vendorCode']
-                , disabled: false
-              }
-            );
+          if(result != null && result.list != null) {
+            let dbVendor = [];
+            for(let i=0; i<result.list.length; i++) {
+              console.log('## result.list[i] : ', result.list[i]);
+              dbVendor.push(
+                {
+                  name: result.list[i]['vendorName']
+                  , value: result.list[i]['vendorCode']
+                  , disabled: false
+                }
+              );
+            }
+            vendorList.value = dbVendor;
+          } else {
+            vendorList.value = [];
           }
-          vendorList.value = dbVendor;
         });
     // return result;
   };
@@ -266,7 +204,7 @@
           , 'itemName': receiptList.value[i]["item"]["itemName"]
           , 'itemCode': receiptList.value[i]["item"]["itemCode"]
           , 'releaseQuantity': receiptList.value[i]["releaseQuantity"]
-          , 'receiptQuantity': receiptList.value[i]["receiptQuantity"]
+          , 'receiveQuantity': receiptList.value[i]["receiveQuantity"]
           , 'unreleased': receiptList.value[i]["receiveUnrelease"]
           , 'receipted': receiptList.value[i]["receiveCheck"]
 
@@ -470,7 +408,7 @@
       // 담당업체 조회.
     } else {
       getDeliveryList(newToDo, '', Array.from(dateList.value));
-      getAssigneeList(toDo.value, Array.from(dateList.value));
+      // getAssigneeList(toDo.value, Array.from(dateList.value));
     }
   });
   // 조회 감시.
@@ -480,7 +418,7 @@
       getReceiptList(toDo.value, '', Array.from(dateList.value));
     } else {
       getDeliveryList(toDo.value, '', Array.from(dateList.value));
-      getAssigneeList(toDo.value, Array.from(dateList.value));
+      // getAssigneeList(toDo.value, Array.from(dateList.value));
     }
     clickSearch.value = false;
   });
