@@ -32,7 +32,6 @@
             <button class="ow-filter-btn-move next" :step="5" @click="move">></button>
           </OwFilterRadio>
 //////
-
         <!-- <div v-show="assigneeList != null" class="ow-filter" style="width: 270px;"> -->
           <button class="ow-filter-btn-move prev" :step="5" @click="move">&lt;</button>
           <ul class="ow-filter-list assignee-list">
@@ -77,16 +76,14 @@
             <ow-input-date :modelValue="startDate" @update:modelValue="updateStartDate" />
             <span style="margin: 4px;">~</span>
             <ow-input-date :modelValue="endDate" @update:modelValue="updateEndDate" />
-            <!-- <wj-input-date id="theDate" :initialized="initDate" class="ow-calendar" @change="handleStartDate"></wj-input-date>
-            <span style="margin: 4px;">~</span>
-            <wj-input-date id="theDate" :initialized="initDate" class="ow-calendar" @change="handleEndDate"></wj-input-date> -->
           </div>
         </div>
         <div>
           <!-- 조회 -->
           <button class="ow-btn type-util" @click="handleClickSearch">조회</button>
           <!-- 품목전달(선택된 갯수) -->
-          <button class="ow-btn type-util">품목전달(0)</button>  
+          <button v-if="showReceipt && toDo===1" class="ow-btn type-util" @click="updateReceiptList()">품목수령({{checkedReceiptCount}})</button>  
+          <button v-if="!showReceipt && toDo===1" class="ow-btn type-util" @click="updateDeliveryList()">품목전달({{checkedDeliveryCount}})</button>  
         </div>
       </div>
 
@@ -112,10 +109,19 @@
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==0" header="수령수량" binding="receiptQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
-    <wj-flex-grid-column header="수령여부" binding="receipted" align="center" :width="70" wordWrap="true">
-      <wj-flex-grid-cell-template cellType="Cell">
-        <button class="ow-btn type-icon check-state"></button>
+    <wj-flex-grid-column header="미출고" binding="unreleased" :width="60">
+      <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+        <div class="ow-input">
+          <input id="receiptUnreleaseInput" type="text" v-model="cell.item.unreleased"/>
+        </div>
+      </wj-flex-grid-cell-template>
+    
+    </wj-flex-grid-column>
+    <!-- <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true"> -->
+    <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
+      <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+        <!-- <button class="ow-btn type-icon check-state" @click="checkReceiptCheckBtn($event, cell.item.orderItemNo, cell.item.No)"></button> -->
+        <button class="ow-btn type-icon check-state" @click="checkReceiptCheckBtn($event, cell.item.orderItemNo)"></button>
         <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
@@ -137,42 +143,16 @@
     <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column header="수량" binding="itemQuantity" :width="60"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==1" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==0" header="전달수량" binding="deliveryQuantity" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
-    <wj-flex-grid-column header="전달여부" binding="delivered" align="center" :width="70" wordWrap="true">
-      <wj-flex-grid-cell-template cellType="Cell">
-        <button class="ow-btn type-icon check-state"></button>
+    <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="delivered" align="center" :width="70" wordWrap="true">
+      <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+        <button class="ow-btn type-icon check-state" @click="handleDeliveryCheckBtn($event, cell.item.orderItemNo)"></button>
         <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
   </ow-n-grid>
-  <!-- 킵,, -->
-  <ow-n-grid
-    v-if="false"
-    :initialized="initialize"
-    :n="2"
-    :read="read"
-    :insert="insert"
-    :update="update"
-    :remove="remove"
-    :visible-rows-count="state.visibleRowsCount"
-  >
-    <template #left>&nbsp;</template>
-    <!-- draggable -->
-    <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
-    <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
-    <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
-    <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column header="수량" binding="itemQuantity" :width="60"></wj-flex-grid-column>
-    <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
-    <wj-flex-grid-column header="전달여부" binding="delivered" align="center" :width="70" wordWrap="true">
-      <wj-flex-grid-cell-template cellType="Cell">
-        <button class="ow-btn type-icon check-state"></button>
-        <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
-      </wj-flex-grid-cell-template>
-    </wj-flex-grid-column>
-  </ow-n-grid>
-  <!-- <div draggable="true" @dragstart="start">드래그 해보기</div> -->
 </template>
 
 <script setup>
@@ -225,15 +205,17 @@
   const receiptList = ref([]);
   const deliveryList = ref([]);
   const deliveredList = ref([]);
-  const receiptListForUpdate = ref([
-    {
-      orderItemNo: 1
-      , receiveUnrelease: 0
-    }
-    , {
-      orderItemNo: 2
-      , receiveUnrelease: 0
-    }
+  const checkedReceiptCount = ref(0);
+  const checkedDeliveryCount = ref(0);
+  const receiptedList = ref([
+    // {
+    //   orderItemNo: 1
+    //   , receiveUnrelease: 0
+    // }
+    // , {
+    //   orderItemNo: 2
+    //   , receiveUnrelease: 0
+    // }
   ]);
 
   //수령 탭
@@ -253,18 +235,6 @@
   };
   getVendorList(['2022-06-10', '2022-06-25']);
 
-
-  // (수령예정) 기간으로 필터링한 수령 목록 조회.
-  // const getReceiptListByDate = async () => {
-  //   const result = await combineShippingApi.getReceiptListByDate(['2022-06-10', '2022-06-25']);
-  //   return result;
-  // };
-  // getReceiptListByDate().then((result) => {
-  //   console.log('getReceiptListByDate - JSON.stringify(result) : ' + JSON.stringify(result));
-  //   receiptList.value = result.list;
-  //   console.log('receiptList.value.length : ' + receiptList.value.length);
-  // });
-
   //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
   const getAssigneeList = async () => {
     const result = await combineShippingApi.getAssigneeList()
@@ -280,7 +250,7 @@
         });
     // return result;
   };
-  // getAssigneeList();
+  getAssigneeList(['2022-06-10', '2022-06-25']);
 
   const retrieve = (param) => {
     console.log('param', param);
@@ -300,6 +270,8 @@
           , 'receiptQuantity': receiptList.value[i]["receiptQuantity"]
           , 'unreleased': receiptList.value[i]["receiveUnrelease"]
           , 'receipted': receiptList.value[i]["receiveCheck"]
+
+          , 'orderItemNo': receiptList.value[i]["orderItemNo"]
         });
       }
     } else {
@@ -326,8 +298,11 @@
           , 'order_release_no': deliveryList.value[i]["orderItem"]["orderNo"] + '/' + deliveryList.value[i]["release"]["releaseNo"]
           , 'itemName': deliveryList.value[i]["item"]["itemName"]
           , 'itemCode': deliveryList.value[i]["item"]["itemCode"]
-          , 'itemQuantity': deliveryList.value[i]["deliveryQuantity"]
+          , 'receiveQuantity': deliveryList.value[i]["receiveQuantity"]
+          , 'deliveryQuantity': deliveryList.value[i]["deliveryQuantity"]
           , 'unreleased': deliveryList.value[i]["deliveryUnrelease"]
+
+          , 'orderItemNo': deliveryList.value[i]["orderItemNo"]
         });
       }
     }
@@ -381,14 +356,12 @@
     const result = await combineShippingApi.getReceiptList(toDo, employeeId, Array.from(dateList))
         .then((result) => {
           if(result.receiptList != null) {
-            console.log('result : ' + result);
             receiptList.value = result.receiptList;
-            console.log('result.receiptList : ' + result.receiptList);
-            console.log('result.receiptList[0] : ' + result.receiptList[0]);
-            console.log('result.receiptList[0]["orderItemNo"] : ' + result.receiptList[0]['orderItemNo']);
-            console.log('receiptList.value[0]// : ' + receiptList.value[0]);
-            console.log('receiptList.value[0]["orderItemNo"]// : ' + receiptList.value[0]['orderItemNo']);
-            console.log('JSON.stringify(receiptList.value[0]) : ' + JSON.stringify(receiptList.value[0]));
+            read();
+            // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+            receiptKey.value++;
+          } else {
+            receiptList.value = [];
             read();
             // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
             receiptKey.value++;
@@ -397,147 +370,110 @@
     // return result;
   };
   getReceiptList();
-  // getReceiptList('E2');
 
   // 수령 Update.
   console.log('before updateReceiptList');
-  const updateReceiptList = async (receiptListForUpdate) => {
-    const result = await combineShippingApi.updateReceiptList(Array.from(receiptListForUpdate.value))
+  const updateReceiptList = async () => {
+    console.log();
+    const result = await combineShippingApi.updateReceiptList(Array.from(receiptedList.value))
       .then((result) => {
         console.log('updateReceiptList - result : ' + result);
+        checkedReceiptCount.value = 0;
       });
     // return result;
   };
-  // receiptListForUpdate.value.length = 0;
-  console.log('receiptListForUpdate.value.length : ' + receiptListForUpdate.value.length);
-  console.log('receiptListForUpdate.value.length : ' + receiptListForUpdate.value.length);
-  // updateReceiptList(receiptListForUpdate);
 
   // '전달' 탭에서 바인딩할 데이터를 불러옴.
-  const getDeliveryList = async (toDo=1, employeeId='', dateList=[]) => {
+  // const getDeliveryList = async (toDo=1, employeeId='', dateList=[]) => {
+  async function getDeliveryList(toDo=1, employeeId='', dateList=[]) {
     const result = await combineShippingApi.getDeliveryList(toDo, employeeId, Array.from(dateList))
         .then((result) => {
           if(result.deliveryList != null) {
-            console.log('getDeliveryList - result : ' + result);
-            console.log('result.deliveryList : ' + result.deliveryList);
-            console.log('result.deliveryList[0] : ' + result.deliveryList[0]);
-            console.log('result.deliveryList[0]["orderItemNo"] : ' + result.deliveryList[0]['orderItemNo']);
             deliveryList.value = result.deliveryList;
-            console.log('deliveryList.value[0]// : ' + deliveryList.value[0]);
-            console.log('deliveryList.value[0]["orderItemNo"]// : ' + deliveryList.value[0]['orderItemNo']);
-            console.log('JSON.stringify(deliveryList.value[0]) : ' + JSON.stringify(deliveryList.value[0]));
+            read();
+            deliveryKey.value++;
+          } else {
+            deliveryList.value = [];
             read();
             deliveryKey.value++;
           }
       });
+    // return result;
   };
-  // getDeliveryList();
-  // getDeliveryList('E1', ['2022-06-10', '2022-06-25']);
 
   // 전달된 항목 정보 update.
-  deliveredList.value.push(
-    {
-        "orderItemNo": 2,
-        "orderCheckDate": null,
-        "receiveCheck": true,
-        "receiveUnrelease": 0,
-        "deliveryUnrelease": 0,
-        "deliverCheck": true,
-        "employeeId": null,
-        "releaseScheduleDate": null,
-        "receiveDate": null,
-        "releaseQuantity": 2,
-        "deliveryQuantity": 2
-    }
-  );
-  deliveredList.value.push(
-    {
-        "orderItemNo": 3,
-        "orderCheckDate": null,
-        "receiveCheck": true,
-        "receiveUnrelease": 0,
-        "deliveryUnrelease": 0,
-        "deliverCheck": true,
-        "employeeId": null,
-        "releaseScheduleDate": null,
-        "receiveDate": null,
-        "releaseQuantity": 10,
-        "deliveryQuantity": 10
-    }
-  );
-  console.log('typeof(deliveredList) : ' + typeof(deliveredList));
-  console.log('typeof(deliveredList.value) : ' + typeof(deliveredList.value));
-  console.log('deliveredList.value : ' + deliveredList.value);
-  console.log('deliveredList.value[0] : ' + deliveredList.value[0]);
-  console.log('deliveredList.value[0]["orderItemNo"] : ' + deliveredList.value[0]["orderItemNo"]);
+  // deliveredList.value.push(
+  //   {
+  //       "orderItemNo": 2,
+  //       "orderCheckDate": null,
+  //       "receiveCheck": true,
+  //       "receiveUnrelease": 0,
+  //       "deliveryUnrelease": 0,
+  //       "deliverCheck": true,
+  //       "employeeId": null,
+  //       "releaseScheduleDate": null,
+  //       "receiveDate": null,
+  //       "releaseQuantity": 2,
+  //       "deliveryQuantity": 2
+  //   }
+  // );
+  // deliveredList.value.push(
+  //   {
+  //       "orderItemNo": 3,
+  //       "orderCheckDate": null,
+  //       "receiveCheck": true,
+  //       "receiveUnrelease": 0,
+  //       "deliveryUnrelease": 0,
+  //       "deliverCheck": true,
+  //       "employeeId": null,
+  //       "releaseScheduleDate": null,
+  //       "receiveDate": null,
+  //       "releaseQuantity": 10,
+  //       "deliveryQuantity": 10
+  //   }
+  // );
 
-  const updateDeliveryList = async (deliveredList) => {
-    const result = await combineShippingApi.updateDeliveryList(deliveredList);
-    return result;
+  const updateDeliveryList = async () => {
+    const result = await combineShippingApi.updateDeliveryList(deliveredList)
+      .then(() => {
+        checkedDeliveryCount.value = 0;
+        window.location.reload(true);
+      });
+    // return result;
   };
-  updateDeliveryList(deliveredList).then(result => {
-    console.log('updateDeliveryList - result : ' + result);
-  });
   
-  // const items = [
-  //   {No: 1, order_release_no: "2201042337/C_02_005", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
-  //   , {No: 2, order_release_no: "22010423828/C_02_001", itemName: "122 Taper Drill", itemCode: "122TDD3506", itemQuantity: 1, unreleased: 0 }
-  //   , {No: 3, order_release_no: "2201042337/C_02_005", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 1, unreleased: 0 }
-  //   , {No: 4, order_release_no: "2201041332/C_02_004", itemName: "Surgical Guide Template", itemCode: "OGTU02", itemQuantity: 2, unreleased: 0 }
-  //   , {No: 5, order_release_no: "2201043708/C_02_006", itemName: "SB Anchor", itemCode: "SBAC4030TSR", itemQuantity: 5, unreleased: 0 }
-  //   , {No: 6, order_release_no: "2201043708/C_02_006", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 2, unreleased: 0 }
-  //   , {No: 7, order_release_no: "2201041015/C_02_002", itemName: "Cover Cap", itemCode: "SBCC4000", itemQuantity: 3, unreleased: 0 }
-  //   , {No: 8, order_release_no: "2201043708/C_02_006", itemName: "SmartMembrane", itemCode: "SM2W10129SB", itemQuantity: 10, unreleased: 0 }
-  //   , {No: 9, order_release_no: "2201042337/C_02_005", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 9, unreleased: 0 }
-  //   , {No: 10, order_release_no: "2201042337/C_02_004", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 1, unreleased: 0 }
-  //   , {No: 11, order_release_no: "2201044479/E_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
-  //   , {No: 12, order_release_no: "2201043828/C_02_001", itemName: "Membrane LIFTER TUBE", itemCode: "SNMT", itemQuantity: 3, unreleased: 0 }
-  //   , {No: 13, order_release_no: "2201041332/C_02_004", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 1, unreleased: 0 }
-  //   , {No: 14, order_release_no: "2201040991/C_02_003", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 4, unreleased: 0 }
-  //   , {No: 15, order_release_no: "2201043828/C_02_001", itemName: "SS III SA Fixture_NoMount", itemCode: "SS3R4010S18", itemQuantity: 3, unreleased: 0 }
-  //   , {No: 16, order_release_no: "2201040991/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  //   , {No: 17, order_release_no: "2201041015/C_02_002", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 1, unreleased: 0 }
-  //   , {No: 18, order_release_no: "2201044479/E_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 10, unreleased: 0 }
-  //   , {No: 19, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  //   // 
-  //   , {No: 20, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  //   , {No: 21, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  //   , {No: 22, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  //   , {No: 23, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  //   , {No: 24, order_release_no: "2201043828/C_02_001", itemName: "TS III Extra Short CA Fixture", itemCode: "TS3S4006C", itemQuantity: 5, unreleased: 0 }
-  // ];
-
   watch(() => showReceipt.value
   , (newShowReceipt, oldShowReceipt) => {
+    // update용 count변수 초기화.
+    checkedReceiptCount.value = 0;
+    checkedDeliveryCount.value = 0;
     if(newShowReceipt === true) {
-      getReceiptList();
+      getReceiptList().then();
       receiptKey.value++;
     } else {
-      getDeliveryList();
+      getDeliveryList().then();
       receiptKey.value++;
     }
   });
   watch(() => toDo.value
   , (newToDo, oldToDo) => {
-    console.log('toDo watch');
-    console.log('toDo watch - newToDo : ' + newToDo);
+    // update용 count변수 초기화.
+    checkedReceiptCount.value = 0;
+    checkedDeliveryCount.value = 0;
+
     if(showReceipt.value === true) {
       getReceiptList(newToDo, '', Array.from(dateList.value));
-      receiptKey.value++;
+      // receiptKey.value++;
     } else {
       getDeliveryList(newToDo, '', Array.from(dateList.value));
-      receiptKey.value++;
+      // deliveryKey.value++;
     }
   });
   watch(() => clickSearch.value
   , (newClickSearch, oldClickSearch) => {
-    console.log('clickSearch watch');
-    console.log('clickSearch watch - newClickSearch : ' + newClickSearch);
     if(showReceipt.value === true) {
       getReceiptList(toDo.value, '', Array.from(dateList.value));
     } else {
-      console.log('toDo.value : ' + toDo.value);
-      console.log('dateList.value : ' + dateList.value);
       getDeliveryList(toDo.value, '', Array.from(dateList.value));
     }
     clickSearch.value = false;
@@ -649,6 +585,60 @@
   function handleClickSearch() {
     // clickSearch.value = !clickSearch.value;
     clickSearch.value = true;
+  }
+
+  // 수령여부 체크 버튼 클릭시.
+  // function checkReceiptCheckBtn(event, orderItemNo) {
+  function checkReceiptCheckBtn(event, orderItemNo) {
+    console.log('## event.target.parentElement: ', event.target.parentElement);
+    console.log('## event.target.parentNode.parentNode.parentNode.parentNode: ', event.target.parentNode.parentNode.parentNode.parentNode);
+    console.log('## event.target.parentNode.parentNode.parentNode.parentNode.firstChild: ', event.target.parentNode.parentNode.parentNode.parentNode.firstChild);
+    console.log('## event.target.parentNode.parentNode.parentNode.parentNode.querySelector("input"): ', event.target.parentNode.parentNode.parentNode.parentNode.querySelector("input"));
+    console.log('## event.target.parentNode.parentNode.parentNode.parentNode.querySelector("input").value: ', event.target.parentNode.parentNode.parentNode.parentNode.querySelector("input").value);
+    let targetRow = event.target.parentNode.parentNode.parentNode.parentNode;
+    let unreleaedTarget = targetRow.querySelector("input");
+    let targetObject = {
+      orderItemNo: orderItemNo
+      , receiveUnrelease: unreleaedTarget.value
+    };
+    // 수령여부 체크해제.
+    if(event.target.classList.contains('active')) {
+      // 수령여부 체크된 개수 감소.
+      checkedReceiptCount.value--;
+      // 수령객체에서 체그 해제된 객체 삭제.
+      receiptedList.value.pop(targetObject);
+    // 수령여부 체크.
+    } else {
+      // 수령여부 체크된 개수 증가.
+      checkedReceiptCount.value++;
+      // 수령객체에 update할 객체 추가.
+      receiptedList.value.push(targetObject);
+    }
+    // 활성화 클래스 toggle.
+    event.target.classList.toggle('active');
+    console.log('## receiptedList.value : ', receiptedList.value);
+  }
+  // 전달여부 체크 버튼 클릭시.
+  function handleDeliveryCheckBtn(event, orderItemNo) {
+    console.log('handleDeliveryCheckBtn');
+    console.log('handleDeliveryCheckBtn - orderItemNo : ' + orderItemNo);
+    console.log('handleDeliveryCheckBtn - event.target : ', event.target);
+    console.log('handleDeliveryCheckBtn - event.target.classList : ', event.target.classList);
+    if(event.target.classList.contains('active')) {
+      // 전달여부 체크해제.
+      checkedDeliveryCount.value--;
+      // 전달객체에서 해당하는 객체 삭제.
+      deliveredList.value.pop(orderItemNo);
+    } else {
+      // 전달여부 체크.
+      checkedDeliveryCount.value++;
+      // 전달객체에 객체 추가.
+      deliveredList.value.push(orderItemNo);
+    }
+    console.log('handleDeliveryCheckBtn - deliveredList.value : ', deliveredList.value);
+    console.log('handleDeliveryCheckBtn - checkedDeliveryCount.value : ', checkedDeliveryCount.value);
+    // 활성화 클래스 toggle.
+    event.target.classList.toggle('active');
   }
 
 </script>
