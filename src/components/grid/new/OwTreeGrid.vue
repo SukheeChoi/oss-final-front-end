@@ -13,7 +13,7 @@
       </div>
     </template> -->
     <div class="ow-grid-wrap">
-      <ow-flex-grid :initialized="initialize" v-bind="$attrs" :selectionChanged="selectionChanged">
+      <ow-flex-grid :initialized="initialize" v-bind="$attrs" selectionMode="None">
         <slot></slot>
       </ow-flex-grid>
     </div>

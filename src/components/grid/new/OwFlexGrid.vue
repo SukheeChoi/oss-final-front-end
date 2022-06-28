@@ -197,6 +197,7 @@ function setDraggable(s) {
     binding: DraggingColumn.description,
     header: '\u00A0',
     cellTemplate: (ctx) => {
+      console.log("ctxctxctxctxctxctxctxctxctx", ctx)
       return ctx.item
         ? '<button class="wj-btn wj-btn-glyph"><span class="wj-glyph-drag" draggable="true"></span></button>'
         : ctx.text;

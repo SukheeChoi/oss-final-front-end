@@ -55,7 +55,7 @@
           <button class="ow-btn type-util">예정시간수정</button>
           <button class="ow-btn type-util">추가</button>
         </div>
-        <ow-tree-grid :initialized="initialize" :read="read" :childItemsPath="['child', 'childrennn']">
+        <ow-tree-grid :initialized="initialize" :read="read" :query="['name']" :childItemsPath="childItemsPath">
           <!-- childitem 순서대로 입력하기 children(albert)아래 children(anton) -->
           <wj-flex-grid-column header="담당자/업체명" binding="name" :width="100"></wj-flex-grid-column>
           <wj-flex-grid-column header="수령일" binding="receiveHourMinute" :width="100" :is-required="true"></wj-flex-grid-column>
@@ -214,6 +214,7 @@ import { CollectionView } from '@grapecity/wijmo';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
 
 const childItemsPath = ['child', 'childrennn'];
+const treeResponse = ref(null);
 
 const items = [
   {
@@ -262,15 +263,19 @@ const items = [
 ];
 
 console.log(items);
+
+
 const retrieve = (param) => {
   console.log('param', param);
   let filteredItems = _.cloneDeep(items);
+  const totalCount = filteredItems.length;
   console.log('param', filteredItems);
   return Promise.resolve({
     data: filteredItems,
     status: 200,
     code: 'OK',
     message: 'Success',
+    totalCount,
   });
 };
 
@@ -285,14 +290,10 @@ async function read(query, pageNo, pageSize) {
   return result;
 }
 
-async function getTreeList() {
-  const result = await inspectionLabelingApi.getTreeList();
-  console.log("getTreeList()", result.item);
-  return result.item;  
-}
-
 async function getListByEmployeeName() {
   employeeName.value = '이동현';
+  // const searchSelected = '업체명';
+  // const searchContent = '최숙희회사';
   const result = await inspectionLabelingApi.getListByEmployeeName(employeeName.value, searchSelected.value, searchContent.value)
   .then((data) => {
     response.value = data.data;
@@ -301,8 +302,19 @@ async function getListByEmployeeName() {
   });
 }
 
+async function getTreeList() {
+  employeeName.value = '이동현';
+  // const searchSelected = '업체명';
+  // const searchContent = '최숙희회사';
+  const result = await inspectionLabelingApi.getTreeList()
+  .then((data) => {
+    treeResponse.value = data.data;
+    console.log('datadatadatadatadatadatadatadatadatadatadatadatadata', data);
+    console.log(response.value);
+  });
+}
+
 const response = ref(null);
-const treeResponse = ref(null);
 const employeeName = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
@@ -355,14 +367,15 @@ export default {
     const initialize = (s) => {};
 
     getStatus();
-    getTreeList();
     getListByEmployeeName();
-
+    getTreeList();
+    
     return {
       initialize,
       read,
       statusBar,
       response,
+      treeResponse,
       employeeName,
       searchSelected, 
       searchContent,

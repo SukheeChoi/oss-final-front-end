@@ -7,16 +7,31 @@
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">전체 : <strong>{{statusBar.total}}</strong>건</div>
-            <div class="state-item">오스템 : <strong>{{statusBar.osstem}}</strong>건</div>
-            <div class="state-item">협력사합배송 : <strong>{{statusBar.vendorShippingPlus}}</strong>건</div>
-            <div class="state-item">협력사직배송 : <strong>{{statusBar.vendorShippingDir}}</strong>건</div>
-            <div class="state-item" style="color: red">미출고 : <strong class="color-type-1">{{statusBar.unreleased}}</strong>건</div>
+            <div class="state-item">
+              전체 : <strong>{{ statusBar.total }}</strong
+              >건
+            </div>
+            <div class="state-item">
+              오스템 : <strong>{{ statusBar.osstem }}</strong
+              >건
+            </div>
+            <div class="state-item">
+              협력사합배송 : <strong>{{ statusBar.vendorShippingPlus }}</strong
+              >건
+            </div>
+            <div class="state-item">
+              협력사직배송 : <strong>{{ statusBar.vendorShippingDir }}</strong
+              >건
+            </div>
+            <div class="state-item" style="color: red">
+              미출고 : <strong class="color-type-1">{{ statusBar.unreleased }}</strong
+              >건
+            </div>
           </div>
         </div>
       </div>
     </div>
-<hr>
+    <hr />
     <!-- 배열을 이용한 동적 헤더  -->
     <div class="ow-flex-wrap item-size-content" style="--gap: 10px">
       <ow-filter-checkbox
@@ -57,6 +72,7 @@
       class="ow-grid type-header-group"
       :initialized="onInitialized"
       :autoRowHeights="true"
+      formatItem="{formatItem}"
     >
       <wj-flex-grid-column-group header="주문">
         <wj-flex-grid-column-group
@@ -161,7 +177,7 @@
         />
         <wj-flex-grid-column-group
           binding="orderCheckDate"
-          header="주문확인일시"
+          header="주문확인<br>일시"
           :width="100"
           align="center"
           cssClassAll="border-right-sm"
@@ -175,7 +191,7 @@
         />
         <wj-flex-grid-column-group
           binding="releaseScheduleDate"
-          header="출고예정일자"
+          header="출고예정<br>일자"
           :width="100"
           align="center"
           cssClassAll="border-right-sm"
@@ -259,14 +275,19 @@ const dummy = ref(null);
 
 //필터 처리된 데이터 가져오는 함수
 async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent) {
-  const result = await orderApi.getFilterList(company, shippingway, unreleased, searchSelected.value, searchContent.value);
+  const result = await orderApi.getFilterList(
+    company,
+    shippingway,
+    unreleased,
+    searchSelected.value,
+    searchContent.value
+  );
   return result;
 }
 
 //현황 가져오는 함수
 async function getStatus() {
-  const result = await orderApi.getStatus()
-  .then((data) => {
+  const result = await orderApi.getStatus().then((data) => {
     statusBar.total = data.total;
     statusBar.osstem = data.osstem;
     statusBar.vendorShippingPlus = data.vendorShippingPlus;
@@ -280,7 +301,7 @@ export default {
   name: 'Order',
   setup() {
     const state = reactive({
-      flex: undefined,
+      grid: undefined,
     });
 
     const checkboxGroup1 = ref([
@@ -304,16 +325,28 @@ export default {
     const checkboxGroup5 = ref([]);
     const checkboxGroup6 = ref([]);
 
-    const onInitialized = (flex) => {
-      state.flex = flex;
-
+    const onInitialized = (grid) => {
+      state.grid = grid;
+      grid.autoSizeRow(0, true);
       const config = {
         groupingColumns: ['orderDate'],
         mergedColumns: ['orderDate', 'orderNo', 'clientName'],
       };
 
-      flex.mergeManager = new SimpleMergeManager(config);
+      grid.mergeManager = new SimpleMergeManager(config);
+
+      grid.formatItem.addHandler((flex, e) => {
+        if (e.panel == flex.columnHeaders) {
+          e.cell.innerHTML = e.cell.textContent;
+        }
+      });
     };
+
+    function formatItem(s, e) {
+      if (e.panel == s.columnHeaders) {
+        e.cell.innerHTML = e.cell.textContent;
+      }
+    }
 
     //체크된 데이터 감시해서 api요청
     watch(
@@ -348,7 +381,7 @@ export default {
 
     getStatus();
 
-    console.log("responseresponseresponse", response);
+    console.log('responseresponseresponse', response);
     return {
       ...toRefs(state),
       onInitialized,
@@ -356,6 +389,7 @@ export default {
       statusBar,
       searchSelected,
       searchContent,
+      formatItem,
       getSearchList,
       checkboxGroup1,
       checkboxGroup2,
@@ -367,4 +401,11 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style>
+.wj-cell.wj-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: inherit;
+}
+  </style>
