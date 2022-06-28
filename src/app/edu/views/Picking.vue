@@ -198,16 +198,7 @@
   const deliveredList = ref([]);
   const checkedReceiptCount = ref(0);
   const checkedDeliveryCount = ref(0);
-  const receiptedList = ref([
-    // {
-    //   orderItemNo: 1
-    //   , receiveUnrelease: 0
-    // }
-    // , {
-    //   orderItemNo: 2
-    //   , receiveUnrelease: 0
-    // }
-  ]);
+  const receiptedList = ref([]);
 
   //수령 탭
   // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
@@ -226,10 +217,13 @@
   };
   getVendorList(['2022-06-01', '2022-06-28']);
 
-  //담당자 조회. 페이지네이션 고려X. 당일의 전달사항에 대한 모든 담당자를 표시할 것.
-  const getAssigneeList = async (dateList=[]) => {
-    const result = await combineShippingApi.getAssigneeList(dateList)
+  //담당자 조회. 페이지네이션 고려X.
+  // 할 일: 해당기간에 수령완료된 이력의 담당자. -> 사실상 '수령 한 일'의 담당자와 같음.
+  // 한 일: 해당기간에 전달이력의 담당자.
+  const getAssigneeList = async (toDo=1, dateList=[]) => {
+    const result = await combineShippingApi.getAssigneeList(toDo, dateList)
         .then((result) => {
+          console.log('## getAssigneeList result : ', result);
           if(result != null) {
             let dbAssignee = [];
             for(let i=0; i<result.list.length; i++) {
@@ -249,7 +243,7 @@
         });
     // return result;
   };
-  getAssigneeList(['2022-06-01', '2022-06-28']);
+  getAssigneeList(toDo.value, ['2022-06-01', '2022-06-28']);
 
   const retrieve = (param) => {
     console.log('param', param);
@@ -443,6 +437,10 @@
   
   watch(() => showReceipt.value
   , (newShowReceipt, oldShowReceipt) => {
+    // 수령/전달 탭 변경시에 담당업체/담당자 목록 초기화.
+    assigneeList.value = [];
+    vendorList.value = [];
+
     // update용 count변수 초기화.
     checkedReceiptCount.value = 0;
     checkedDeliveryCount.value = 0;
@@ -474,6 +472,7 @@
       getReceiptList(toDo.value, '', Array.from(dateList.value));
     } else {
       getDeliveryList(toDo.value, '', Array.from(dateList.value));
+      getAssigneeList(toDo.value, Array.from(dateList.value));
     }
     clickSearch.value = false;
   });

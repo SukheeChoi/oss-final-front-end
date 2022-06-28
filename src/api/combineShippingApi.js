@@ -31,10 +31,11 @@ async function getReceiptListByDate(dateList) {
 // 선택된 날짜에 해당하는 목록 조회.
 
 // 담당자 띄우기. 이름과 코드 필요.
-async function getAssigneeList(dateList=Array.from([])) {
+async function getAssigneeList(toDo=1, dateList=Array.from([])) {
   let assigneeList = null;
   try {
     let params = new URLSearchParams();
+    params.append('toDo', toDo);
     params.append('dateList', Array.from(dateList));
 ;    const response = await axios.post(`/combineShipping/getAssignee`, params);
     assigneeList = response.data;
