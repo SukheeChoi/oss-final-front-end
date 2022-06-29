@@ -92,7 +92,7 @@
       class="ow-grid type-header-group"
       :items-source="afterPickingList"
       :initialized="onInitialized"
-      :allowMerging="'Cells'"
+      :allowMerging="7"
       style="display: flex"
     >
       <!-- :allowResizing="Row" -->
@@ -127,22 +127,22 @@
           cssClassAll="ta-c border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="picking.pickingQty"
+          binding="picking.pickingQuantity"
           header="피킹수량"
           align="center"
           width="*"
           cssClassAll="ta-c border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="releaseInspectionQuantity"
+          binding="releaseInspection.releaseInspectionQuantity"
           header="검수수량"
           align="center"
           width="*"
           cssClassAll="ta-c border-right-sm"
         />
-        <!-- 합산 필요 -->
+        <!-- 합산 불필요(로직변경) -->
         <wj-flex-grid-column-group
-          binding="packing.unReleased"
+          binding="strAfterPickingUnreleased"
           header="미출고수량"
           align="center"
           width="*"
@@ -181,7 +181,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="employeeName"
+          binding="releaseInspection.employeeName"
           header="담당자"
           align="center"
           width="*"
@@ -189,7 +189,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="releasePrintDate"
+          binding="releaseInspection.releasePrintDate"
           header="출고요청서 출력일시"
           align="center"
           :width="110"
@@ -198,7 +198,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="receiptPrintDate"
+          binding="releaseInspection.receiptPrintDate"
           header="거래명세서 출력일시"
           align="center"
           :width="110"
@@ -207,7 +207,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="releaseInspectionDate"
+          binding="releaseInspection.releaseInspectionDate"
           header="검수일시"
           align="center"
           :width="100"
@@ -215,7 +215,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="boxQuantity"
+          binding="packing.boxQuantity"
           header="Box수량"
           width="*"
           cssClassAll="ta-c"
@@ -474,7 +474,7 @@
   getSummary();
 
   // 리스트 전체 조회.(페이지네이션 필요.)
-  const getAfterPickingList = async (filterList) => {
+  const getAfterPickingList = async () => {
     const result = await afterPickingApi.getAfterPickingList(filterList)
       .then((result) => {
         console.log('getAfterPickingList - JSON.stringify(result) : ' + JSON.stringify(result));
@@ -517,7 +517,7 @@
       });
     // return result;
   };
-  getAfterPickingList(filterList);
+  getAfterPickingList();
 
   const state = reactive({
     flex: undefined,
@@ -593,7 +593,7 @@
         filterList.released = new3[0];
       }
       console.log('watch([checkedGroup1, checkedGroup2, checkedGroup3] : ', filterList);
-      getAfterPickingList(filterList)
+      getAfterPickingList()
         .then(() => {
           // releaseInspection_Packing_Data.value = afterPickingList.value;
         });
@@ -606,7 +606,7 @@
     console.log('newSelectedAssignee : ', newSelectedAssignee);
     filterList.assignee = newSelectedAssignee;
     console.log('watch(() => selectedAssignee.value : ' + filterList);
-    getAfterPickingList(filterList)
+    getAfterPickingList()
       .then(() => {
         // releaseInspection_Packing_Data.value = afterPickingList.value;
     });
@@ -624,7 +624,7 @@
       filterList.vendorName = inputKeyword.value;
     }
     console.log('function search() : ', filterList);
-    getAfterPickingList(filterList)
+    getAfterPickingList()
       .then(() => {
         // releaseInspection_Packing_Data.value = afterPickingList.value;
     });
