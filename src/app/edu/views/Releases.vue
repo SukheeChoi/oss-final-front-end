@@ -64,18 +64,18 @@
 
           <div class="item align-to-right" style="--gap-item: 6px">
             <!-- 출고검수/패킹 담당자 필터링 드롭박스 -->
-            <div style="--width: 90px">
+            <div style="--width: 130px">
               <ow-select :label="dropboxAssigneeLabel" :items="dropboxAssigneeList" v-model="selectedAssignee">
               </ow-select>
             </div>
             <!-- 검색기준 드롭박스 -->
-            <div style="--width: 97px">
+            <div style="--width: 130px">
               <ow-select :label="selectSearchLabel" :items="selectSearchList" v-model="selectedSearchCategory">
               </ow-select>
             </div>
             <!-- 검색바 -->
             <div class="ow-input type-button" style="--width: 200px">
-              <input type="text" v-model="inputKeyword" placeholder="검색어를 입력하세요." />
+              <input type="text" v-model="inputKeyword" placeholder="입력" />
               <input type="submit" class="btn-search" @click="search" />
             </div>
           </div>
@@ -92,7 +92,7 @@
       class="ow-grid type-header-group"
       :items-source="afterPickingList"
       :initialized="onInitialized"
-      :allowMerging="'Cells'"
+      :allowMerging="7"
       style="display: flex"
     >
       <!-- :allowResizing="Row" -->
@@ -127,22 +127,22 @@
           cssClassAll="ta-c border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="picking.pickingQty"
+          binding="picking.pickingQuantity"
           header="피킹수량"
           align="center"
           width="*"
           cssClassAll="ta-c border-right-sm"
         />
         <wj-flex-grid-column-group
-          binding="releaseInspectionQuantity"
+          binding="releaseInspection.releaseInspectionQuantity"
           header="검수수량"
           align="center"
           width="*"
           cssClassAll="ta-c border-right-sm"
         />
-        <!-- 합산 필요 -->
+        <!-- 합산 불필요(로직변경) -->
         <wj-flex-grid-column-group
-          binding="packing.unReleased"
+          binding="strAfterPickingUnreleased"
           header="미출고수량"
           align="center"
           width="*"
@@ -181,7 +181,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="employeeName"
+          binding="releaseInspection.employeeName"
           header="담당자"
           align="center"
           width="*"
@@ -189,7 +189,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="releasePrintDate"
+          binding="releaseInspection.releasePrintDate"
           header="출고요청서 출력일시"
           align="center"
           :width="110"
@@ -198,7 +198,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="receiptPrintDate"
+          binding="releaseInspection.receiptPrintDate"
           header="거래명세서 출력일시"
           align="center"
           :width="110"
@@ -207,7 +207,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="releaseInspectionDate"
+          binding="releaseInspection.releaseInspectionDate"
           header="검수일시"
           align="center"
           :width="100"
@@ -215,129 +215,13 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="boxQuantity"
+          binding="strBoxQuantity"
           header="Box수량"
           width="*"
-          cssClassAll="ta-c"
+          cssClassAll="ta-c border-right-sm"
           :allowMerging="true"
         />
       </wj-flex-grid-column-group>
-      <!-- <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm">
-        <wj-flex-grid-column-group
-          binding="releaseNo"
-          header="출고번호"
-          align="center"
-          :width="85"
-          cssClassAll="ta-c border-right-sm"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group binding="itemName" header="품목명" align="center" cssClassAll="ta-c border-right-sm">
-          <wj-flex-grid-cell-template cellType="Cell" v-slot="cell" align="left">
-            <span align="left" style="justify-content: flex-start"> {{ cell.item['itemName'] || '-' }} </span><br />
-          </wj-flex-grid-cell-template>
-        </wj-flex-grid-column-group>
-        <wj-flex-grid-column-group
-          binding="itemCode"
-          header="품목코드"
-          align="center"
-          :width="110"
-          cssClassAll="ta-c border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="pickingQty"
-          header="피킹수량"
-          align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="inspectionQty"
-          header="검수수량"
-          align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="packingUnrelease"
-          header="미출고수량"
-          align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="orderClient"
-          header="거래처"
-          align="center"
-          :width="100"
-          cssClassAll="ta-c border-right-sm"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group
-          binding="shippingDest"
-          header="배송지"
-          align="center"
-          :width="100"
-          cssClassAll="ta-c border-right-sm"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group
-          binding="shippingCat"
-          header="배송구분"
-          align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group
-          binding="shippingWay"
-          header="배송방식"
-          align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group
-          binding="packingPersonincharge"
-          header="담당자"
-          align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group
-          binding="releasePrintDate"
-          header="출고요청서 출력일시"
-          align="center"
-          :width="110"
-          cssClassAll="ta-c border-right-sm"
-          multiLine="true"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group
-          binding="receiptPrintDate"
-          header="거래명세서 출력일시"
-          align="center"
-          :width="110"
-          cssClassAll="ta-c border-right-sm"
-          multiLine="true"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group
-          binding="inspectionDate"
-          header="검수일시"
-          align="center"
-          :width="100"
-          cssClassAll="ta-c border-right-sm"
-          :allowMerging="true"
-        />
-        <wj-flex-grid-column-group
-          binding="boxQty"
-          header="Box수량"
-          width="*"
-          cssClassAll="ta-c"
-          :allowMerging="true"
-        />
-      </wj-flex-grid-column-group> -->
       <!-- 출고 탭 -->
       <wj-flex-grid-column-group header="출고" align="center">
         <wj-flex-grid-column-group
@@ -433,8 +317,7 @@
   });
   const summaryList = reactive({
     status: {
-      progressOrderNo: '100'
-      // progressOrderNo: null
+      progressOrderNo: null
       , pickingDirectionNo: null
       , releaseInspectionNo: null
     }
@@ -459,22 +342,12 @@
         summaryList.delivery.unreleasedNo = result.summaryMap.unreleasedNo;
         summaryList.delivery.expressShippingNo = result.summaryMap.expressShippingNo;
         summaryList.delivery.normalShippingNo = result.summaryMap.normalShippingNo;
-
-        console.log('summaryList.status.progressOrderNo : ' + summaryList.status.progressOrderNo);
-        console.log('summaryList.status.pickingDirectionNo : ' + summaryList.status.pickingDirectionNo);
-        console.log('result.summaryMap.unreleasedNo : ' + result.summaryMap.unreleasedNo);
-        console.log('result.summaryMap : ' + result.summaryMap);
-        console.log('result.summaryMap.expressShippingNo : ' + result.summaryMap.expressShippingNo);
-        console.log('result.summaryMap.normalShippingNo : ' + result.summaryMap.normalShippingNo);
-        console.log('result.summaryMap.progressOrderNo : ' + result.summaryMap.progressOrderNo);
-        console.log('result.summaryMap.pickingDirectionNo : ' + result.summaryMap.pickingDirectionNo);
-        console.log('result.summaryMap.releaseInspectionNo : ' + result.summaryMap.releaseInspectionNo);
     });
   };
   getSummary();
 
   // 리스트 전체 조회.(페이지네이션 필요.)
-  const getAfterPickingList = async (filterList) => {
+  const getAfterPickingList = async () => {
     const result = await afterPickingApi.getAfterPickingList(filterList)
       .then((result) => {
         console.log('getAfterPickingList - JSON.stringify(result) : ' + JSON.stringify(result));
@@ -517,7 +390,7 @@
       });
     // return result;
   };
-  getAfterPickingList(filterList);
+  getAfterPickingList();
 
   const state = reactive({
     flex: undefined,
@@ -593,7 +466,7 @@
         filterList.released = new3[0];
       }
       console.log('watch([checkedGroup1, checkedGroup2, checkedGroup3] : ', filterList);
-      getAfterPickingList(filterList)
+      getAfterPickingList()
         .then(() => {
           // releaseInspection_Packing_Data.value = afterPickingList.value;
         });
@@ -606,7 +479,7 @@
     console.log('newSelectedAssignee : ', newSelectedAssignee);
     filterList.assignee = newSelectedAssignee;
     console.log('watch(() => selectedAssignee.value : ' + filterList);
-    getAfterPickingList(filterList)
+    getAfterPickingList()
       .then(() => {
         // releaseInspection_Packing_Data.value = afterPickingList.value;
     });
@@ -624,7 +497,7 @@
       filterList.vendorName = inputKeyword.value;
     }
     console.log('function search() : ', filterList);
-    getAfterPickingList(filterList)
+    getAfterPickingList()
       .then(() => {
         // releaseInspection_Packing_Data.value = afterPickingList.value;
     });
