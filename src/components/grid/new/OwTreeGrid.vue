@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- <template v-if="isNotBlank">
-      <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
+    <template v-if="isNotBlank">
+      <!-- <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
         <slot name="left">
           <h1 class="h1">그리드</h1>
         </slot>
@@ -10,9 +10,9 @@
             <button type="button" class="ow-btn type-state" v-if="insert" @click="addNew">추가</button>
           </template>
         </slot>
-      </div>
-    </template> -->
-    <div class="ow-grid-wrap">
+      </div> -->
+    </template>
+    <div class="ow-grid-wrap mt-8 mb-8">
       <ow-flex-grid :initialized="initialize" v-bind="$attrs">
         <slot></slot>
       </ow-flex-grid>
@@ -100,7 +100,7 @@ export default {
     remove: Function,
     editable: Boolean,
     editorSize: { type: String, default: 'L' },
-    childItemsPath: { type: String, default: DEFULT_CHILD_ITEM_PATH },
+    childItemsPath: { type: Array, default: DEFULT_CHILD_ITEM_PATH },
   },
   setup(props) {
     const header = ref();
@@ -127,7 +127,6 @@ export default {
     const setPage = (c) => {
       const { grid: s, totalItemCount } = c;
       state.totalCount = totalItemCount;
-      //셀이 접히는 단계를 설정함(0이면 다 접힌 상태, 1이면 하나만 펼쳐진 상태)
       s.collapseGroupsToLevel(1);
     };
 
