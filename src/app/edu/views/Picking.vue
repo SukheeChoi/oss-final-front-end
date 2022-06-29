@@ -9,7 +9,8 @@
       <!-- 수령 대상 업체 필터링 -->
       <div v-if="showReceipt && vendorList!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 370px;">
-          <ow-filter-radio :items="vendorList" :step="5" :modelValue="checkedVendor" @update:modelValue="updateVendor"/>
+          <ow-filter-radio :items="vendorList" :step="5" />
+          <!-- <ow-filter-radio :items="vendorList" :step="5" :modelValue="checkedVendor" @update:modelValue="updateVendor"/> -->
         </div>
       </div>
 
@@ -580,7 +581,7 @@
     if(event.target.classList.contains('active')) {
       // 수령여부 체크된 개수 감소.
       checkedReceiptCount.value--;
-      // 수령객체에서 체그 해제된 객체 삭제.
+      // 수령객체에서 체크 해제된 객체 삭제.
       receiptedList.value.pop(targetObject);
     // 수령여부 체크.
     } else {
