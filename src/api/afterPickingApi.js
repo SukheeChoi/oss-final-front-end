@@ -14,6 +14,27 @@ async function getSummary() {
   return summaryList;
 }
 
+// 출고검수/패킹담당자 필터링용 드롭박스에 바인딩할 객체 조회.
+async function getAssigneeList(filterList) {
+  let assigneeList = null;
+  try {
+    let params = new URLSearchParams();
+    params.append('shippingCategory', filterList.shippingCategory);
+    params.append('shippingWay', filterList.shippingWay);
+    params.append('released', filterList.released);
+    params.append('orderNo', filterList.orderNo);
+    params.append('clientName', filterList.clientName);
+    params.append('shippingDestination', filterList.shippingDestination);
+    params.append('vendorName', filterList.vendorName);
+    const response = await axios.post(`/afterPicking/assigneeList`, params);
+    assigneeList = response.data;
+    console.log('assigneeList : ', assigneeList);
+  } catch(error) {
+    console.log(error);
+  }
+  return assigneeList;
+}
+
 // 조회.
 // params:
   // mainCategory(int): 1(배송구분-String), 2(배송방식-String), 3(미출고-String), 4(출고검수/패킹담당자), 5(주문번호/거래처/배송지/업체명)
@@ -54,5 +75,6 @@ async function getAfterPickingList(filterList) {
 
 export default {
   getSummary
+  , getAssigneeList
   , getAfterPickingList
 };

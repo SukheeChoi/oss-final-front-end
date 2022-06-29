@@ -92,7 +92,7 @@
       class="ow-grid type-header-group"
       :items-source="afterPickingList"
       :initialized="onInitialized"
-      :allowMerging="7"
+      :allowMerging="Cells"
       style="display: flex"
     >
       <!-- :allowResizing="Row" -->
@@ -265,8 +265,17 @@
   import afterPickingApi from '@/api/afterPickingApi.js';
   // 셀 병합 기준 조절 위함.
   import { SimpleMergeManager } from '@/utils/wijmo.grid';
-  import { ref, reactive, toRefs, watch } from 'vue';
+  import { ref, reactive, watch } from 'vue';
 
+  const dropboxAssigneeLabel = '출고검수/패킹담당자';
+  //출고검수/패킹 담당자 필터링 드롭박스 바인딩 객체.
+  const dropboxAssigneeList = ref([
+    { name: '전체', value: '' }
+    , { name: '최숙희', value: '최숙희' }
+    , { name: '이동현', value: '이동현' }
+    , { name: '김예원', value: '김예원' }
+    , { name: '신현주', value: '신현주' }
+  ]);
   // 선택된 출고검수/패킹담당자
   const selectedAssignee = ref(null);
   // 선택된 검색기준
@@ -313,6 +322,30 @@
   };
   getSummary();
 
+  // 출고검수/패킹담당자 필터링용 드롭박스에 바인딩할 객체 조회.
+  async function getAssigneeList() {
+    const result = await afterPickingApi.getAssigneeList(filterList)
+      .then((result) => {
+        let dbAssigneeList = [];
+        dbAssigneeList.push(
+          {
+            name: '전체'
+            , value: ''
+          }
+        );
+        for(let i=0; i<result.list.length; i++){
+          dbAssigneeList.push(
+            {
+              name: result.list[i]
+              , value: result.list[i]
+            }
+          );
+        }
+        dropboxAssigneeList.value = dbAssigneeList;
+    });
+  };
+  getAssigneeList();
+
   // 리스트 전체 조회.(페이지네이션 필요.)
   const getAfterPickingList = async () => {
     const result = await afterPickingApi.getAfterPickingList(filterList)
@@ -339,14 +372,7 @@
   };
 
   //
-  const dropboxAssigneeLabel = '출고검수/패킹담당자';
-  const dropboxAssigneeList = [
-    { name: '전체', value: '' }
-    , { name: '최숙희', value: '최숙희' }
-    , { name: '이동현', value: '이동현' }
-    , { name: '김예원', value: '김예원' }
-    , { name: '신현주', value: '신현주' }
-  ];
+  
   const selectSearchLabel = '검색';
   const selectSearchList = [
     { name: '주문번호', value: '주문번호' }
@@ -411,10 +437,7 @@
     console.log('newSelectedAssignee : ', newSelectedAssignee);
     filterList.assignee = newSelectedAssignee;
     console.log('watch(() => selectedAssignee.value : ' + filterList);
-    getAfterPickingList()
-      .then(() => {
-        // releaseInspection_Packing_Data.value = afterPickingList.value;
-    });
+    getAfterPickingList();
   });
 
   // 필터링 키워드를 입력해서 조회한 경우.
@@ -429,10 +452,7 @@
       filterList.vendorName = inputKeyword.value;
     }
     console.log('function search() : ', filterList);
-    getAfterPickingList()
-      .then(() => {
-        // releaseInspection_Packing_Data.value = afterPickingList.value;
-    });
+    getAfterPickingList();
   }
 
 </script>
