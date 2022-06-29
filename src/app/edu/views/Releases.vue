@@ -269,17 +269,11 @@
 
   const dropboxAssigneeLabel = '출고검수/패킹담당자';
   //출고검수/패킹 담당자 필터링 드롭박스 바인딩 객체.
-  const dropboxAssigneeList = ref([
-    { name: '전체', value: '' }
-    , { name: '최숙희', value: '최숙희' }
-    , { name: '이동현', value: '이동현' }
-    , { name: '김예원', value: '김예원' }
-    , { name: '신현주', value: '신현주' }
-  ]);
+  const dropboxAssigneeList = ref([]);
   // 선택된 출고검수/패킹담당자
   const selectedAssignee = ref(null);
   // 선택된 검색기준
-  const selectedSearchCategory = ref(null);
+  const selectedSearchCategory = ref('주문번호');
   // 검색 키워드
   const inputKeyword = ref(null);
 
@@ -326,22 +320,26 @@
   async function getAssigneeList() {
     const result = await afterPickingApi.getAssigneeList(filterList)
       .then((result) => {
-        let dbAssigneeList = [];
-        dbAssigneeList.push(
-          {
-            name: '전체'
-            , value: ''
-          }
-        );
-        for(let i=0; i<result.list.length; i++){
+        if(result.list != null) {
+          let dbAssigneeList = [];
           dbAssigneeList.push(
             {
-              name: result.list[i]
-              , value: result.list[i]
+              name: '전체'
+              , value: ''
             }
           );
+          for(let i=0; i<result.list.length; i++){
+            dbAssigneeList.push(
+              {
+                name: result.list[i]
+                , value: result.list[i]
+              }
+            );
+          }
+          dropboxAssigneeList.value = dbAssigneeList;
+        } else {
+          dropboxAssigneeList.value = [];
         }
-        dropboxAssigneeList.value = dbAssigneeList;
     });
   };
   getAssigneeList();
@@ -350,10 +348,18 @@
   const getAfterPickingList = async () => {
     const result = await afterPickingApi.getAfterPickingList(filterList)
       .then((result) => {
-        afterPickingList.value = result.list;
-        console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
+        if(result != null && result.list != null) {
+          afterPickingList.value = result.list;
+          console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
+          // 리스트를 조회할 때 마다, 조회되는 리스트에 맞는 출고검수/패킹 담당자 목록을 조회해서 동적으로 드롭박스에 할당.
+          getAssigneeList(filterList);
+        } else {
+          // 조회된 목록이 없는 경우:
+          // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
+          afterPickingList.value = [];
+          dropboxAssigneeList.value = [];
+        }
       });
-    // return result;
   };
   getAfterPickingList();
 
@@ -370,8 +376,6 @@
 
     flex.mergeManager = new SimpleMergeManager(config);
   };
-
-  //
   
   const selectSearchLabel = '검색';
   const selectSearchList = [
@@ -400,11 +404,6 @@
   // 체크된 값을 기준으로 필터링한 데이터를 받아오는 API요청.
   watch([checkedGroup1, checkedGroup2, checkedGroup3]
     , ([new1, new2, new3], [old1, old2, old3]) => {
-      console.log('new1 : ', new1);
-      console.log('new2 : ', new2);
-      console.log('new3 : ', new3);
-      console.log('new1.length : ', new1.length);
-      console.log('new1[0] : ', new1[0]);
       // '배송구분' 체크박스의 체크된 값을 필터링용 반응형 객체에 대입.
       if(new1.length == 2) {
         filterList.shippingCategory = '전체';
@@ -424,10 +423,7 @@
         filterList.released = new3[0];
       }
       console.log('watch([checkedGroup1, checkedGroup2, checkedGroup3] : ', filterList);
-      getAfterPickingList()
-        .then(() => {
-          // releaseInspection_Packing_Data.value = afterPickingList.value;
-        });
+      getAfterPickingList();
     }
     , {deep:true}
   );
@@ -442,16 +438,30 @@
 
   // 필터링 키워드를 입력해서 조회한 경우.
   function search() {
+    console.log('## selectedSearchCategory.value : ', selectedSearchCategory.value);
+    console.log('## inputKeyword.value : ', inputKeyword.value);
     if(selectedSearchCategory.value === '주문번호') {
-      filterList.orderNo = inputKeyword.value;
+      filterList.orderNo = inputKeyword.value
+      filterList.clientName = ''
+      filterList.shippingDestination = ''
+      filterList.vendorName = ''
     } else if(selectedSearchCategory.value === '거래처') {
-      filterList.clientName = inputKeyword.value;
+      filterList.orderNo = -1
+      filterList.clientName = inputKeyword.value
+      filterList.shippingDestination = ''
+      filterList.vendorName = ''
     } else if(selectedSearchCategory.value === '배송지') {
-      filterList.shippingDestination = inputKeyword.value;
+      filterList.orderNo = -1
+      filterList.clientName = ''
+      filterList.shippingDestination = inputKeyword.value
+      filterList.vendorName = ''
     } else if(selectedSearchCategory.value === '업체명') {
-      filterList.vendorName = inputKeyword.value;
+      filterList.orderNo = -1
+      filterList.clientName = ''
+      filterList.shippingDestination = ''
+      filterList.vendorName = inputKeyword.value
     }
-    console.log('function search() : ', filterList);
+    console.log('## function search() : ', filterList);
     getAfterPickingList();
   }
 
