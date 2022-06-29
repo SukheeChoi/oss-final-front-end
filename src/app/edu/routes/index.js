@@ -9,60 +9,65 @@ export default [
       left: {
         show: false,
       },
-      children:[
-          // Test (2depth)
-          {
-              path: 'Main',
-              name: 'DISTSub',
-              redirect: '/edu/Order'
-          },
-          // detail ( 3depth)
-          {
-              path: 'Order',
-              name: 'DISTSub1',
-              component: () => import('@@/edu/views/Order')
-          },
-          {
-            path: 'ReleaseInspection',
-            name: 'DISTSub2',
-            component: () => import('@@/edu/views/ReleaseInspection')
-        },
-        {
-            path: 'Releases',
-            name: 'DISTSub3',
-            component: () => import('@@/edu/views/Releases')
-        },
-        {
-            path: 'Picking',
-            name: 'DISTSub4',
-            component: () => import('@@/edu/views/Picking')
-        },
-        {
-            path: 'CustomerReceipt',
-            name: 'DISTSub5',
-            component: () => import('@@/edu/views/CustomerReceipt')
-        },
-        {
-            path: 'InspectionLabeling',
-            name: 'DISTSub6',
-            component: () => import('@@/edu/views/InspectionLabeling')
-        },
-        {
-            path: 'test',
-            name: 'test',
-            component: () => import('@@/edu/views/Test')
-        },
-        {
-            path: 'test1',
-            name: 'test1',
-            component: () => import('@@/edu/views/Test1')
-        },
-        {
-            path: 'test2',
-            name: 'test2',
-            component: () => import('@@/edu/views/Test2')
-        },
-      ]
-  }
-}
+    },
+    children: [
+      // Test (2depth)
+      {
+        path: 'Main',
+        name: 'DISTSub',
+        redirect: '/edu/Order',
+      },
+      // detail ( 3depth)
+      {
+        path: 'CustomerReceipt',
+        name: 'DISTSub1',
+        component: () => import('@@/edu/views/CustomerReceipt'),
+      },
+      {
+        path: 'Order',
+        name: 'DISTSub2',
+        component: () => import('@@/edu/views/Order'),
+      },
+      {
+        path: 'ReleaseInspection',
+        name: 'DISTSub3',
+        component: () => import('@@/edu/views/ReleaseInspection'),
+      },
+      {
+        path: 'Releases',
+        name: 'DISTSub4',
+        component: () => import('@@/edu/views/Releases'),
+      },
+      {
+        path: 'Picking',
+        name: 'DISTSub5',
+        component: () => import('@@/edu/views/Picking'),
+      },
+      {
+        path: 'InspectionLabelling',
+        name: 'DISTSub6',
+        component: () => import('@@/edu/views/InspectionLabeling'),
+      },
+      {
+        path: 'test',
+        name: 'test',
+        component: () => import('@@/edu/views/Test'),
+      },
+      {
+        path: 'test1',
+        name: 'test1',
+        component: () => import('@@/edu/views/Test1'),
+      },
+      {
+        path: 'test2',
+        name: 'test2',
+        component: () => import('@@/edu/views/Test2'),
+      },
+      {
+        path: 'test3',
+        name: 'test3',
+        component: () => import('@@/edu/views/Test3'),
+      },
+    ],
+  },
 ];

@@ -8,19 +8,24 @@
         <div class="item">
           <div class="state">
             <div class="state-item">
-              전체 : <strong>{{ statusBar.total }}</strong>건
+              전체 : <strong>{{ statusBar.total }}</strong
+              >건
             </div>
             <div class="state-item">
-              오스템 : <strong>{{ statusBar.osstem }}</strong>건
+              오스템 : <strong>{{ statusBar.osstem }}</strong
+              >건
             </div>
             <div class="state-item">
-              협력사합배송 : <strong>{{ statusBar.vendorShippingPlus }}</strong>건
+              협력사합배송 : <strong>{{ statusBar.vendorShippingPlus }}</strong
+              >건
             </div>
             <div class="state-item">
-              협력사직배송 : <strong>{{ statusBar.vendorShippingDir }}</strong>건
+              협력사직배송 : <strong>{{ statusBar.vendorShippingDir }}</strong
+              >건
             </div>
             <div class="state-item" style="color: red">
-              미출고 : <strong class="color-type-1">{{ statusBar.unreleased }}</strong>건
+              미출고 : <strong class="color-type-1">{{ statusBar.unreleased }}</strong
+              >건
             </div>
           </div>
         </div>
@@ -59,15 +64,16 @@
 
   <!-- 그리드 부분 -->
   <div class="ow-grid-wrap">
-    <wj-flex-grid
+    <ow-grid
       headersVisibility="Column"
       :allowMerging="'Cells'"
       selectionMode="None"
-      :itemsSource="response"
+      :read="read"
       class="ow-grid type-header-group"
       :initialized="onInitialized"
       :autoRowHeights="true"
     >
+      <template #left>&nbsp;</template>
       <wj-flex-grid-column-group header="주문">
         <wj-flex-grid-column-group
           binding="orderDate"
@@ -137,7 +143,7 @@
         <wj-flex-grid-column-group binding="transferEmployee" header="담당자" :width="50" align="center" />
         <wj-flex-grid-column-group binding="transferDate" header="인계일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
-    </wj-flex-grid>
+    </ow-grid>
   </div>
 </template>
 
@@ -145,43 +151,6 @@
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import orderApi from '@/api/orderApi';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-
-const response = ref(null);
-const statusBar = reactive({
-  total: null,
-  osstem: null,
-  vendorShippingPlus: null,
-  vendorShippingDir: null,
-  unreleased: null,
-});
-const searchSelected = ref(null);
-const searchContent = ref(null);
-const searchContent2 = ref(null);
-const dummy = ref(null);
-
-//필터 처리된 데이터 가져오는 함수
-async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent) {
-  const result = await orderApi.getFilterList(
-    company,
-    shippingway,
-    unreleased,
-    searchSelected.value,
-    searchContent.value
-  );
-  return result;
-}
-
-//현황 가져오는 함수
-async function getStatus() {
-  const result = await orderApi.getStatus().then((data) => {
-    statusBar.total = data.total;
-    statusBar.osstem = data.osstem;
-    statusBar.vendorShippingPlus = data.vendorShippingPlus;
-    statusBar.vendorShippingDir = data.vendorShippingDir;
-    statusBar.unreleased = data.unreleased;
-    console.log(data);
-  });
-}
 
 export default {
   name: 'Order',
@@ -207,9 +176,63 @@ export default {
       { name: '미출고', value: 'unreleased' },
     ]);
 
-    const checkboxGroup4 = ref([]);
-    const checkboxGroup5 = ref([]);
-    const checkboxGroup6 = ref([]);
+    const checkboxGroup4 = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
+    const checkboxGroup5 = ref(['emergency', 'normal']);
+    const checkboxGroup6 = ref(['released', 'unreleased']);
+
+    const response = ref(null);
+    const statusBar = reactive({
+      total: null,
+      osstem: null,
+      vendorShippingPlus: null,
+      vendorShippingDir: null,
+      unreleased: null,
+    });
+    const searchSelected = ref(null);
+    const searchContent = ref(null);
+    const searchContent2 = ref(null);
+    const dummy = ref(null);
+
+    //필터 처리된 데이터 가져오는 함수
+
+    //현황 가져오는 함수
+    async function getStatus() {
+      const result = await orderApi.getStatus().then((data) => {
+        statusBar.total = data.total;
+        statusBar.osstem = data.osstem;
+        statusBar.vendorShippingPlus = data.vendorShippingPlus;
+        statusBar.vendorShippingDir = data.vendorShippingDir;
+        statusBar.unreleased = data.unreleased;
+        console.log(data);
+      });
+    }
+
+    //그리드에 바인딩 하는 함수
+    async function read(query, pageNo, pageSize) {
+      console.log(query, pageNo, pageSize, checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value);
+
+      const lee = await getFilterList();
+
+      const result = {
+        totalCount: 100,
+        data: lee,
+      };
+
+      console.log('resultresultresultresultresultresultresultresultresultresultresultresultresultresult', result);
+      return result;
+    }
+
+    async function getFilterList() {
+      const result = await orderApi.getFilterList(
+        checkboxGroup4.value,
+        checkboxGroup5.value,
+        checkboxGroup6.value,
+        searchSelected.value,
+        searchContent.value
+      );
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', result);
+      return result;
+    }
 
     const onInitialized = (grid) => {
       state.grid = grid;
@@ -228,67 +251,16 @@ export default {
       });
     };
 
-    function formatItem(s, e) {
-      if (e.panel == s.columnHeaders) {
-        e.cell.innerHTML = e.cell.textContent;
-      }
-    }
-
     //체크된 데이터 감시해서 api요청
     watch(
       () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
       (newGroup, oldGroup) => {
-        console.log('newGroup.length : ' + newGroup.length);
-        console.log('typeof(newGroup[0]) : ' + typeof(newGroup[0]));
-        const list = newGroup.map((data) => {
-          return data.value;
-        });
+        const query = null;
+        const pageNo = null;
+        const pageSize = null;
 
-        console.log('checkboxGroup4checkboxGroup4', checkboxGroup4);
+        read();
 
-        const company = list[0].map((data) => {
-          return data;
-        });
-        const shippingway = list[1].map((data) => {
-          return data;
-        });
-        const unreleased = list[2].map((data) => {
-          return data;
-        });
-        console.log('oldGroupoldGroupoldGroupoldGroupoldGroup', oldGroup);
-        console.log('newGroupnewGroupnewGroupnewGroup', newGroup);
-        getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((result) => {
-          console.log(result.data.list);
-          //하이픈 처리
-          result.data.list.map((i) => {
-            //오스템 제품 & 오스템 상품 (협력사 => 하이픈 처리)
-            if(i.vendorName === "오스템제품" || i.vendorName === "오스템상품") {
-              i.orderCheckDate = "-"
-              i.releaseQuantity = "-"
-              i.releaseScheduleDate = "-"
-              i.recieveDate = "-"
-            }
-
-            //협력사 상품 합배송 & 직배송 (피킹 => 하이픈 처리)
-            if(i.vendorName !== "오스템제품" && i.vendorName !== "오스템상품") {
-              i.pickingDate = "-"
-              i.pickingEmployee = "-"
-              i.pickingQuantity = "-"
-              i.pickingUnrelease = "-"
-            }
-
-            //협력사 상품 직배송 (출고검수/패킹, 출고, 인계 => 하이픈 처리)
-            if(i.vendorName !== "오스템제품" && i.vendorName !== "오스템상품" && i.orderShippingWay === "직배송") {
-              i.packingInspectionEmployee = "-"
-              i.inspectionDate = "-"
-              i.releaseEmployee = "-"
-              i.releaseDate = "-"
-              i.transferEmployee = "-"
-              i.transferDate = "-"
-            }
-          });
-          response.value = result.data.list;
-        });
         dummy.value = false;
       },
       { deep: true }
@@ -306,9 +278,9 @@ export default {
       onInitialized,
       response,
       statusBar,
+      read,
       searchSelected,
       searchContent,
-      formatItem,
       getSearchList,
       checkboxGroup1,
       checkboxGroup2,
@@ -316,7 +288,6 @@ export default {
       checkboxGroup4,
       checkboxGroup5,
       checkboxGroup6,
-      summary
     };
   },
 };

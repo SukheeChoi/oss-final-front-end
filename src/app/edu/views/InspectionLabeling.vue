@@ -261,20 +261,22 @@
 
 <script>
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
-import WjFlexGrid from '@grapecity/wijmo.vue2.grid';
-import { CollectionView } from '@grapecity/wijmo';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
-import { selectionMode } from '@grapecity/wijmo.grid';
+
 const childItemsPath = ['child', 'childrennn'];
 
 async function read(query, pageNo, pageSize) {
   const treeList = await inspectionLabelingApi.getTreeList();
+  console.log(treeList);
   console.log('queryqueryqueryquery', query);
   console.log('result', result);
+
   const result = {
     totalCount: 1,
     data: treeList,
   };
+  
+  console.log('result', result);
   return result;
 }
 
