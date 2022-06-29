@@ -118,10 +118,10 @@
         <wj-flex-grid-column-group binding="pickingDirectionUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="피킹">
-        <wj-flex-grid-column-group binding="count3-1" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="count3-2" header="피킹수량" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="count3-3" header="피킹일시" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="count3-4" header="미출고" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingQuantity" header="피킹수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingDate" header="피킹일시" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="협력사">
         <wj-flex-grid-column-group binding="orderShippingWay" header="배송방식" :width="60" align="center" />
@@ -131,16 +131,16 @@
         <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="100" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고검수/패킹">
-        <wj-flex-grid-column-group binding="count4-1" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="count4-2" header="검수일시" :width="70" align="center" />
+        <wj-flex-grid-column-group binding="packingInspectionEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="inspectionDate" header="검수일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고">
-        <wj-flex-grid-column-group binding="count5-1" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="count5-2" header="출고일시" :width="70" align="center" />
+        <wj-flex-grid-column-group binding="releaseEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="releaseDate" header="출고일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="인계">
-        <wj-flex-grid-column-group binding="count6-1" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="count6-2" header="인계일시" :width="70" align="center" />
+        <wj-flex-grid-column-group binding="transferEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="transferDate" header="인계일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
     </wj-flex-grid>
   </div>
@@ -259,8 +259,38 @@ export default {
         });
         console.log('oldGroupoldGroupoldGroupoldGroupoldGroup', oldGroup);
         console.log('newGroupnewGroupnewGroupnewGroup', newGroup);
-        getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
-          response.value = data.data.list;
+        
+        getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((result) => {
+          console.log(result.data.list);
+          //하이픈 처리
+          result.data.list.map((i) => {
+            //오스템 제품 & 오스템 상품 (협력사 => 하이픈 처리)
+            if(i.vendorName === "오스템제품" || i.vendorName === "오스템상품") {
+              i.orderCheckDate = "-"
+              i.releaseQuantity = "-"
+              i.releaseScheduleDate = "-"
+              i.recieveDate = "-"
+            }
+
+            //협력사 상품 합배송 & 직배송 (피킹 => 하이픈 처리)
+            if(i.vendorName !== "오스템제품" && i.vendorName !== "오스템상품") {
+              i.pickingDate = "-"
+              i.pickingEmployee = "-"
+              i.pickingQuantity = "-"
+              i.pickingUnrelease = "-"
+            }
+
+            //협력사 상품 직배송 (출고검수/패킹, 출고, 인계 => 하이픈 처리)
+            if(i.vendorName !== "오스템제품" && i.vendorName !== "오스템상품" && i.orderShippingWay === "직배송") {
+              i.packingInspectionEmployee = "-"
+              i.inspectionDate = "-"
+              i.releaseEmployee = "-"
+              i.releaseDate = "-"
+              i.transferEmployee = "-"
+              i.transferDate = "-"
+            }
+          });
+          response.value = result.data.list;
         });
         dummy.value = false;
       },

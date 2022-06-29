@@ -60,7 +60,6 @@
           selectionMode="None"
           :childItemsPath="['child', 'childrennn']"
           :initialized="treeInitialized"
-          :selectionChanged="selectLee"
         >
           <!-- childitem 순서대로 입력하기 children(albert)아래 children(anton) -->
           <wj-flex-grid-column
@@ -124,7 +123,7 @@
         </ow-tree-grid>
       </div>
       <!-- 오른쪽 화면 -->
-      <div class="right">
+      <div class="right flex-fill">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <div class="item align-to-right" style="--gap-item: 6px">
             <div class="title-field">검색</div>
@@ -145,11 +144,13 @@
         </div>
         <div class="ow-panel">
           <div class="ow-panel-header">
-            <div class="ow-panel-title">■[이가을]검품검수 및 라벨링 내역</div>
+            <div class="ow-panel-title">■<span v-if="employeeName">[{{employeeName}}]</span>검품검수 및 라벨링 내역</div>
           </div>
           <div class="ow-panel-body1">
             <div class="ow-grid-wrap">
+              <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
               <wj-flex-grid
+                v-if="employeeName"
                 headersVisibility="Column"
                 :allowMerging="'Cells'"
                 selectionMode="None"
@@ -168,7 +169,7 @@
                 <wj-flex-grid-column
                   binding="itemName"
                   header="품목명"
-                  :width="100"
+                  width="*"
                   align="center"
                   cssClassAll="border-right-sm"
                 />
@@ -289,10 +290,6 @@ async function getListByEmployeeName() {
     });
 }
 
-function selectLee() {
-  console.log();
-}
-
 const response = ref(null);
 const treeResponse = ref(null);
 const employeeName = ref(null);
@@ -357,20 +354,23 @@ export default {
         }
       });
 
-      //그리드 셀렉션모드 설정
+      //그리드 셀렉션모드 설정(Row)
       grid.selectionMode = 3;
 
       //그리드 셀렉션 핸들러
       grid.selectionChanged.addHandler((grid, target) => {
-        employeeName.value = grid.selectedItems[0].employeeName;
+
+        //반응형 변수 세팅(검색 조건 리셋)
         searchSelected.value = '';
         searchContent.value = '';
+
+        //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
         if (target.row !== -1) {
           //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
           if (typeof grid.selectedItems[0].childrennn == 'object') {
             console.log('api통신입니다!');
-            getListByEmployeeName(employeeName.value);
             employeeName.value = grid.selectedItems[0].employeeName;
+            getListByEmployeeName(employeeName.value);
           }
         }
       });
@@ -381,13 +381,16 @@ export default {
       console.log(grid);
       grid.autoSizeRow(0, true);
 
+      //헤더에 html태그 사용하게 하는 설정
       grid.formatItem.addHandler((flex, e) => {
         if (e.panel == flex.columnHeaders) {
           e.cell.innerHTML = e.cell.textContent;
         }
       });
+
+      //그리드 셀렉션모드 설정(None)
       grid.selectionMode = 0;
-      console.log('grid.selectionMode', selectionMode);
+
     };
 
     getStatus();
@@ -403,7 +406,6 @@ export default {
       searchContent,
       childItemsPath,
       getListByEmployeeName,
-      selectLee,
     };
   },
 };
