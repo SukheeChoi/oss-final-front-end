@@ -37,11 +37,11 @@
       </div>
       <div>전체 {{ totalCount }} 건</div>
     </div>
-    <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
+    <!-- <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
       <template #default="item">
         <slot name="editor" :item="item.data"> </slot>
       </template>
-    </ow-flex-grid-editor>
+    </ow-flex-grid-editor> -->
   </div>
 </template>
 
@@ -211,10 +211,8 @@ export default {
 
     onMounted(async () => {
       await nextTick();
-      // const el = header.value;
-      const el = '가나다라마바사';
+      const el = header.value;
       const textContent = el.textContent.trim();
-      // const textContent = el.textContent.trim();
       state.isNotBlank = textContent !== '';
     });
 
