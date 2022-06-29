@@ -29,6 +29,7 @@ for (let i = 0; i < 100; i += 1) {
     expenses: Math.random() * 5000,
   });
 }
+
 const retrieve = (param) => {
   console.log('param', param);
   let filteredItems = _.cloneDeep(items);
