@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <template v-if="isNotBlank">
+    <template v-if="isNotBlank">
       <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
         <slot name="left">
           <h1 class="h1">그리드</h1>
@@ -11,7 +11,7 @@
           </template>
         </slot>
       </div>
-    </template> -->
+    </template>
     <div class="ow-grid-wrap mt-8 mb-8">
       <template v-for="i in n" :key="i">
         <ow-flex-grid :initialized="initialize.bind(null, i)" v-bind="$attrs">
@@ -122,7 +122,7 @@ export default {
     const state = reactive({
       grids: ['a', 'b', 'c', 'd', 'e'],
       pageNo: 1,
-      pageSize: 10,
+      pageSize: 15,
       pageSizeList: [],
       totalCount: 0,
       api: {
