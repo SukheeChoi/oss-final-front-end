@@ -34,16 +34,19 @@
     <div class="item ow-flex-wrap dir-col" style="--size: 80%">
       <div class="container-fluid">
         <div class="ow-grid-wrap">
-          <wj-flex-grid
+         
+          <ow-grid
             headersVisibility="Column"
             selectionMode="RowRange"
             :items-source="releaseInspectionData"
-            class="ow-grid"
             :allowMerging="'Cells'"
             :initialized="onInitialized"
             :autoRowHeights="true"
             :autoGenerateColumns="false"
             :selectionChanged="SelectionChanged"
+            :is-read-only="true"
+            :header="false"
+            :footer="false"
           >
             <!-- :autoRowHeights="true" -->
             <wj-flex-grid-column :binding="'no'" :header="'No'" :allowMerging="true" :width="40" align="center" />
@@ -159,7 +162,7 @@
               align="center"
               :allowMerging="true"
             ></wj-flex-grid-column>
-          </wj-flex-grid>
+          </ow-grid>
         </div>
       </div>
     </div>
@@ -262,9 +265,7 @@
         <!-- 박스별 품목정보 -->
         <div class="item align-y-start">
           <div class="ow-flex-wrap">
-            <div class="item size-fix" style="--gap-item: 6px">
-              <div class="title-field">박스별품목정보</div>
-            </div>
+            <div class="title-field">박스별품목정보</div>
             <button class="ow-btn type-state" v-on:click="addBox()">박스추가+</button>
           </div>
         </div>
@@ -278,20 +279,29 @@
                 <wj-flex-grid-column-group :binding="'code'" header="품목코드" :width="100" />
                 <wj-flex-grid-column-group :binding="'orderItemqty'" header="주문수량" :width="63" />
                 <wj-flex-grid-column-group :binding="'pickingQty'" header="피킹수량" :width="63" />
-                <wj-flex-grid-column-group :binding="'releaseInspectionQuantity'" header="검수수량" :width="63" />
-                <wj-flex-grid-column-group header="물품수량" :width="63" >
-                  <wj-flex-grid-cell-template cellType="Cell">
+                <wj-flex-grid-column-group :binding="'releaseInspectionQuantity'" header="검수수량" :width="63" >
+                  <!-- <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">-->
+                    <!-- <div class="ow-input"> -->
+                      <!-- <input id="releaseInspectionQuantity" type="text" :v-model='cell.item.releaseInspectionQuantity'/> -->
+                    <!-- </div>
+                  </wj-flex-grid-cell-template>   -->  
+                </wj-flex-grid-column-group>
+                <wj-flex-grid-column-group :binding="'note'" header="물품수량" :width="63" >
+                  <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
                     <div class="ow-input">
-                      <input type="text" placeholder="" :value="boxItemData.releaseInspectionQuantity"/>
+                      <input id="note" type="text" v-model='cell.item.note'/>
                     </div>
-                  </wj-flex-grid-cell-template>                  
+                  </wj-flex-grid-cell-template>    
                 </wj-flex-grid-column-group>
               </wj-flex-grid-column-group>
             </wj-flex-grid>
           </div>
           <div class="container">
-            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="unrelease(tally.releaseCode, scannedBarcode)">
-              패킹완료
+            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="packingDone()" v-if="boxArrays.length > 0">
+              패킹최종완료
+            </button>
+            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="oneBoxPacking(index)" v-if="boxArrays.length > 0">
+              박스{{index+1}} 패킹완료
             </button>
           </div>
         </div>
@@ -304,8 +314,10 @@
 import { ref, reactive, toRefs, watch, toRaw, onMounted } from 'vue';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 import releaseInspectionApi from '@/api/releaseInspectionApi';
+import OwGrid from '../../../components/grid/OwGrid.vue';
 
 export default {
+  components: { OwGrid },
   setup() {
     const state = reactive({
       flex: null, //wj-flex-grid의 정보를 flex에 담아서 사용
@@ -319,7 +331,6 @@ export default {
       };
       flex.mergeManager = new SimpleMergeManager(config);
     };
-
 
     //현황
     const statusBar = reactive({
@@ -370,7 +381,6 @@ export default {
     async function scan(releaseCode) {
 
       const result = await releaseInspectionApi.scan(releaseCode);
-      console.log('vue');
 
       tally.clientName = result.client.clientName;
       tally.totalPickingQty = result.picking.pickingQty;
@@ -378,6 +388,7 @@ export default {
       tally.unRelease = result.unReleased;
       tally.orderNo = result.order.orderNo;
 
+      //스캔 버튼 누르면 box테이블 데이터 생성
       boxItemData.value = [];
       for (let i = 0; i < releaseInspectionData.value.length; i++) {
         if (releaseInspectionData.value[i].orderNo === tally.orderNo) {
@@ -392,10 +403,13 @@ export default {
     //박스 개수
     var boxNum = 0;
 
-    // ow-tab에 넘겨줄 index
+    //ow-tab에서 사용하는 item
+    let boxArrays = ref([]);
+
+    //ow-tab에 넘겨줄 index
     var index = ref(0);
 
-    //박스 추가 버튼
+    //박스 추가 버튼 -> boxArrays에 추가
     function addBox() {
       boxNum = boxNum + 1;
       //박스는 8개까지 만들 수 있다.
@@ -404,25 +418,51 @@ export default {
       }
     }
 
-    let boxArrays = ref([]);
-    let emptyBoxArrays = ref([]);
+    //n번째 박스 패킹처리
+    async function oneBoxPacking(index) {
 
-    //click box number
-    let clickBoxNum = ref(0);
+      //api로 전달할 변수(//박스별 검수수량을 저장할 객체 -> 박스 집합)
+      const apiArray = [];
 
-    function click(index) {
-      clickBoxNum = index;
-      console.log(`${index}번째 버튼을 눌렀습니다.`, clickBoxNum);
-      return clickBoxNum;
+      for(let i=0; i<boxItemData.value.length; i++){
+        console.log(i+'번째', boxItemData.value[i]);
+        boxItemData.value[i].releaseInspectionQuantity += parseInt(boxItemData.value[i].note);
+        
+        apiArray.push({"releaseCode": boxItemData.value[i].releaseCode,
+                      "boxNumber": index+1, 
+                      "itemCode": boxItemData.value[i].code,
+                      "itemName": boxItemData.value[i].itemName,
+                      "releaseInspectionQty": parseInt(boxItemData.value[i].note),
+                      "pickingQty": boxItemData.value[i].pickingQty,
+                      "orderItemQty": boxItemData.value[i].orderItemqty,
+                      "orderItemNo" : boxItemData.value[i].orderItemNo});
+
+        boxItemData.value[i].note = null;
+      }
+
+      
+      console.log("패킹패킹")
+      console.log(apiArray);      
+
+      const result = await releaseInspectionApi.packing(apiArray);
+      return result;
     }
 
-    const isActive = (index) => {
-      console.log('isActive');
-      console.log('index', index);
-      console.log('click', click());
+    //패킹완료 버튼 클릭
+    async function packingDone() {
+      //boxArrays.length (박스개수), releaseCode(숫자) 전달
+      const packingDoneInfo = {"boxQty":boxArrays.value.length, "releaseCode": tally.releaseCode}
+      console.log("패킹완료 버튼 클릭!!")
+      console.log(packingDoneInfo);
 
-      return clickBoxNum === index;
-    };
+      //출고검수 (release done) 완료 처리
+      const result = await releaseInspectionApi.packingDone(packingDoneInfo);
+
+      //패킹이 완료되었기 때문에 박스변수 초기화
+      boxNum = 0;
+      boxArrays.value = []
+    }
+
 
     // 전체 데이터 가져오는 부분 주석처리
     // const getReleaseInspectionList = async () => {
@@ -478,6 +518,10 @@ export default {
     onMounted(() => {
       //Filter 긴급, 일반 변화 감시
       watch(emptyGroup, (newGroup, oldGroup) => {
+        if(oldGroup.length === 0) {
+          emptyGroup.value.push('일반');
+        } 
+
         console.log('emptyGroup 객체 변경 감시');
         console.log('newGroup:', toRaw(newGroup));
         console.log('oldGroup:', toRaw(oldGroup));
@@ -502,6 +546,12 @@ export default {
             if (v[i].receiptePrintDate === null) {
               v[i].receiptePrintDate = ' ';
             }
+            if (v[i].done === 0) {
+              v[i].done = 'N';
+            }else if(v[i].done === 1) {
+              v[i].done = 'Y';
+            }
+
           }
           releaseInspectionData.value = v;
         });
@@ -646,13 +696,11 @@ export default {
       addBox,
       //boxBtnClick1,
       boxArrays,
-      isActive,
-      click,
       index,
-      emptyBoxArrays,
       boxItemData,
-      clickBoxNum,
-      statusBar
+      statusBar,
+      packingDone,
+      oneBoxPacking
     };
   },
 };

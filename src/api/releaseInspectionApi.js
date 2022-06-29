@@ -82,11 +82,38 @@ async function getTotal() {
   return response.data;
 }
 
+// n번째 박스 패킹 완료 버튼 클릭
+async function packing(boxItemData) {
+  let response = null;
+  try{
+    response = await axios.post(`/releaseInspection/packing`, boxItemData);
+  }catch(error){
+    console.log("#######/releaseInspection/packing 통신 실패######")
+    console.log(error);
+  }
+  return response;
+}
+
+// 패킹 최종 완료
+async function packingDone(packingDoneInfo) {
+  let response = null;
+  try{
+    response = await axios.post(`/releaseInspection/packingDone`, packingDoneInfo);
+  }catch(error){
+    console.log("#######/releaseInspection/packingDone 통신 실패######")
+    console.log(error);
+  }
+  return response;
+}
+
+
 export default{
   getReleaseInspectionList,
   getFilterList,
   releaseInspectionQtyUpdate,
   unReleaseQtyUpdate,
   scan,
-  getTotal
+  getTotal,
+  packing,
+  packingDone
 };
