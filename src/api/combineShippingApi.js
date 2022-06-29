@@ -3,13 +3,15 @@
 import axios from "axios";
 
 //수령/전달 날짜 필터링 유무로 나눠진 API 합치기!!
-async function getVendorList(dateList) {
+async function getVendorList(toDo=1, dateList=Array.from([])) {
   let vendorList = null;
   try {
     let params = new URLSearchParams();
+    params.append('toDo', toDo);
     params.append('dateList', Array.from(dateList));
     const response = await axios.post(`/combineShipping/getVendorList`, params);
     vendorList = response.data;
+    console.log('## vendorList : ', vendorList);
   } catch(error) {
     console.log(error);
   }
@@ -31,11 +33,15 @@ async function getReceiptListByDate(dateList) {
 // 선택된 날짜에 해당하는 목록 조회.
 
 // 담당자 띄우기. 이름과 코드 필요.
-async function getAssigneeList() {
+async function getAssigneeList(toDo=1, dateList=Array.from([])) {
   let assigneeList = null;
   try {
-    const response = await axios.get(`/combineShipping/getAssignee`);
+    let params = new URLSearchParams();
+    params.append('toDo', toDo);
+    params.append('dateList', Array.from(dateList));
+;    const response = await axios.post(`/combineShipping/getAssignee`, params);
     assigneeList = response.data;
+    console.log('## assigneeList : ', assigneeList);
   } catch(error) {
     console.log(error);
   }
@@ -45,13 +51,14 @@ async function getAssigneeList() {
 
 // param: 담당자 코드, pageNo
 // '수령'탭에서 표시할 list.
-async function getReceiptList(employeeId, dateList) {
+async function getReceiptList(toDo=1, employeeId='', dateList=Array.from([])) {
   console.log('getReceiptList');
   let receiptList = null;
   try {
     let params = new URLSearchParams();
+    params.append('toDo', toDo);
     params.append('employeeId', employeeId);
-    params.append('dateList', dateList);
+    params.append('dateList', Array.from(dateList));
     const response = await axios.post(`/combineShipping/getReceiptList`, params);
     receiptList = response.data;
   } catch(error) {
@@ -62,13 +69,13 @@ async function getReceiptList(employeeId, dateList) {
 
 // param: 담당자 코드, pageNo
 // '전달'탭에서 표시할 list.
-async function getDeliveryList(toDo=1, employeeId, dateList) {
+async function getDeliveryList(toDo=1, employeeId='', dateList=Array.from([])) {
   let deliveryList = null;
   try {
     let params = new URLSearchParams();
     params.append('toDo', toDo);
     params.append('employeeId', employeeId);
-    params.append('dateList', dateList);
+    params.append('dateList', Array.from(dateList));
     const response = await axios.post(`/combineShipping/getDeliveryList`, params);
     deliveryList = response.data;
   } catch(error) {
