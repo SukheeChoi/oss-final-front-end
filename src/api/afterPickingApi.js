@@ -44,6 +44,7 @@ async function getAfterPickingList(filterList) {
     params.append('vendorName', filterList.vendorName);
     const response = await axios.post(`/afterPicking/`, params);
     afterPickingList = response.data;
+    console.log('## afterPickingList : ', afterPickingList);
   } catch(error) {
     console.log(error);
   }
