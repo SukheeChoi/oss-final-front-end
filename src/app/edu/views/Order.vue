@@ -8,24 +8,19 @@
         <div class="item">
           <div class="state">
             <div class="state-item">
-              전체 : <strong>{{ statusBar.total }}</strong
-              >건
+              전체 : <strong>{{ statusBar.total }}</strong>건
             </div>
             <div class="state-item">
-              오스템 : <strong>{{ statusBar.osstem }}</strong
-              >건
+              오스템 : <strong>{{ statusBar.osstem }}</strong>건
             </div>
             <div class="state-item">
-              협력사합배송 : <strong>{{ statusBar.vendorShippingPlus }}</strong
-              >건
+              협력사합배송 : <strong>{{ statusBar.vendorShippingPlus }}</strong>건
             </div>
             <div class="state-item">
-              협력사직배송 : <strong>{{ statusBar.vendorShippingDir }}</strong
-              >건
+              협력사직배송 : <strong>{{ statusBar.vendorShippingDir }}</strong>건
             </div>
             <div class="state-item" style="color: red">
-              미출고 : <strong class="color-type-1">{{ statusBar.unreleased }}</strong
-              >건
+              미출고 : <strong class="color-type-1">{{ statusBar.unreleased }}</strong>건
             </div>
           </div>
         </div>
@@ -161,6 +156,7 @@ const statusBar = reactive({
 });
 const searchSelected = ref(null);
 const searchContent = ref(null);
+const searchContent2 = ref(null);
 const dummy = ref(null);
 
 //필터 처리된 데이터 가져오는 함수
@@ -242,6 +238,8 @@ export default {
     watch(
       () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
       (newGroup, oldGroup) => {
+        console.log('newGroup.length : ' + newGroup.length);
+        console.log('typeof(newGroup[0]) : ' + typeof(newGroup[0]));
         const list = newGroup.map((data) => {
           return data.value;
         });
@@ -259,7 +257,6 @@ export default {
         });
         console.log('oldGroupoldGroupoldGroupoldGroupoldGroup', oldGroup);
         console.log('newGroupnewGroupnewGroupnewGroup', newGroup);
-        
         getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((result) => {
           console.log(result.data.list);
           //하이픈 처리
@@ -319,6 +316,7 @@ export default {
       checkboxGroup4,
       checkboxGroup5,
       checkboxGroup6,
+      summary
     };
   },
 };

@@ -1,14 +1,13 @@
 export default [
   {
-      // Main Menu (1depth)
-      path: '/edu',
-      name: 'DIST',
-      redirect: '/edu/Main',
-      component: () => import('@/views/AppMain'),
-      props:{
-          left:{
-              show: false,
-          },
+    // Main Menu (1depth)
+    path: '/edu',
+    name: 'DIST',
+    redirect: '/edu/Main',
+    component: () => import('@/views/AppMain'),
+    props: {
+      left: {
+        show: false,
       },
       children:[
           // Test (2depth)
@@ -65,4 +64,5 @@ export default [
         },
       ]
   }
-]
+}
+];
