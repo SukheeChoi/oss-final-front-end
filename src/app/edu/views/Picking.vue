@@ -9,7 +9,8 @@
       <!-- 수령 대상 업체 필터링 -->
       <div v-if="showReceipt && vendorList!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 370px;">
-          <ow-filter-radio :items="vendorList" :step="5"/>
+          <ow-filter-radio :items="vendorList" :step="5" />
+          <!-- <ow-filter-radio :items="vendorList" :step="5" :modelValue="checkedVendor" @update:modelValue="updateVendor"/> -->
         </div>
       </div>
 
@@ -102,7 +103,7 @@
     <wj-flex-grid-column v-if="showReceipt==false && toDo==1" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="showReceipt==false && toDo==0" header="전달수량" binding="deliveryQuantity" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="delivered" align="center" :width="70" wordWrap="true">
+    <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <button class="ow-btn type-icon check-state" @click="handleDeliveryCheckBtn($event, cell.item.orderItemNo)"></button>
         <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
@@ -125,14 +126,15 @@
   const endDate = ref(new Date());
   const clickSearch = ref(false);
   const vendorList = ref(null);
+  const checkedVendor = ref(null);
   const assigneeList = ref(null);
   const dateList = ref([startDate.value, endDate.value]);
   const receiptList = ref([]);
+  const receiptedList = ref([]);
   const deliveryList = ref([]);
   const deliveredList = ref([]);
   const checkedReceiptCount = ref(0);
   const checkedDeliveryCount = ref(0);
-  const receiptedList = ref([]);
 
   //수령 탭
   // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
@@ -310,11 +312,12 @@
   // 수령 Update.
   console.log('before updateReceiptList');
   const updateReceiptList = async () => {
-    console.log();
     const result = await combineShippingApi.updateReceiptList(Array.from(receiptedList.value))
       .then((result) => {
         console.log('updateReceiptList - result : ' + result);
         checkedReceiptCount.value = 0;
+        // 수령 update한 결과를 보여주기.
+        getReceiptList(toDo.value, '', dateList.value);
       });
     // return result;
   };
@@ -371,10 +374,11 @@
   // );
 
   const updateDeliveryList = async () => {
-    const result = await combineShippingApi.updateDeliveryList(deliveredList)
+    const result = await combineShippingApi.updateDeliveryList(deliveredList.value)
       .then(() => {
         checkedDeliveryCount.value = 0;
-        window.location.reload(true);
+        // 전달 update한 결과를 보여주기.
+        getDeliveryList(toDo.value, '', dateList.value);
       });
     // return result;
   };
@@ -388,12 +392,16 @@
     // update용 count변수 초기화.
     checkedReceiptCount.value = 0;
     checkedDeliveryCount.value = 0;
+    // update용 list 초기화.
+    receiptedList.value = [];
+    deliveredList.value = [];
+
     if(newShowReceipt === true) {
       getReceiptList(toDo.value, '', dateList.value).then();
       getVendorList(toDo.value, dateList.value);
     } else {
       getDeliveryList(toDo.value, '', dateList.value).then();
-      getAssigneeList(toDo.value, '', dateList.value);
+      getAssigneeList(toDo.value, dateList.value);
     }
   });
   // 할일/한일 초기화 관리.
@@ -402,6 +410,9 @@
     // update용 count변수 초기화.
     checkedReceiptCount.value = 0;
     checkedDeliveryCount.value = 0;
+    // update용 list 초기화.
+    receiptedList.value = [];
+    deliveredList.value = [];
 
     if(showReceipt.value === true) {
       getReceiptList(newToDo, '', Array.from(dateList.value));
@@ -428,6 +439,17 @@
     }
     clickSearch.value = false;
   });
+  function updateVendor(event) {
+    // console.log('## event : ', event);
+    // console.log('## event.target : ', event.target);
+    // console.log('## checkedVendor.value : ', checkedVendor.value);
+  }
+  // checkedVendor
+  watch(() => checkedVendor.value
+    , (newVendor, oldVendor) => {
+      console.log('## newVendor : ', newVendor);
+    });
+
   // selectedEmployeeId
   watch(() => selectedEmployeeId.value
     , (newSelectedEmployeeId, oldSelectedEmployeeId) => {
@@ -539,12 +561,10 @@
   }
 
   function handleClickSearch() {
-    // clickSearch.value = !clickSearch.value;
     clickSearch.value = true;
   }
 
   // 수령여부 체크 버튼 클릭시.
-  // function checkReceiptCheckBtn(event, orderItemNo) {
   function checkReceiptCheckBtn(event, orderItemNo) {
     console.log('## event.target.parentElement: ', event.target.parentElement);
     console.log('## event.target.parentNode.parentNode.parentNode.parentNode: ', event.target.parentNode.parentNode.parentNode.parentNode);
@@ -561,7 +581,7 @@
     if(event.target.classList.contains('active')) {
       // 수령여부 체크된 개수 감소.
       checkedReceiptCount.value--;
-      // 수령객체에서 체그 해제된 객체 삭제.
+      // 수령객체에서 체크 해제된 객체 삭제.
       receiptedList.value.pop(targetObject);
     // 수령여부 체크.
     } else {
