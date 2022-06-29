@@ -7,17 +7,25 @@
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">전체 : <strong>1360</strong>건</div>
-            <div class="state-item">오스템 : <strong>360</strong>건</div>
-            <div class="state-item">협력사합배송 : <strong>530</strong>건</div>
-            <div class="state-item">협력사직배송 : <strong>470</strong>건</div>
-            <div class="state-item" style="color: red">미출고 : <strong class="color-type-1">2</strong>건</div>
+            <div class="state-item">물품수령 : <strong>26</strong>품목/<string>538</string>개</div>
+            <div class="state-item">검품검수 : <strong>8</strong>품목/<string>283</string>개</div>
+            <div class="state-item">라벨링 : <strong>4</strong>품목/<string>120</string>개</div>
+          </div>
+        </div>
+        <div class="item size-fix" style="--gap-item: 6px">
+          <div class="title-field">검품검수현황</div>
+        </div>
+        <div class="item">
+          <div class="state">
+            <div class="state-item">양품 : <strong>8</strong>품목/<string>280</string>개</div>
+            <div class="state-item">누락 : <strong>1</strong>품목/<string>1</string>개</div>
+            <div class="state-item">파손 : <strong>4</strong>품목/<string>2</string>개</div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="d-flex">
+  <div class="ow-grid-wrap">
     <div class="left-side">
       <!-- Left -->
       <div class="d-flex justify-content-end">
@@ -33,15 +41,17 @@
       </ow-tree-grid>
     </div>
     <!-- Right -->
-    <div class="right-side flex-grow-1">
+    <div class="right-side">
       <div class="d-flex justify-content-end">
         <div class="item align-to-right" style="--gap-item: 6px">
           <div class="title-field">검색</div>
           <div class="ow-select" style="--width: 97px">
             <select name="" id="">
               <option value="" selected hidden>선택</option>
-              <option value="주문번호">주문번호</option>
-              <option value="거래처">거래처</option>
+              <option value="업체명">업체명</option>
+              <option value="발주번호">발주번호</option>
+              <option value="품목명">품목명</option>
+              <option value="품목코드">품목코드</option>
             </select>
           </div>
           <div class="ow-input type-button" style="--width: 200px">
@@ -52,7 +62,7 @@
       </div>
       <div class="ow-panel">
         <div class="ow-panel-header">
-          <div class="ow-panel-title">주문</div>
+          <div class="ow-panel-title">■[이가을]검품검수 및 라벨링 내역</div>
         </div>
         <div class="ow-panel-body">
           <div class="ow-grid-wrap">
@@ -63,10 +73,19 @@
               class="ow-grid"
               :autoRowHeights="true"
             >
-              <wj-flex-grid-column binding="id" header="아이디" :width="200" align="center" />
-              <wj-flex-grid-column binding="country" header="국가" :width="200" align="center" />
-              <wj-flex-grid-column binding="sales" header="가격" width="*" cssClassAll="ta-c" />
-              <wj-flex-grid-column binding="expenses" header="판매" :width="200" align="center" Class="clr-red" />
+              <wj-flex-grid-column binding="id" header="업체명" width="*" align="center" />
+              <wj-flex-grid-column binding="country" header="품목명" width="*" align="center" />
+              <wj-flex-grid-column binding="sales" header="품목코드" width="*" cssClassAll="ta-c" />
+              <wj-flex-grid-column binding="expenses" header="발주번호" width="*" align="center" Class="clr-red" />
+              <wj-flex-grid-column binding="id" header="LOT번호" width="*" align="center" />
+              <wj-flex-grid-column binding="country" header="수령수량" width="*" align="center" />
+              <wj-flex-grid-column binding="id" header="검수수량" width="*" align="center" />
+              <wj-flex-grid-column binding="country" header="양품수량" width="*" align="center" />
+              <wj-flex-grid-column binding="id" header="누락수량" width="*" align="center" />
+              <wj-flex-grid-column binding="country" header="파손수량" width="*" align="center" />
+              <wj-flex-grid-column binding="id" header="기타수량" width="*" align="center" />
+              <wj-flex-grid-column binding="country" header="승인여부" width="*" align="center" />
+              <wj-flex-grid-column binding="country" header="라벨링수량" width="*" align="center" />
             </wj-flex-grid>
           </div>
         </div>
@@ -158,18 +177,5 @@ export default {
 </script>
 
 <style>
-.clr-red {
-  color: #f60808;
-}
-.ow-panel .ow-panel-header {
-  /* display: flex; */
-  height: 26px;
-  flex-shrink: 0;
-  align-items: center;
-  padding: 0 12px;
-  background-color: #284077;
-  border-radius: 4px 4px 0 0;
-  color: #fff;
-  font-size: 13px;
-}
+
 </style>

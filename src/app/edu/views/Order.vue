@@ -4,20 +4,29 @@
       <div class="ow-flex-wrap">
         <div class="item size-fix" style="--gap-item: 6px">
           <div class="title-field">현황</div>
-          <div>{{ searchSelected }}</div>
         </div>
         <div class="item">
           <div class="state">
-            <div class="state-item">전체 : <strong>{{statusBar.total}}</strong>건</div>
-            <div class="state-item">오스템 : <strong>{{statusBar.osstem}}</strong>건</div>
-            <div class="state-item">협력사합배송 : <strong>{{statusBar.vendorShippingPlus}}</strong>건</div>
-            <div class="state-item">협력사직배송 : <strong>{{statusBar.vendorShippingDir}}</strong>건</div>
-            <div class="state-item" style="color: red">미출고 : <strong>{{statusBar.unreleased}}</strong>건</div>
+            <div class="state-item">
+              전체 : <strong>{{ statusBar.total }}</strong>건
+            </div>
+            <div class="state-item">
+              오스템 : <strong>{{ statusBar.osstem }}</strong>건
+            </div>
+            <div class="state-item">
+              협력사합배송 : <strong>{{ statusBar.vendorShippingPlus }}</strong>건
+            </div>
+            <div class="state-item">
+              협력사직배송 : <strong>{{ statusBar.vendorShippingDir }}</strong>건
+            </div>
+            <div class="state-item" style="color: red">
+              미출고 : <strong class="color-type-1">{{ statusBar.unreleased }}</strong>건
+            </div>
           </div>
         </div>
       </div>
     </div>
-
+    <hr />
     <!-- 배열을 이용한 동적 헤더  -->
     <div class="ow-flex-wrap item-size-content" style="--gap: 10px">
       <ow-filter-checkbox
@@ -63,179 +72,70 @@
         <wj-flex-grid-column-group
           binding="orderDate"
           header="주문일시"
-          width="*"
+          :width="90"
           align="center"
           :allowMerging="true"
-          cssClassAll="border-right-sm"
+          cssClassAll="border-center"
         />
         <wj-flex-grid-column-group
           binding="orderNo"
           header="주문번호"
-          width="*"
-          align="center"
+          :width="90"
+          align="left"
           :allowMerging="true"
-          cssClassAll="border-right-sm"
+          cssClassAll="border-center"
         />
         <wj-flex-grid-column-group
           binding="clientName"
           header="거래처"
           width="*"
-          align="center"
+          align="left"
           :allowMerging="true"
-          cssClassAll="border-right-sm"
+          cssClassAll="border-center"
         />
         <wj-flex-grid-column-group
           binding="itemName"
           header="품목명"
-          width="*"
-          align="center"
-          wordWrap="true"
-          multiLine="true"
-          cssClassAll="border-right-sm"
+          :width="130"
+          :wordWrap="true"
+          :multiLine="true"
+          cssClassAll="border-left"
         />
-        <wj-flex-grid-column-group
-          binding="itemCode"
-          header="품목코드"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="orderItemQuantity"
-          header="주문수량"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="orderCategory"
-          header="배송구분"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="vendorName"
-          header="업체명"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="itemCode" header="품목코드" :width="110" align="left" />
+        <wj-flex-grid-column-group binding="orderItemQuantity" header="주문수량" :width="50" align="right" />
+        <wj-flex-grid-column-group binding="shippingCategory" header="배송구분" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="vendorName" header="업체명" :width="90" align="left" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="피킹지시">
-        <wj-flex-grid-column-group
-          binding="pickingDirectionAttempt"
-          header="차수"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="pickingDirectionDate"
-          header="지시일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="pickingDirectionQuantity"
-          header="지시수량"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="pickingDirectionUnrelease"
-          header="미출고"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="pickingDirectionAttempt" header="차수" :width="30" align="center" />
+        <wj-flex-grid-column-group binding="pickingDirectionDate" header="지시일시" :width="90" align="center" />
+        <wj-flex-grid-column-group binding="pickingDirectionQuantity" header="지시수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingDirectionUnrelease" header="미출고" :width="50" align="center" />
+      </wj-flex-grid-column-group>
+      <wj-flex-grid-column-group header="피킹">
+        <wj-flex-grid-column-group binding="pickingEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingQuantity" header="피킹수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingDate" header="피킹일시" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="협력사">
-        <wj-flex-grid-column-group
-          binding="orderShippingWay"
-          header="배송방식"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="orderCheckDate"
-          header="주문확인일시"
-          :width="100"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="releaseQuantity"
-          header="출고수량"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="releaseScheduleDate"
-          header="출고예정일자"
-          :width="100"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="recieveDate"
-          header="수령일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="orderShippingWay" header="배송방식" :width="60" align="center" />
+        <wj-flex-grid-column-group binding="orderCheckDate" header="주문확인<br>일시" :width="100" align="center" />
+        <wj-flex-grid-column-group binding="releaseQuantity" header="출고수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="releaseScheduleDate" header="출고예정<br>일자" :width="60" align="center" />
+        <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="100" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고검수/패킹">
-        <wj-flex-grid-column-group
-          binding="count4-1"
-          header="담당자"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="count4-2"
-          header="검수일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="packingInspectionEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="inspectionDate" header="검수일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고">
-        <wj-flex-grid-column-group
-          binding="count5-1"
-          header="담당자"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="count5-2"
-          header="출고일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="releaseEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="releaseDate" header="출고일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="인계">
-        <wj-flex-grid-column-group
-          binding="count6-1"
-          header="담당자"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
-        <wj-flex-grid-column-group
-          binding="count6-2"
-          header="인계일시"
-          width="*"
-          align="center"
-          cssClassAll="border-right-sm"
-        />
+        <wj-flex-grid-column-group binding="transferEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="transferDate" header="인계일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
     </wj-flex-grid>
   </div>
@@ -260,19 +160,20 @@ const searchContent2 = ref(null);
 const dummy = ref(null);
 
 //필터 처리된 데이터 가져오는 함수
-async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent2) {
-  const result = await orderApi.getFilterList(company, shippingway, unreleased, searchSelected.value, searchContent2.value);
+async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent) {
+  const result = await orderApi.getFilterList(
+    company,
+    shippingway,
+    unreleased,
+    searchSelected.value,
+    searchContent.value
+  );
   return result;
 }
 
-const summary = reactive({
-  total: null
-});
-
-//전체 데이터 가져오는 함수
-async function getTotal() {
-  const result = await orderApi.getTotal()
-  .then((data) => {
+//현황 가져오는 함수
+async function getStatus() {
+  const result = await orderApi.getStatus().then((data) => {
     statusBar.total = data.total;
     statusBar.osstem = data.osstem;
     statusBar.vendorShippingPlus = data.vendorShippingPlus;
@@ -286,7 +187,7 @@ export default {
   name: 'Order',
   setup() {
     const state = reactive({
-      flex: undefined,
+      grid: undefined,
     });
 
     const checkboxGroup1 = ref([
@@ -310,16 +211,28 @@ export default {
     const checkboxGroup5 = ref([]);
     const checkboxGroup6 = ref([]);
 
-    const onInitialized = (flex) => {
-      state.flex = flex;
-
+    const onInitialized = (grid) => {
+      state.grid = grid;
+      grid.autoSizeRow(0, true);
       const config = {
         groupingColumns: ['orderDate'],
         mergedColumns: ['orderDate', 'orderNo', 'clientName'],
       };
 
-      flex.mergeManager = new SimpleMergeManager(config);
+      grid.mergeManager = new SimpleMergeManager(config);
+
+      grid.formatItem.addHandler((flex, e) => {
+        if (e.panel == flex.columnHeaders) {
+          e.cell.innerHTML = e.cell.textContent;
+        }
+      });
     };
+
+    function formatItem(s, e) {
+      if (e.panel == s.columnHeaders) {
+        e.cell.innerHTML = e.cell.textContent;
+      }
+    }
 
     //체크된 데이터 감시해서 api요청
     watch(
@@ -331,6 +244,8 @@ export default {
           return data.value;
         });
 
+        console.log('checkboxGroup4checkboxGroup4', checkboxGroup4);
+
         const company = list[0].map((data) => {
           return data;
         });
@@ -340,11 +255,39 @@ export default {
         const unreleased = list[2].map((data) => {
           return data;
         });
-
+        console.log('oldGroupoldGroupoldGroupoldGroupoldGroup', oldGroup);
         console.log('newGroupnewGroupnewGroupnewGroup', newGroup);
-        // getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((data) => {
-        getFilterList(company, shippingway, unreleased, searchSelected, searchContent2).then((data) => {
-          response.value = data.data.list;
+        getFilterList(company, shippingway, unreleased, searchSelected, searchContent).then((result) => {
+          console.log(result.data.list);
+          //하이픈 처리
+          result.data.list.map((i) => {
+            //오스템 제품 & 오스템 상품 (협력사 => 하이픈 처리)
+            if(i.vendorName === "오스템제품" || i.vendorName === "오스템상품") {
+              i.orderCheckDate = "-"
+              i.releaseQuantity = "-"
+              i.releaseScheduleDate = "-"
+              i.recieveDate = "-"
+            }
+
+            //협력사 상품 합배송 & 직배송 (피킹 => 하이픈 처리)
+            if(i.vendorName !== "오스템제품" && i.vendorName !== "오스템상품") {
+              i.pickingDate = "-"
+              i.pickingEmployee = "-"
+              i.pickingQuantity = "-"
+              i.pickingUnrelease = "-"
+            }
+
+            //협력사 상품 직배송 (출고검수/패킹, 출고, 인계 => 하이픈 처리)
+            if(i.vendorName !== "오스템제품" && i.vendorName !== "오스템상품" && i.orderShippingWay === "직배송") {
+              i.packingInspectionEmployee = "-"
+              i.inspectionDate = "-"
+              i.releaseEmployee = "-"
+              i.releaseDate = "-"
+              i.transferEmployee = "-"
+              i.transferDate = "-"
+            }
+          });
+          response.value = result.data.list;
         });
         dummy.value = false;
       },
@@ -355,8 +298,9 @@ export default {
       dummy.value = true;
     }
 
-    getTotal();
+    getStatus();
 
+    console.log('responseresponseresponse', response);
     return {
       ...toRefs(state),
       onInitialized,
@@ -364,7 +308,7 @@ export default {
       statusBar,
       searchSelected,
       searchContent,
-      searchContent2,
+      formatItem,
       getSearchList,
       checkboxGroup1,
       checkboxGroup2,
@@ -377,4 +321,23 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style>
+.wj-cell.wj-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: inherit;
+}
+
+.wj-cell.border-left {
+  display: flex;
+  align-items: center;
+  line-height: inherit;
+}
+
+.wj-cell.border-center {
+  display: flex;
+  align-items: center;
+  line-height: inherit;
+}
+</style>

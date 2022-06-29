@@ -3,7 +3,7 @@
     <div class="filter-radio-label">{{ label }}</div>
   </template>
   <div class="ow-filter" ref="root" v-bind="$attrs">
-    <template v-if="overflow">
+    <template>
       <button type="button" class="ow-filter-btn-move prev" @click="move">&#60;</button>
     </template>
     <ul class="ow-filter-list" ref="filter">
@@ -23,7 +23,7 @@
         </li>
       </template>
     </ul>
-    <template v-if="overflow">
+    <template>
       <button type="button" class="ow-filter-btn-move next" @click="move">&#62;</button>
     </template>
   </div>
@@ -67,7 +67,7 @@ export default {
         get: () => props.modelValue,
         set: (value) => emit('update:modelValue', value),
       }),
-      overflow: false,
+      overflow: true,
     });
 
     watch(
@@ -141,7 +141,7 @@ export default {
     onUnmounted(() => {
       observer.disconnect();
     });
-
+    console.log("radioradioradioradioradioradioradioradioradioradio", state);
     return {
       root,
       filter,
@@ -158,7 +158,10 @@ export default {
   letter-spacing: -1.08px;
   color: #333;
   margin-right: 6px;
+  line-height: 24px;
+  flex-shrink: 0;
 }
+
 .ow-filter {
   width: var(--width, auto);
   &-list {

@@ -1,14 +1,13 @@
 export default [
   {
-      // Main Menu (1depth)
-      path: '/edu',
-      name: 'DIST',
-      redirect: '/edu/Main',
-      component: () => import('@/views/AppMain'),
-      props:{
-          left:{
-              show: false,
-          },
+    // Main Menu (1depth)
+    path: '/edu',
+    name: 'DIST',
+    redirect: '/edu/Main',
+    component: () => import('@/views/AppMain'),
+    props: {
+      left: {
+        show: false,
       },
       children:[
           // Test (2depth)
@@ -44,9 +43,9 @@ export default [
             component: () => import('@@/edu/views/CustomerReceipt')
         },
         {
-            path: 'InspectionLabelling',
+            path: 'InspectionLabeling',
             name: 'DISTSub6',
-            component: () => import('@@/edu/views/InspectionLabelling')
+            component: () => import('@@/edu/views/InspectionLabeling')
         },
         {
             path: 'test',
@@ -58,6 +57,12 @@ export default [
             name: 'test1',
             component: () => import('@@/edu/views/Test1')
         },
+        {
+            path: 'test2',
+            name: 'test2',
+            component: () => import('@@/edu/views/Test2')
+        },
       ]
   }
-]
+}
+];
