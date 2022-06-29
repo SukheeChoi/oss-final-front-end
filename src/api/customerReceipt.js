@@ -1,13 +1,14 @@
 import axios from 'axios';
 
 //주문을 한 거래처의 이름과 주문 상태 가져오기
-async function getClientInfo() {
+async function getClientInfo(checkboxGroup2, checkboxGroup4) {
+  const shippingCategory = checkboxGroup2._rawValue.join(',');
+  const status = checkboxGroup4.value;
+
   let receiptList = [];
   try {
-    const response = await axios.get(`/client/`);
+    const response = await axios.get(`/client/`,{params:{shippingCategory, status}});
     receiptList = response.data.list;
-    console.log('receiptList[0]["clientName"] : ' + receiptList[0]['clientName']);
-    console.log('receiptList[0]["order"]["status"] : ' + receiptList[0]['order']['status']);
   } catch (error) {
     console.log(error);
   }

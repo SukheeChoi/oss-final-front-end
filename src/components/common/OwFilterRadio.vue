@@ -141,7 +141,7 @@ export default {
     onUnmounted(() => {
       observer.disconnect();
     });
-
+    console.log("radioradioradioradioradioradioradioradioradioradio", state);
     return {
       root,
       filter,
@@ -158,7 +158,10 @@ export default {
   letter-spacing: -1.08px;
   color: #333;
   margin-right: 6px;
+  line-height: 24px;
+  flex-shrink: 0;
 }
+
 .ow-filter {
   width: var(--width, auto);
   &-list {

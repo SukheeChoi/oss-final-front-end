@@ -1,6 +1,6 @@
 <template>
   <ow-flex-wrap class="size-full" col :class="$attrs.class" :style="$attrs.style">
-    <ow-flex-item fix v-if="header">
+    <!-- <ow-flex-item fix v-if="header">
       <ow-flex-item class="headline-wrap" align="center" to="left">
         <slot name="left">
           <h1 class="h1" v-if="title">{{ title }}</h1>
@@ -25,7 +25,7 @@
           <button type="button" class="ow-btn type-state" @click="saveRows" v-else-if="button === 'SAVE'">저장</button>
         </template>
       </ow-flex-item>
-    </ow-flex-item>
+    </ow-flex-item> -->
     <div class="ow-grid-wrap" :class="{ 'ow-grid-empty': isEmpty }">
       <ow-flex-grid :initialized="initialize" v-bind="$attrs">
         <slot></slot>
