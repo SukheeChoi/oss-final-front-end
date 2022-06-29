@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <template v-if="isNotBlank">
+    <template v-if="isNotBlank">
       <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
         <slot name="left">
           <h1 class="h1">그리드</h1>
@@ -11,7 +11,7 @@
           </template>
         </slot>
       </div>
-    </template> -->
+    </template>
     <div class="ow-grid-wrap mt-8 mb-8">
       <ow-flex-grid :initialized="initialize" v-bind="$attrs">
         <slot></slot>
@@ -37,11 +37,11 @@
       </div>
       <div>전체 {{ totalCount }} 건</div>
     </div>
-    <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
+    <!-- <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
       <template #default="item">
         <slot name="editor" :item="item.data"> </slot>
       </template>
-    </ow-flex-grid-editor>
+    </ow-flex-grid-editor> -->
   </div>
 </template>
 
@@ -211,10 +211,8 @@ export default {
 
     onMounted(async () => {
       await nextTick();
-      // const el = header.value;
-      const el = '가나다라마바사';
+      const el = header.value;
       const textContent = el.textContent.trim();
-      // const textContent = el.textContent.trim();
       state.isNotBlank = textContent !== '';
     });
 

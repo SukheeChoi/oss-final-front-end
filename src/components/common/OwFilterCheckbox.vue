@@ -68,9 +68,6 @@ export default {
       overflow: false,
     },);
 
-    console.log("checkedValues", state.checkedValues);
-    console.log("enabledValues", state.enabledValues);
-    
     watch(
       () => state.checkedValues,
       (newCheckedValues, oldCheckedValues = []) => {
