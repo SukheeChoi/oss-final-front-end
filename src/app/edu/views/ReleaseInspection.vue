@@ -34,11 +34,11 @@
     <div class="item ow-flex-wrap dir-col" style="--size: 80%">
       <div class="container-fluid">
         <div class="ow-grid-wrap">
-         
+          <!-- :items-source="releaseInspectionData" -->
+
           <ow-grid
             headersVisibility="Column"
             selectionMode="RowRange"
-            :items-source="releaseInspectionData"
             :allowMerging="'Cells'"
             :initialized="onInitialized"
             :autoRowHeights="true"
@@ -47,8 +47,8 @@
             :is-read-only="true"
             :header="false"
             :footer="false"
+            :read = "read" 
           >
-            <!-- :autoRowHeights="true" -->
             <wj-flex-grid-column :binding="'no'" :header="'No'" :allowMerging="true" :width="40" align="center" />
             <wj-flex-grid-column
               :binding="'clientName'"
@@ -314,22 +314,22 @@
 import { ref, reactive, toRefs, watch, toRaw, onMounted } from 'vue';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 import releaseInspectionApi from '@/api/releaseInspectionApi';
-import OwGrid from '../../../components/grid/OwGrid.vue';
+import OwGrid from '../../../components/grid/new/OwGrid.vue';
 
 export default {
   components: { OwGrid },
   setup() {
     const state = reactive({
-      flex: null, //wj-flex-grid의 정보를 flex에 담아서 사용
+      grid: null, //wj-flex-grid의 정보를 flex에 담아서 사용
     });
 
     //grid 병합 처리 >> custom merge
-    const onInitialized = (flex) => {
+    const onInitialized = (grid) => {
       const config = {
         groupingColumns: ['clientName'],
         mergedColumns: [0, 1, 2, 3, 4, 5, 'releasePrintDate', 'boxQty', 14, 15, 16],
       };
-      flex.mergeManager = new SimpleMergeManager(config);
+      grid.mergeManager = new SimpleMergeManager(config);
     };
 
     //현황
@@ -503,8 +503,8 @@ export default {
     ]);
     const emptyGroup = ref([]);
 
-    const getFilterList = async (newGroup) => {
-      const list = await releaseInspectionApi.getFilterList(newGroup);
+    const getFilterList1 = async () => {
+      const list = await releaseInspectionApi.getFilterList(emptyGroup.value);
       return list;
     };
 
@@ -513,6 +513,17 @@ export default {
 
     //전체 데이터(왼쪽) 가져오기
     const releaseInspectionData = ref([]);
+
+    let newGroupData = null;
+
+    //read함수
+    async function read(pageNo, pageSize) {
+      console.log("newGroupData 잘 들어가고 있니??")
+      console.log(emptyGroup.value);
+      console.log("=========================================")
+      releaseInspectionData.value = await getFilterList1(emptyGroup.value);
+      const result = {totalCount:10, data : releaseInspectionData.value};
+    }
 
     //mounted => filter, Barcode 감시
     onMounted(() => {
@@ -526,35 +537,6 @@ export default {
         console.log('newGroup:', toRaw(newGroup));
         console.log('oldGroup:', toRaw(oldGroup));
         console.log(newGroup[0]);
-        let filterType = emptyGroup;
-        let temp = [];
-        for (let i = 0; i < newGroup.length; i++) {
-          temp.push(i);
-        }
-        console.log('temp>>', temp);
-
-        getFilterList(newGroup).then((v) => {
-          console.log('젭알요 ㅠㅜㅜㅜㅜ');
-          console.log(v);
-          for (let i = 0; i < v.length; i++) {
-            if (v[i].boxQty === 0) {
-              v[i].boxQty = ' ';
-            }
-            if (v[i].releasePrintDate === null) {
-              v[i].releasePrintDate = ' ';
-            }
-            if (v[i].receiptePrintDate === null) {
-              v[i].receiptePrintDate = ' ';
-            }
-            if (v[i].done === 0) {
-              v[i].done = 'N';
-            }else if(v[i].done === 1) {
-              v[i].done = 'Y';
-            }
-
-          }
-          releaseInspectionData.value = v;
-        });
 
         // releaseInspectionData.value = getFilterList(newGroup).then((appData) => {
         //   return appData;
@@ -700,7 +682,8 @@ export default {
       boxItemData,
       statusBar,
       packingDone,
-      oneBoxPacking
+      oneBoxPacking,
+      read
     };
   },
 };
