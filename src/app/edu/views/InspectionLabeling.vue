@@ -57,9 +57,8 @@
         </div>
         <ow-tree-grid
           :read="read"
-          selectionMode="None"
+          :selectionMode="None"
           :childItemsPath="['child', 'childrennn']"
-          :initialized="treeInitialized"
         >
           <!-- childitem 순서대로 입력하기 children(albert)아래 children(anton) -->
           <wj-flex-grid-column

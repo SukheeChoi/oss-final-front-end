@@ -37,11 +37,11 @@
       </div>
       <div>전체 {{ totalCount }} 건</div>
     </div>
-    <!-- <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
+    <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
       <template #default="item">
         <slot name="editor" :item="item.data"> </slot>
       </template>
-    </ow-flex-grid-editor> -->
+    </ow-flex-grid-editor>
   </div>
 </template>
 
@@ -116,7 +116,7 @@ export default {
       grid: null,
       query: Object.assign({}, props.query),
       pageNo: 1,
-      pageSize: 10,
+      pageSize: 15,
       pageSizeList: [],
       totalCount: 0,
       api: {
