@@ -34,20 +34,17 @@
     <div class="item ow-flex-wrap dir-col" style="--size: 80%">
       <div class="container-fluid">
         <div class="ow-grid-wrap">
-          <!-- :items-source="releaseInspectionData" -->
-
-          <ow-grid
+         
+          <wj-flex-grid
             headersVisibility="Column"
             selectionMode="RowRange"
+            :items-source="releaseInspectionData"
+            class="ow-grid"
             :allowMerging="'Cells'"
             :initialized="onInitialized"
             :autoRowHeights="true"
             :autoGenerateColumns="false"
             :selectionChanged="SelectionChanged"
-            :is-read-only="true"
-            :header="false"
-            :footer="false"
-            :read = "read" 
           >
             <wj-flex-grid-column :binding="'no'" :header="'No'" :allowMerging="true" :width="40" align="center" />
             <wj-flex-grid-column
@@ -162,7 +159,7 @@
               align="center"
               :allowMerging="true"
             ></wj-flex-grid-column>
-          </ow-grid>
+          </wj-flex-grid>
         </div>
       </div>
     </div>
