@@ -116,7 +116,7 @@ export default {
       grid: null,
       query: Object.assign({}, props.query),
       pageNo: 1,
-      pageSize: 15,
+      pageSize: 10,
       pageSizeList: [],
       totalCount: 0,
       api: {

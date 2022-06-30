@@ -67,7 +67,7 @@
     <ow-grid
       :allowMerging="'Cells'"
       :key="keyData"
-      :read="getData"
+      :read="read"
       :visibleRowsCount="15"
       :initialized="onInitialized"
     >
@@ -199,8 +199,30 @@ async function getStatus() {
     console.log(data);
   });
 }
-// getStatus();
+getStatus();
 
+const retrieve = (param) => {
+  const lee = orderApi.getFilterList(checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value
+  , searchSelected.value, searchContent.value, param.pageNo, param.pageSize);
+  console.log(lee);
+  return Promise.resolve({
+    data: lee,
+    status: 200,
+    code: 'OK',
+    message: 'Success',
+    totalCount,
+  });
+};
+
+async function read(query, pageNo, pageSize) {
+  const result = await retrieve({
+    ...query,
+    pageNo,
+    pageSize,
+  });
+  console.log('result', result);
+  return result;
+}
 
 //그리드에 바인딩 하는 함수
 getData.value = async function (query, pageNo, pageSize) {

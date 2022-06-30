@@ -54,7 +54,6 @@ export default {
     },
   },
   setup(props, { emit }) {
-    console.log(props);
     const root = ref(null);
     const filter = ref(null);
 
@@ -88,7 +87,6 @@ export default {
       if (!state.isAllChecked) {
         state.checkedValues = state.enabledValues.map((item) => item.value);
       }
-      console.log("checkedValues", state.checkedValues);
     };
     
     const getContentRect = (dom) => {

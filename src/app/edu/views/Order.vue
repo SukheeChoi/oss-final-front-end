@@ -174,7 +174,6 @@ const checkboxGroup6 = ref(['released', 'unreleased']);
 const getData = ref([]);
 const keyData = ref(0);
 
-
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
@@ -199,7 +198,7 @@ async function getStatus() {
     console.log(data);
   });
 }
-// getStatus();
+getStatus();
 
 
 //그리드에 바인딩 하는 함수
@@ -209,11 +208,13 @@ getData.value = async function (query, pageNo, pageSize) {
   //pageSize = "한페이지 몇 행"
   //totalCount = "전체 행 수"
 
-  const lee = await orderApi.getFilterList(checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value, searchSelected.value, searchContent.value, pageNo, pageSize);
-
+  const lee = await orderApi.getFilterList(checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value
+  , searchSelected.value, searchContent.value, pageNo, pageSize);
+  
   const result = {
     ...lee,
     pageNo,
+    pageSize,
   };
 
   console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', result);
