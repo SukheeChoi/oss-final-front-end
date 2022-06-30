@@ -26,7 +26,7 @@ async function getAllList() {
   return response.data;
 }
 
-async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent) {
+async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent, pageNo, pageSize) {
   let response = null;
   let companyURI = encodeURI(company);
   let shippingwayURI = encodeURI(shippingway);
@@ -38,6 +38,8 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
                                                                 , unreleased: unreleasedURI
                                                                 , searchSelected
                                                                 , searchContent
+                                                                , pageNo
+                                                                , pageSize 
                                                         } });
       console.log(response);
     } catch (error) {
@@ -71,7 +73,7 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
   //     i.transferDate = '-';
   //   }
   // });
-  return response.data.list;
+  return response.data;
 }
 
 
