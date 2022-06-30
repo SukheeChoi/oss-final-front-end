@@ -44,7 +44,7 @@ export default [
           component: () => import('@@/edu/views/Picking'),
         },
         {
-          path: 'Picking',
+          path: 'Picking2',
           name: 'DISTSub5-2',
           component: () => import('@@/edu/views/Picking copy'),
         },

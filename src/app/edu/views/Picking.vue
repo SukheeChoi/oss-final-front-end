@@ -17,6 +17,7 @@
       <!-- 전달 담당자 이름 filter -->
       <div v-if="!showReceipt && assigneeList!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 270px;">
+          <!-- <ow-filter-radio id="assignee-filter-radio" :items="assigneeList" :step="4" v-model="selectedAssignee" @update:modelValue="updateSelectedAssignee" :key="assigneeKey"/> -->
           <ow-filter-radio id="assignee-filter-radio" :items="assigneeList" :step="4" v-model="selectedAssignee" @update="selectedAssignee = value('assignee-filter-radio')" :key="assigneeKey"/>
         </div>
       </div>
@@ -53,7 +54,7 @@
     v-if="showReceipt"
     :initialized="initialize"
     :n="2"
-    :read="getReceiptList"
+    :read="read"
     :key="receiptKey"
     :insert="insert"
     :update="update"
@@ -288,7 +289,7 @@
       // label: label
       , items: items
     });
-    console.log('result', result);
+    console.log('@@ result', result);
     // initialize();
     return result;
   }
@@ -357,7 +358,7 @@
   // '전달' 탭에서 바인딩할 데이터를 불러옴.
   // const getDeliveryList = async (toDo=1, employeeId='', dateList=[]) => {
   async function getDeliveryList() {
-    const result = await combineShippingApi.getDeliveryList(toDo.value, '', Array.from(dateList.value))
+    const result = await combineShippingApi.getDeliveryList(toDo.value, selectedAssignee.value, Array.from(dateList.value))
         .then((result) => {
           if(result != null && result.deliveryList != null) {
             deliveryList.value = result.deliveryList;
@@ -368,7 +369,7 @@
             read();
             deliveryKey.value++;
           }
-          getAssigneeList();
+          // getAssigneeList();
       });
     // return result;
   };
@@ -463,7 +464,9 @@
     checkedDeliveryCount.value = 0;
 
     if(showReceipt.value === true) {
-      getReceiptList();
+      // read();
+    // receiptKey++;
+      // getReceiptList();
       getVendorList();
     } else {
       getDeliveryList();

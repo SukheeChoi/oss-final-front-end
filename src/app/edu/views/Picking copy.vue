@@ -143,6 +143,7 @@
   const checkedDeliveryCount = ref(0);
 
   const vendorKey = ref(1);
+  const assigneeKey = ref(1);
 
   //수령 탭
   // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
@@ -282,7 +283,7 @@
     const result = await retrieve({
       ...query,
       pageNo,
-      pageSize: 10,
+      pageSize,
       label: label
       , items: items
     });
@@ -295,7 +296,7 @@
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
   const getReceiptList = async () => {
-    const result = await combineShippingApi.getReceiptList(toDo.value, '', Array.from(dateList.value))
+    const result = await combineShippingApi.getReceiptList(toDo.value, selectedAssignee.value, Array.from(dateList.value))
         .then((result) => {
           if(result.receiptList != null) {
             receiptList.value = result.receiptList;
@@ -330,7 +331,7 @@
   // '전달' 탭에서 바인딩할 데이터를 불러옴.
   // const getDeliveryList = async (toDo=1, employeeId='', dateList=[]) => {
   async function getDeliveryList() {
-    const result = await combineShippingApi.getDeliveryList(toDo.value, '', Array.from(dateList.value))
+    const result = await combineShippingApi.getDeliveryList(toDo.value, selectedAssignee.value, Array.from(dateList.value))
         .then((result) => {
           if(result != null && result.deliveryList != null) {
             deliveryList.value = result.deliveryList;
@@ -342,6 +343,8 @@
             deliveryKey.value++;
           }
           getAssigneeList();
+          assigneeKey++;
+          // 수령/전달 페이지 전환시에도 담당업체/담당자 초기화하지 않음.
       });
     // return result;
   };
@@ -462,8 +465,9 @@
   // selectedAssignee
   watch(() => selectedAssignee.value
     , (newSelectedAssignee, oldSelectedAssignee) => {
-      console.log('## selectedAssignee.value : ', selectedAssignee.value);
-      console.log('## newSelectedAssignee : ', newSelectedAssignee);
+      selectedAssignee.value = newSelectedAssignee;
+      
+      getDeliveryList();
     }
   );
 
@@ -545,6 +549,10 @@
   function handleChangeToDelivery() {
     showReceipt.value = false;
   }
+  // 담당자 선택시.
+  // function updateSelectedAssignee(assignee) {
+  //   console.log('!! assignee', assignee);
+  // }
 
   // 할 일 탭 클릭시.
   function handleChangeToTodo() {
