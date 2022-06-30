@@ -173,7 +173,7 @@
         });
     // return result;
   };
-  getVendorList();
+  // getVendorList();
 
   //담당자 조회. 페이지네이션 고려X.
   // 할 일: 해당기간에 수령완료된 이력의 담당자. -> 사실상 '수령 한 일'의 담당자와 같음.
@@ -203,7 +203,6 @@
           }
         });
   };
-  getAssigneeList();
 
   const retrieve = (param) => {
     console.log('param', param);
@@ -296,7 +295,7 @@
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
   const getReceiptList = async () => {
-    const result = await combineShippingApi.getReceiptList(toDo.value, selectedAssignee.value, Array.from(dateList.value))
+    const result = await combineShippingApi.getReceiptList(toDo.value, selectedVendor.value, Array.from(dateList.value))
         .then((result) => {
           if(result.receiptList != null) {
             receiptList.value = result.receiptList;
@@ -309,7 +308,7 @@
             // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
             receiptKey.value++;
           }
-          // getVendorList(toDo.value, dateList.values);
+          getVendorList();
         });
     // return result;
   };
@@ -422,13 +421,16 @@
     receiptedList.value = [];
     deliveredList.value = [];
 
+    // 할일/한일 탭 전환시, 담당업체/담당자 초기화.
+
     if(showReceipt.value === true) {
-      getReceiptList();
-      getVendorList();
-      // 담당업체 조회.
+      // 선택된 담당업체 초기화.
+      selectedVendor.value = '전체';
+      getReceiptList(); // 내부에서 getVendorList() 호출.
     } else {
-      getDeliveryList();
-      getAssigneeList();
+      // 선택된 담당자 초기화.
+      selectedAssignee.value = '전체';
+      getDeliveryList(); // 내부에서 getAssigneeList() 호출.
     }
   });
   // 조회 감시.
@@ -440,10 +442,8 @@
 
     if(showReceipt.value === true) {
       getReceiptList();
-      getVendorList();
     } else {
       getDeliveryList();
-      getAssigneeList();
     }
     clickSearch.value = false;
   });
@@ -458,8 +458,10 @@
   // selectedVendor
   watch(() => selectedVendor.value
     , (newSelectedVendor, oldSelectedVendor) => {
-      console.log('## selectedVendor.value : ', selectedVendor.value);
-      console.log('## newSelectedVendor : ', newSelectedVendor);
+      console.log('!! selectedVendor.value : ', selectedVendor.value);
+      console.log('!! newSelectedVendor : ', newSelectedVendor);
+
+      getReceiptList();
     }
   );
   // selectedAssignee
@@ -565,11 +567,9 @@
 
   // 날짜 변경 핸들러.
   function updateStartDate(event) {
-    console.log('event - startDate.value : ' + startDate.value);
     console.log('event : ' + event);
-    // console.log('event.target : ' + event.target);
-    // console.log('event.target.value' + event.target.value);
     console.log('event - startDate.value : ' + startDate.value);
+
     // 할당해주지 않으면 바인딩 객체의 값이 바뀌진 않음.
     startDate.value = event;
     dateList.value[0] = startDate.value;
