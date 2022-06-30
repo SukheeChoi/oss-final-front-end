@@ -65,13 +65,11 @@
   <!-- 그리드 부분 -->
   <div class="ow-grid-wrap">
     <ow-grid
-      headersVisibility="Column"
       :allowMerging="'Cells'"
-      selectionMode="None"
-      :read="read"
-      class="ow-grid type-header-group"
+      :key="keyData"
+      :read="getData"
+      :visibleRowsCount="15"
       :initialized="onInitialized"
-      :autoRowHeights="true"
     >
       <template #left>&nbsp;</template>
       <wj-flex-grid-column-group header="주문">
@@ -147,152 +145,114 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import orderApi from '@/api/orderApi';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
-export default {
-  name: 'Order',
-  setup() {
-    const state = reactive({
-      grid: undefined,
-    });
+const checkboxGroup1 = ref([
+  { name: '오스템제품', value: 'osstemItem' },
+  { name: '오스템상품', value: 'osstemProduct' },
+  { name: '협력사상품(합배송)', value: 'vendorproductPlus' },
+  { name: '협력사상품(직배송)', value: 'vendorproductDir' },
+]);
 
-    const checkboxGroup1 = ref([
-      { name: '오스템제품', value: 'osstemItem' },
-      { name: '오스템상품', value: 'osstemProduct' },
-      { name: '협력사상품(합배송)', value: 'vendorproductPlus' },
-      { name: '협력사상품(직배송)', value: 'vendorproductDir' },
-    ]);
+const checkboxGroup2 = ref([
+  { name: '긴급', value: 'emergency' },
+  { name: '일반', value: 'normal' },
+]);
 
-    const checkboxGroup2 = ref([
-      { name: '긴급', value: 'emergency' },
-      { name: '일반', value: 'normal' },
-    ]);
+const checkboxGroup3 = ref([
+  { name: '출고', value: 'released' },
+  { name: '미출고', value: 'unreleased' },
+]);
 
-    const checkboxGroup3 = ref([
-      { name: '출고', value: 'released' },
-      { name: '미출고', value: 'unreleased' },
-    ]);
+const checkboxGroup4 = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
+const checkboxGroup5 = ref(['emergency', 'normal']);
+const checkboxGroup6 = ref(['released', 'unreleased']);
 
-    const checkboxGroup4 = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
-    const checkboxGroup5 = ref(['emergency', 'normal']);
-    const checkboxGroup6 = ref(['released', 'unreleased']);
+const getData = ref([]);
+const keyData = ref(0);
 
-    const response = ref(null);
-    const statusBar = reactive({
-      total: null,
-      osstem: null,
-      vendorShippingPlus: null,
-      vendorShippingDir: null,
-      unreleased: null,
-    });
-    const searchSelected = ref(null);
-    const searchContent = ref(null);
-    const searchContent2 = ref(null);
-    const dummy = ref(null);
 
-    //필터 처리된 데이터 가져오는 함수
+const searchSelected = ref(null);
+const searchContent = ref(null);
 
-    //현황 가져오는 함수
-    async function getStatus() {
-      const result = await orderApi.getStatus().then((data) => {
-        statusBar.total = data.total;
-        statusBar.osstem = data.osstem;
-        statusBar.vendorShippingPlus = data.vendorShippingPlus;
-        statusBar.vendorShippingDir = data.vendorShippingDir;
-        statusBar.unreleased = data.unreleased;
-        console.log(data);
-      });
+const dummy = ref(null);
+
+const statusBar = reactive({
+  total: null,
+  osstem: null,
+  vendorShippingPlus: null,
+  vendorShippingDir: null,
+  unreleased: null,
+});
+
+//현황 가져오는 함수
+async function getStatus() {
+  const result = await orderApi.getStatus().then((data) => {
+    statusBar.total = data.total;
+    statusBar.osstem = data.osstem;
+    statusBar.vendorShippingPlus = data.vendorShippingPlus;
+    statusBar.vendorShippingDir = data.vendorShippingDir;
+    statusBar.unreleased = data.unreleased;
+    console.log(data);
+  });
+}
+// getStatus();
+
+
+//그리드에 바인딩 하는 함수
+getData.value = async function (query, pageNo, pageSize) {
+  console.log(pageNo, pageSize, checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value);
+  //pageNo = "페이지번호"
+  //pageSize = "한페이지 몇 행"
+  //totalCount = "전체 행 수"
+
+  const lee = await orderApi.getFilterList(checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value, searchSelected.value, searchContent.value, pageNo, pageSize);
+
+  const result = {
+    ...lee,
+    pageNo,
+  };
+
+  console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', result);
+  return result;
+}
+
+const onInitialized = (grid) => {
+  grid.autoSizeRow(0, true);
+
+  const config = {
+    groupingColumns: ['orderDate'],
+    mergedColumns: ['orderDate', 'orderNo', 'clientName'],
+  };
+
+  grid.mergeManager = new SimpleMergeManager(config);
+
+  grid.formatItem.addHandler((flex, e) => {
+    if (e.panel == flex.columnHeaders) {
+      e.cell.innerHTML = e.cell.textContent;
     }
-
-    //그리드에 바인딩 하는 함수
-    async function read(query, pageNo, pageSize) {
-      console.log(query, pageNo, pageSize, checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value);
-
-      const lee = await getFilterList();
-
-      const result = {
-        totalCount: 100,
-        data: lee,
-      };
-
-      console.log('resultresultresultresultresultresultresultresultresultresultresultresultresultresult', result);
-      return result;
-    }
-
-    async function getFilterList() {
-      const result = await orderApi.getFilterList(
-        checkboxGroup4.value,
-        checkboxGroup5.value,
-        checkboxGroup6.value,
-        searchSelected.value,
-        searchContent.value
-      );
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', result);
-      return result;
-    }
-
-    const onInitialized = (grid) => {
-      state.grid = grid;
-      console.log(state.grid);
-      grid.autoSizeRow(0, true);
-
-      const config = {
-        groupingColumns: ['orderDate'],
-        mergedColumns: ['orderDate', 'orderNo', 'clientName'],
-      };
-
-      grid.mergeManager = new SimpleMergeManager(config);
-
-      grid.formatItem.addHandler((flex, e) => {
-        if (e.panel == flex.columnHeaders) {
-          e.cell.innerHTML = e.cell.textContent;
-        }
-      });
-    };
-
-    //체크된 데이터 감시해서 api요청
-    watch(
-      () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
-      (newGroup, oldGroup) => {
-        const query = null;
-        const pageNo = null;
-        const pageSize = null;
-        
-        read();
-        onInitialized(state.grid);
-        dummy.value = false;
-      },
-      { deep: true }
-    );
-
-    function getSearchList() {
-      dummy.value = true;
-    }
-
-    getStatus();
-
-    console.log('responseresponseresponse', response);
-    return {
-      ...toRefs(state),
-      onInitialized,
-      response,
-      statusBar,
-      read,
-      searchSelected,
-      searchContent,
-      getSearchList,
-      checkboxGroup1,
-      checkboxGroup2,
-      checkboxGroup3,
-      checkboxGroup4,
-      checkboxGroup5,
-      checkboxGroup6,
-    };
-  },
+  });
 };
+
+//체크된 데이터 감시해서 api요청
+watch(
+  () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
+  (newGroup, oldGroup) => {
+
+    keyData.value++;
+    dummy.value = false;
+  },
+  { deep: true }
+);
+
+function getSearchList() {
+  dummy.value = true;
+}
+
+
 </script>
 <style>
 .wj-cell.wj-header {

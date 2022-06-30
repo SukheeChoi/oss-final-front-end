@@ -58,6 +58,16 @@ export default [
           name: 'test1',
           component: () => import('@@/edu/views/Test1'),
         },
+        {
+          path: 'test2',
+          name: 'test2',
+          component: () => import('@@/edu/views/Test2'),
+        },
+        {
+          path: 'test3',
+          name: 'test3',
+          component: () => import('@@/edu/views/Test3'),
+        },
       ],
     },
   ];
