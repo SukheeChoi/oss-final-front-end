@@ -84,8 +84,20 @@
   </div>
 
   <div class="ow-grid-wrap">
-    <!-- <ow-grid> -->
-    <wj-flex-grid
+    <ow-grid
+      headersVisibility="Column"
+      allowSorting="None"
+      selectionMode="None"
+      class="ow-grid type-header-group"
+      :read="read"
+      :initialized="onInitialized"
+      :allowMerging="Cells"
+      style="display: flex"
+      :autoRowHeights="true"
+    >
+      <!-- :items-source="afterPickingList" -->
+    <template #left>&nbsp;</template>
+    <!-- <wj-flex-grid
       headersVisibility="Column"
       allowSorting="None"
       selectionMode="None"
@@ -94,7 +106,7 @@
       :initialized="onInitialized"
       :allowMerging="Cells"
       style="display: flex"
-    >
+    > -->
       <!-- :allowResizing="Row" -->
       <!--화이팅 이라구요! 언니 힘내라구요! -->
       <!-- :loadedRows="onloadedRows" -->
@@ -116,9 +128,8 @@
         <wj-flex-grid-column-group
           binding="ITM_NAME"
           header="품목명"
-          align="center"
+          align="left"
           cssClassAll="ta-c border-right-sm"
-          style="text-align: left;"
         />
         <wj-flex-grid-column-group
           binding="ITM_CODE"
@@ -257,17 +268,23 @@
         :allowMerging="true"
       >
       </wj-flex-grid-column-group>
-    </wj-flex-grid>
-    <!-- </ow-grid> -->
+    <!-- </wj-flex-grid> -->
+    </ow-grid>
   </div>
 </template>
 
 <script setup>
+import OwGrid from '@/components/grid/new/OwGrid';
+
+
+///
+
   import afterPickingApi from '@/api/afterPickingApi.js';
   // 셀 병합 기준 조절 위함.
   import { SimpleMergeManager } from '@/utils/wijmo.grid';
   import { ref, reactive, watch } from 'vue';
-
+////
+///
   const dropboxAssigneeLabel = '출고검수/패킹담당자';
   //출고검수/패킹 담당자 필터링 드롭박스 바인딩 객체.
   const dropboxAssigneeList = ref([]);
@@ -354,11 +371,13 @@
           console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
           // 리스트를 조회할 때 마다, 조회되는 리스트에 맞는 출고검수/패킹 담당자 목록을 조회해서 동적으로 드롭박스에 할당.
           getAssigneeList(filterList);
+
         } else {
           // 조회된 목록이 없는 경우:
           // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
           afterPickingList.value = [];
           dropboxAssigneeList.value = [];
+
         }
       });
   };
@@ -464,6 +483,48 @@
     }
     console.log('## function search() : ', filterList);
     getAfterPickingList();
+  }
+
+
+  ////////
+  const retrieve = (param) => {
+    let items = _.cloneDeep(param.items);
+
+  const totalCount = items.length;
+  console.log('## totalCount : ', totalCount);
+    if (param.sort) {
+      items = _.sortBy(items, param.sort);
+      if (['desc', 'DESC'].includes(param.direction)) {
+        items = items.reverse();
+      }
+    }
+    if (param.pageNo) {
+      items = items.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
+    }
+
+    return Promise.resolve({
+      data: items,
+      status: 200,
+      code: 'OK',
+      message: 'Success',
+      totalCount: totalCount,
+    });
+  }
+
+  async function read(query, pageNo, pageSize) {
+    await getAfterPickingList();
+    const result = await retrieve({
+      ...query,
+        pageNo: pageNo
+        , pageSize: pageSize
+        , pageSizeList: pageSizeList
+        , totalCount: totalCount
+        , items: afterPickingList.value
+      });
+      data: afterPickingList.value
+    console.log('## result', result);
+    // initialize();
+    return result;
   }
 
 </script>

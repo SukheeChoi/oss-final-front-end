@@ -9,15 +9,15 @@
       <!-- 수령 대상 업체 필터링 -->
       <div v-if="showReceipt && vendorList!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 370px;">
-          <ow-filter-radio :items="vendorList" :step="5" />
-          <!-- <ow-filter-radio :items="vendorList" :step="5" :modelValue="checkedVendor" @update:modelValue="updateVendor"/> -->
+          <ow-filter-radio id="vendor-filter-radio" :items="vendorList" :step="5" v-model="selectedVendor" @update="selectedVendor = value('vendor-filter-radio')" :key="vendorKey"/>
+          <!-- <ow-filter-radio :items="vendorList" :step="5" :modelValue="selectedVendor" @update:modelValue="updateVendor" :key="vendorKey"/> -->
         </div>
       </div>
 
       <!-- 전달 담당자 이름 filter -->
       <div v-if="!showReceipt && assigneeList!=null" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 270px;">
-          <ow-filter-radio :items="assigneeList" :step="4"/>
+          <ow-filter-radio id="assignee-filter-radio" :items="assigneeList" :step="4" v-model="selectedAssignee" @update="selectedAssignee = value('assignee-filter-radio')" :key="assigneeKey"/>
         </div>
       </div>
 
@@ -119,15 +119,21 @@
 
   const receiptKey = ref(0);
   const deliveryKey = ref(0);
-  const selectedEmployeeId = ref('');
   const showReceipt = ref(true);
   const toDo = ref(1);
   const startDate = ref(new Date());
   const endDate = ref(new Date());
   const clickSearch = ref(false);
-  const vendorList = ref(null);
-  const checkedVendor = ref(null);
-  const assigneeList = ref(null);
+  const vendorList = ref({
+    name: '전체'
+    , value: '전체'
+  });
+  const selectedVendor = ref('전체');
+  const assigneeList = ref({
+    name: '전체'
+    , value: '전체'
+  });
+  const selectedAssignee = ref('전체');
   const dateList = ref([startDate.value, endDate.value]);
   const receiptList = ref([]);
   const receiptedList = ref([]);
@@ -136,20 +142,26 @@
   const checkedReceiptCount = ref(0);
   const checkedDeliveryCount = ref(0);
 
+  const vendorKey = ref(1);
+
   //수령 탭
   // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
-  const getVendorList = async (toDo=1, dateList=Array.from([new Date(), new Date()])) => {
-    const result = await combineShippingApi.getVendorList(toDo, dateList)
+  const getVendorList = async () => {
+    const result = await combineShippingApi.getVendorList(toDo.value, dateList.value)
         .then((result) => {
           if(result != null && result.list != null) {
-            let dbVendor = [];
+            let dbVendor = [{
+              name: '전체'
+              , value: '전체'
+            }];
             for(let i=0; i<result.list.length; i++) {
               console.log('## result.list[i] : ', result.list[i]);
               dbVendor.push(
                 {
                   name: result.list[i]['vendorName']
-                  , value: result.list[i]['vendorCode']
-                  , disabled: false
+                  , value: result.list[i]['vendorName']
+                  // , value: result.list[i]['vendorCode']
+                  // , disabled: false
                 }
               );
             }
@@ -160,17 +172,20 @@
         });
     // return result;
   };
-  getVendorList(toDo.value, Array.from(['2022-06-01', '2022-06-28']));
+  getVendorList();
 
   //담당자 조회. 페이지네이션 고려X.
   // 할 일: 해당기간에 수령완료된 이력의 담당자. -> 사실상 '수령 한 일'의 담당자와 같음.
   // 한 일: 해당기간에 전달이력의 담당자.
-  const getAssigneeList = async (toDo=1, dateList=[]) => {
-    const result = await combineShippingApi.getAssigneeList(toDo, dateList)
+  const getAssigneeList = async () => {
+    const result = await combineShippingApi.getAssigneeList(toDo.value, dateList.value)
         .then((result) => {
           console.log('## getAssigneeList result : ', result);
           if(result != null && result.list != null) {
-            let dbAssignee = [];
+            let dbAssignee = [{
+              name: '전체'
+              , value: '전체'
+            }];
             for(let i=0; i<result.list.length; i++) {
               console.log('## result.list[i] : ', result.list[i]);
               dbAssignee.push(
@@ -186,9 +201,8 @@
             assigneeList.value = null;
           }
         });
-    // return result;
   };
-  getAssigneeList(toDo.value, [new Date(), new Date()]);
+  getAssigneeList();
 
   const retrieve = (param) => {
     console.log('param', param);
@@ -198,7 +212,6 @@
     let filteredItems = [];
 
     if(param.label === 'receipt') {
-      console.log('retrieve - receiptList.value[i]["releaseQuantity"] : ' + receiptList.value[0]["releaseQuantity"]);
       for(let i=0; i<items.length; i++) {
         filteredItems.push({
           'No': i+1  //pagination할 때 rowNum 함께 받아서 이용할 것.
@@ -213,33 +226,25 @@
         });
       }
     } else {
+      console.log('#### deliveryList.value', deliveryList.value);
+      console.log('#### deliveryList.value.length', deliveryList.value.length);
       for(let i=0; i<items.length; i++) {
-        //No는 행번호를 이용해서 생성할것.
-        console.log('deliveryList.value[' + i + '] : ' + deliveryList.value[i]);
-        //주문번호
-        console.log('deliveryList.value[' + i + ']["orderItem"]["orderNo"] : ' + deliveryList.value[i]["orderItem"]["orderNo"]);
-        //출고번호
-        console.log('deliveryList.value[' + i + ']["release"]["releaseNo"] : ' + deliveryList.value[i]["release"]["releaseNo"]);
-        //품목명
-        console.log('deliveryList.value[' + i + ']["item"]["itemName"] : ' + deliveryList.value[i]["item"]["itemName"]);
-        //품목코드
-        console.log('deliveryList.value[' + i + ']["item"]["itemCode"] : ' + deliveryList.value[i]["item"]["itemCode"]);
-        //수량
-        console.log('deliveryList.value[' + i + ']["deliveryQuantity"] : ' + deliveryList.value[i]["deliveryQuantity"]);
-        //미출고
-        console.log('deliveryList.value[' + i + ']["deliveryUnrelease"] : ' + deliveryList.value[i]["deliveryUnrelease"]);
-        //전달여부
-        console.log('deliveryList.value[' + i + ']["deliverCheck"] : ' + deliveryList.value[i]["deliverCheck"]);
-  
         filteredItems.push({
+          // ROWNUM 사용할 것.
           'No': i+1
+          // 주문번호/출고번호
           , 'order_release_no': deliveryList.value[i]["orderItem"]["orderNo"] + '/' + deliveryList.value[i]["release"]["releaseNo"]
+          // 품목명
           , 'itemName': deliveryList.value[i]["item"]["itemName"]
+          // 품목코드
           , 'itemCode': deliveryList.value[i]["item"]["itemCode"]
+          // 수령수량
           , 'receiveQuantity': deliveryList.value[i]["receiveQuantity"]
+          // 전달수량
           , 'deliveryQuantity': deliveryList.value[i]["deliveryQuantity"]
+          // 미출고
           , 'unreleased': deliveryList.value[i]["deliveryUnrelease"]
-
+          // PK용 orderItemNo
           , 'orderItemNo': deliveryList.value[i]["orderItemNo"]
         });
       }
@@ -289,14 +294,14 @@
   // '수령'탭에 바인딩할 데이터를 불러옴.
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
-  const getReceiptList = async (toDo=1, employeeId='', dateList=[]) => {
-    const result = await combineShippingApi.getReceiptList(toDo, employeeId, Array.from(dateList))
+  const getReceiptList = async () => {
+    const result = await combineShippingApi.getReceiptList(toDo.value, '', Array.from(dateList.value))
         .then((result) => {
           if(result.receiptList != null) {
             receiptList.value = result.receiptList;
             read();
             // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-            receiptKey.value++;
+            receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
           } else {
             receiptList.value = [];
             read();
@@ -317,17 +322,17 @@
         console.log('updateReceiptList - result : ' + result);
         checkedReceiptCount.value = 0;
         // 수령 update한 결과를 보여주기.
-        getReceiptList(toDo.value, '', dateList.value);
+        getReceiptList();
       });
     // return result;
   };
 
   // '전달' 탭에서 바인딩할 데이터를 불러옴.
   // const getDeliveryList = async (toDo=1, employeeId='', dateList=[]) => {
-  async function getDeliveryList(toDo=1, employeeId='', dateList=[]) {
-    const result = await combineShippingApi.getDeliveryList(toDo, employeeId, Array.from(dateList))
+  async function getDeliveryList() {
+    const result = await combineShippingApi.getDeliveryList(toDo.value, '', Array.from(dateList.value))
         .then((result) => {
-          if(result.deliveryList != null) {
+          if(result != null && result.deliveryList != null) {
             deliveryList.value = result.deliveryList;
             read();
             deliveryKey.value++;
@@ -336,7 +341,7 @@
             read();
             deliveryKey.value++;
           }
-          // getAssigneeList(toDo.value, dateList.value);
+          getAssigneeList();
       });
     // return result;
   };
@@ -397,11 +402,11 @@
     deliveredList.value = [];
 
     if(newShowReceipt === true) {
-      getReceiptList(toDo.value, '', dateList.value).then();
-      getVendorList(toDo.value, dateList.value);
+      getReceiptList();
+      getVendorList();
     } else {
-      getDeliveryList(toDo.value, '', dateList.value).then();
-      getAssigneeList(toDo.value, dateList.value);
+      getDeliveryList();
+      getAssigneeList();
     }
   });
   // 할일/한일 초기화 관리.
@@ -415,12 +420,12 @@
     deliveredList.value = [];
 
     if(showReceipt.value === true) {
-      getReceiptList(newToDo, '', Array.from(dateList.value));
-      getVendorList(toDo.value, '', dateList.value);
+      getReceiptList();
+      getVendorList();
       // 담당업체 조회.
     } else {
-      getDeliveryList(newToDo, '', Array.from(dateList.value));
-      getAssigneeList(toDo.value, Array.from(dateList.value));
+      getDeliveryList();
+      getAssigneeList();
     }
   });
   // 조회 감시.
@@ -431,31 +436,36 @@
     checkedDeliveryCount.value = 0;
 
     if(showReceipt.value === true) {
-      getReceiptList(toDo.value, '', Array.from(dateList.value));
-      getVendorList(toDo.value, '', Array.from(dateList.value));
+      getReceiptList();
+      getVendorList();
     } else {
-      getDeliveryList(toDo.value, '', Array.from(dateList.value));
-      getAssigneeList(toDo.value, Array.from(dateList.value));
+      getDeliveryList();
+      getAssigneeList();
     }
     clickSearch.value = false;
   });
-  function updateVendor(event) {
-    // console.log('## event : ', event);
-    // console.log('## event.target : ', event.target);
-    // console.log('## checkedVendor.value : ', checkedVendor.value);
-  }
-  // checkedVendor
-  watch(() => checkedVendor.value
-    , (newVendor, oldVendor) => {
-      console.log('## newVendor : ', newVendor);
-    });
+  // function updateVendor(vendor) {
+  //   // vendorKey.value++;
+  //   console.log('## vendor : ', vendor);
+  //   selectedVendor.value = vendor;
+  //   console.log('## selectedVendor.value : ', selectedVendor.value);
+  //   vendorKey.value++;
+  // }
 
-  // selectedEmployeeId
-  watch(() => selectedEmployeeId.value
-    , (newSelectedEmployeeId, oldSelectedEmployeeId) => {
-      console.log('## newSelectedEmployeeId : ', newSelectedEmployeeId);
-      // 전달 목록 조회하는 통신 수행하기.
-  });
+  // selectedVendor
+  watch(() => selectedVendor.value
+    , (newSelectedVendor, oldSelectedVendor) => {
+      console.log('## selectedVendor.value : ', selectedVendor.value);
+      console.log('## newSelectedVendor : ', newSelectedVendor);
+    }
+  );
+  // selectedAssignee
+  watch(() => selectedAssignee.value
+    , (newSelectedAssignee, oldSelectedAssignee) => {
+      console.log('## selectedAssignee.value : ', selectedAssignee.value);
+      console.log('## newSelectedAssignee : ', newSelectedAssignee);
+    }
+  );
 
   // watch(
   //   () => [selectedEmployeeId, showReceipt, toDo, clickSearch]
@@ -535,6 +545,7 @@
   function handleChangeToDelivery() {
     showReceipt.value = false;
   }
+
   // 할 일 탭 클릭시.
   function handleChangeToTodo() {
     toDo.value = 1;

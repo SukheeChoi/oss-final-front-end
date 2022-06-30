@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs, watch } from 'vue';
+import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import orderApi from '@/api/orderApi';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
@@ -236,7 +236,9 @@ export default {
 
     const onInitialized = (grid) => {
       state.grid = grid;
+      console.log(state.grid);
       grid.autoSizeRow(0, true);
+
       const config = {
         groupingColumns: ['orderDate'],
         mergedColumns: ['orderDate', 'orderNo', 'clientName'],
@@ -258,9 +260,9 @@ export default {
         const query = null;
         const pageNo = null;
         const pageSize = null;
-
+        
         read();
-
+        onInitialized(state.grid);
         dummy.value = false;
       },
       { deep: true }
