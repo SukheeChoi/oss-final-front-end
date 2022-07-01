@@ -15,7 +15,7 @@ export default [
       {
         path: 'Main',
         name: 'DISTSub',
-        redirect: '/edu/Order',
+        redirect: '/edu/CustomerReceipt',
       },
       // detail ( 3depth)
       {
