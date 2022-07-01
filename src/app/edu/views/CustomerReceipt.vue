@@ -143,7 +143,12 @@
         </div>
         <div class="item align-to-right" style="--gap-item: 6px">
           <div>
-            <button class="ow-btn type-icon arrow-down arrow_down"></button>
+            <button type="button" class="ow-btn type-icon arrow_down">
+              <img
+                src="@/assets/images/icon/ico_list.svg"
+                style="border: 0.8px solid gray; width: 20px; padding: 2px"
+              />
+            </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
               <div>
@@ -202,26 +207,8 @@
         :visible-rows-count="state.visibleRowsCount"
       >
         <template #left>&nbsp;</template>
-        <wj-flex-grid-column binding="client" header="거래처" width="*" align="center" />
-        <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
-          <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
-            <span class="ow-tag type-category"><i class="o">주</i></span>
-            <span v-if="cell.item.level >= 2" class="ow-tag type-category"><i class="p">피</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">피</i></span>
-            <span v-if="cell.item.level >= 3" class="ow-tag type-category"><i class="i">검</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">검</i></span>
-            <span v-if="cell.item.level >= 4" class="ow-tag type-category"><i class="r">출</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">출</i></span>
-            <span v-if="cell.item.level == 5" class="ow-tag type-category"><i class="t">인</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">인</i></span>
-          </wj-flex-grid-cell-template>
-        </wj-flex-grid-column>
-        <!-- <wj-flex-grid-column cssClass="unrelease" binding="client" header="거래처" width="*" align="center">
-          <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
-            <span class="ow-tag type-category"><i class="u">미</i><strong style="color : rgb(210, 57, 46);">{{ cell.item.client }}</strong></span>
-          </wj-flex-grid-cell-template>
-        </wj-flex-grid-column>
-        <wj-flex-grid-column cssClass="unrelease" binding="level" header="처리단계" width="1.5*" align="center">
+        <!-- <wj-flex-grid-column v-if="!unrelease" binding="client" header="거래처" width="*" align="center" />
+        <wj-flex-grid-column v-if="!unrelease" binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <span class="ow-tag type-category"><i class="o">주</i></span>
             <span v-if="cell.item.level >= 2" class="ow-tag type-category"><i class="p">피</i></span>
@@ -234,6 +221,26 @@
             <span v-else class="ow-tag type-category"><i class="n">인</i></span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column> -->
+        <wj-flex-grid-column v-if="unrelease" cssClass="unrelease" binding="client" header="거래처" width="*" align="center">
+          <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
+            <span class="ow-tag type-category"
+              ><i class="u">미</i><strong style="color: rgb(210, 57, 46)">{{ cell.item.client }}</strong></span
+            >
+          </wj-flex-grid-cell-template>
+        </wj-flex-grid-column>
+        <wj-flex-grid-column v-if="unrelease" cssClass="unrelease" binding="level" header="처리단계" width="1.5*" align="center">
+          <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
+            <span class="ow-tag type-category"><i class="o">주</i></span>
+            <span v-if="cell.item.level >= 2" class="ow-tag type-category"><i class="p">피</i></span>
+            <span v-else class="ow-tag type-category"><i class="n">피</i></span>
+            <span v-if="cell.item.level >= 3" class="ow-tag type-category"><i class="i">검</i></span>
+            <span v-else class="ow-tag type-category"><i class="n">검</i></span>
+            <span v-if="cell.item.level >= 4" class="ow-tag type-category"><i class="r">출</i></span>
+            <span v-else class="ow-tag type-category"><i class="n">출</i></span>
+            <span v-if="cell.item.level == 5" class="ow-tag type-category"><i class="t">인</i></span>
+            <span v-else class="ow-tag type-category"><i class="n">인</i></span>
+          </wj-flex-grid-cell-template>
+        </wj-flex-grid-column>
       </ow-n-grid>
     </div>
   </div>
@@ -244,7 +251,7 @@ import OwNGrid from '@/components/grid/new/OwNGrid';
 import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
 
-const items = [];
+const items = ref([]);
 const statusOrd = ref(null);
 const statusPick = ref(null);
 const statusRls = ref(null);
@@ -258,7 +265,7 @@ const percentTrf = ref(null);
 
 //ngrid 페이지 설정
 const retrieve = (param) => {
-  let filteredItems = _.cloneDeep(items);
+  let filteredItems = _.cloneDeep(items.value);
   const totalCount = filteredItems.length;
   if (param.sort) {
     filteredItems = _.sortBy(filteredItems, param.sort);
@@ -285,6 +292,7 @@ async function read(query, pageNo, pageSize) {
     pageNo,
     pageSize,
   });
+  console.log(result);
   return result;
 }
 
@@ -328,10 +336,12 @@ export default {
 
     dummy().then((list) => {
       for (let i = 0; i < list.length; i++) {
-        items.push({
+        items.value.push({
           client: list[i]['client']['clientName'],
           level: list[i]['status'],
+          unrelease: list[i]['orderUnrelease'],
         });
+        console.log('items : ' + items.value.unrelease);
       }
     });
 

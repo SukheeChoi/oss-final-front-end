@@ -24,6 +24,8 @@ async function getFilterList(checkboxGroup2, checkboxGroup4, checkbox1) {
     const response = await axios.get(`/client/getFilterList`,{params:{shippingCategory, status, unreleaseChk}});
     receiptList = response.data.list;
     console.log("receiptList : " + receiptList);
+    console.log("receiptList - status : " + receiptList[0]['status']);
+    console.log("receiptList - unrelease : " + receiptList[0]['orderUnrelease']);
   } catch (error) {
     console.log(error);
   }
