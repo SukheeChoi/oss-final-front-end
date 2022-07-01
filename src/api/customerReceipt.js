@@ -13,22 +13,15 @@ import axios from 'axios';
 //   return receiptList;
 // }
 
-async function getFilterList(filterList) {
-  let receiptList = null;
+async function getFilterList(checkboxGroup2, checkboxGroup4, checkbox1) {
+  const shippingCategory = checkboxGroup2._rawValue.join(',');
+  const status = checkboxGroup4.value;
+  const unreleaseChk = checkbox1.value;
+  
+  console.log("unreleaseChk : " + typeof(unreleaseChk));
+  let receiptList = [];
   try {
-    let params = new URLSearchParams();
-    params.append('shippingCategory',filterList.shippingCategory);
-    params.append('status',filterList.status);
-    params.append('unreleased',filterList.unreleased);
-    params.append('orderNo',filterList.orderNo);
-    params.append('clientName',filterList.clientName);
-    console.log(params);
-    console.log("filterList.shippingCategory : " + filterList.shippingCategory);
-    console.log("filterList.status : " + filterList.status);
-    console.log("filterList.unreleased : " + filterList.unreleased);
-    console.log("1111111111111111111111");
-    const response = await axios.post(`/client/getFilterList`, params);
-    console.log("222222222222222222222");
+    const response = await axios.get(`/client/getFilterList`,{params:{shippingCategory, status, unreleaseChk}});
     receiptList = response.data.list;
     console.log("receiptList : " + receiptList);
   } catch (error) {

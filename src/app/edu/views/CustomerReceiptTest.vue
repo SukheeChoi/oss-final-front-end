@@ -9,23 +9,37 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
-              <progress class="low" v-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
-              <progress class="mid" v-else-if="percentOrd < 100" :value="percentOrd" :max="100"></progress>
-              <progress class="high" v-else :value="percentOrd" :max="100"></progress>
+              <span :data-value="statusCount.percent.percentOrd" :style="`width: ${statusCount.percent.percentOrd}%`"
+                >{{ statusCount.percent.percentOrd }}%</span
+              >
+              <progress
+                class="low"
+                v-if="statusCount.percent.percentOrd < 80"
+                :value="statusCount.percent.percentOrd"
+                :max="100"
+              ></progress>
+              <progress
+                class="mid"
+                v-else-if="statusCount.percent.percentOrd < 100"
+                :value="statusCount.percent.percentOrd"
+                :max="100"
+              ></progress>
+              <progress class="high" v-else :value="statusCount.percent.percentOrd" :max="100"></progress>
             </div>
           </div>
           <hr />
           <div class="ow-flex-wrap">
             <div class="item">계획</div>
             <div class="align-to-right">
-              200건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 200 - statusOrd }}건</strong> /
-              <strong style="color: rgb(210, 57, 46)">미출고 6건</strong>)
+              {{ statusCount.status.OrderPlan }}건(<strong style="color: rgb(103, 146, 226)"
+                >잔여 {{ statusCount.status.OrderPlan - statusCount.status.statusOrd }}건</strong
+              >
+              / <strong style="color: rgb(210, 57, 46)">미출고 6건</strong>)
             </div>
           </div>
           <div class="ow-flex-wrap">
             <div class="item">실적</div>
-            <div class="align-to-right">{{ statusOrd }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusOrd }}건</div>
           </div>
         </div>
       </div>
@@ -37,20 +51,32 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span :data-value="percentPick" :style="`width: ${percentPick}%`">{{ percentPick }}%</span>
-              <progress class="low" v-if="percentPick < 80" :value="percentPick" max="100"></progress>
-              <progress class="mid" v-else-if="percentPick < 100" :value="percentPick" max="100"></progress>
-              <progress class="high" v-else :value="percentPick" max="100"></progress>
+              <span :data-value="statusCount.percent.percentPick" :style="`width: ${statusCount.percent.percentPick}%`"
+                >{{ statusCount.percent.percentPick }}%</span
+              >
+              <progress
+                class="low"
+                v-if="statusCount.percent.percentPick < 80"
+                :value="statusCount.percent.percentPick"
+                max="100"
+              ></progress>
+              <progress
+                class="mid"
+                v-else-if="statusCount.percent.percentPick < 100"
+                :value="statusCount.percent.percentPick"
+                max="100"
+              ></progress>
+              <progress class="high" v-else :value="statusCount.percent.percentPick" max="100"></progress>
             </div>
           </div>
           <hr />
           <div class="ow-flex-wrap">
             <div class="item">계획</div>
-            <div class="align-to-right">{{ statusOrd }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusOrd }}건</div>
           </div>
           <div class="ow-flex-wrap">
             <div class="item">실적</div>
-            <div class="align-to-right">{{ statusPick }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusPick }}건</div>
           </div>
         </div>
       </div>
@@ -62,20 +88,32 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span :data-value="percentPack" :style="`width: ${percentPack}%`">{{ percentPack }}%</span>
-              <progress class="low" v-if="percentPack < 80" :value="percentPack" max="100"></progress>
-              <progress class="mid" v-else-if="percentPack < 100" :value="percentPack" max="100"></progress>
-              <progress class="high" v-else :value="percentPack" max="100"></progress>
+              <span :data-value="statusCount.percent.percentPack" :style="`width: ${statusCount.percent.percentPack}%`"
+                >{{ statusCount.percent.percentPack }}%</span
+              >
+              <progress
+                class="low"
+                v-if="statusCount.percent.percentPack < 80"
+                :value="statusCount.percent.percentPack"
+                max="100"
+              ></progress>
+              <progress
+                class="mid"
+                v-else-if="statusCount.percent.percentPack < 100"
+                :value="statusCount.percent.percentPack"
+                max="100"
+              ></progress>
+              <progress class="high" v-else :value="statusCount.percent.percentPack" max="100"></progress>
             </div>
           </div>
           <hr />
           <div class="ow-flex-wrap">
             <div class="item">계획</div>
-            <div class="align-to-right">{{ statusPick }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusPick }}건</div>
           </div>
           <div class="ow-flex-wrap">
             <div class="item">실적</div>
-            <div class="align-to-right">{{ statusPack }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusPack }}건</div>
           </div>
         </div>
       </div>
@@ -87,20 +125,32 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span :data-value="percentRls" :style="`width: ${percentRls}%`">{{ percentRls }}%</span>
-              <progress class="low" v-if="percentRls < 80" :value="percentRls" max="100"></progress>
-              <progress class="mid" v-else-if="percentRls < 100" :value="percentRls" max="100"></progress>
-              <progress class="high" v-else :value="percentRls" max="100"></progress>
+              <span :data-value="statusCount.percent.percentRls" :style="`width: ${statusCount.percent.percentRls}%`"
+                >{{ statusCount.percent.percentRls }}%</span
+              >
+              <progress
+                class="low"
+                v-if="statusCount.percent.percentRls < 80"
+                :value="statusCount.percent.percentRls"
+                max="100"
+              ></progress>
+              <progress
+                class="mid"
+                v-else-if="statusCount.percent.percentRls < 100"
+                :value="statusCount.percent.percentRls"
+                max="100"
+              ></progress>
+              <progress class="high" v-else :value="statusCount.percent.percentRls" max="100"></progress>
             </div>
           </div>
           <hr />
           <div class="ow-flex-wrap">
             <div class="item">계획</div>
-            <div class="align-to-right">{{ statusPack }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusPack }}건</div>
           </div>
           <div class="ow-flex-wrap">
             <div class="item">실적</div>
-            <div class="align-to-right">{{ statusRls }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusRls }}건</div>
           </div>
         </div>
       </div>
@@ -112,20 +162,32 @@
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <span :data-value="percentTrf" :style="`width: ${percentTrf}%`">{{ percentTrf }}%</span>
-              <progress class="low" v-if="percentTrf < 80" :value="percentTrf" max="100"></progress>
-              <progress class="mid" v-else-if="percentTrf < 100" :value="percentTrf" max="100"></progress>
-              <progress class="high" v-else :value="percentTrf" max="100"></progress>
+              <span :data-value="statusCount.percent.percentRls" :style="`width: ${statusCount.percent.percentRls}%`"
+                >{{ statusCount.percent.percentRls }}%</span
+              >
+              <progress
+                class="low"
+                v-if="statusCount.percent.percentRls < 80"
+                :value="statusCount.percent.percentRls"
+                max="100"
+              ></progress>
+              <progress
+                class="mid"
+                v-else-if="statusCount.percent.percentRls < 100"
+                :value="statusCount.percent.percentRls"
+                max="100"
+              ></progress>
+              <progress class="high" v-else :value="statusCount.percent.percentRls" max="100"></progress>
             </div>
           </div>
           <hr />
           <div class="ow-flex-wrap">
             <div class="item">계획</div>
-            <div class="align-to-right">{{ statusRls }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusRls }}건</div>
           </div>
           <div class="ow-flex-wrap">
             <div class="item">실적</div>
-            <div class="align-to-right">{{ statusTrf }}건</div>
+            <div class="align-to-right">{{ statusCount.status.statusTrf }}건</div>
           </div>
         </div>
       </div>
@@ -143,7 +205,13 @@
         </div>
         <div class="item align-to-right" style="--gap-item: 6px">
           <div>
-            <button class="ow-btn type-icon arrow-down arrow_down"></button>
+            <!-- <button class="ow-btn type-icon arrow-down arrow_down"></button> -->
+            <button type="button" class="ow-btn type-icon arrow_down">
+              <img
+                src="@/assets/images/icon/ico_list.svg"
+                style="border: 0.8px solid gray; width: 20px; padding: 2px"
+              />
+            </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
               <div>
@@ -179,16 +247,12 @@
             </div>
           </div>
           <div class="title-field">검색</div>
-          <div class="ow-select" style="--width: 97px">
-            <select name="" id="">
-              <option value="" selected hidden>선택</option>
-              <option value="주문번호">주문번호</option>
-              <option value="거래처">거래처</option>
-            </select>
+          <div style="--width: 97px">
+            <ow-select :items="searchCategoryList" v-model="searchCategory"></ow-select>
           </div>
           <div class="ow-input type-button" style="--width: 200px">
-            <input type="text" placeholder="검색어를 입력하세요." />
-            <input type="submit" class="btn-search" />
+            <input type="text" v-model="searchCategoryContent" placeholder="검색어를 입력하세요." />
+            <input type="submit" class="btn-search" @click="search" />
           </div>
         </div>
       </div>
@@ -196,9 +260,11 @@
     <div>
       <ow-n-grid
         :n="9"
+        :itemsSource="receiptList"
         :initialized="initialize"
         :read="read"
         :autoRowHeights="true"
+        selectionMode="None"
         :visible-rows-count="state.visibleRowsCount"
       >
         <template #left>&nbsp;</template>
@@ -239,22 +305,82 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import OwNGrid from '@/components/grid/new/OwNGrid';
 import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
+import { requestLogout } from '../../../api/login';
 
 const items = [];
-const statusOrd = ref(null);
-const statusPick = ref(null);
-const statusRls = ref(null);
-const statusPack = ref(null);
-const statusTrf = ref(null);
-const percentOrd = ref(null);
-const percentPick = ref(null);
-const percentPack = ref(null);
-const percentRls = ref(null);
-const percentTrf = ref(null);
+
+//검색 카테고리
+const searchCategory = ref(null);
+//검색 내용
+const searchCategoryContent = ref(null);
+
+const filterList = reactive({
+  shippingCategory: '',
+  status: '',
+  unreleased: '',
+  orderNo: '',
+  clientName: '',
+});
+
+const statusCount = reactive({
+  status: {
+    OrderPlan: null,
+    statusOrd: null,
+    statusPick: null,
+    statusPack: null,
+    statusRls: null,
+    statusTrf: null,
+  },
+  percent: {
+    percentOrd: null,
+    percentPick: null,
+    percentPack: null,
+    percentRls: null,
+    percentTrf: null,
+  },
+});
+
+const receiptList = ref([]);
+
+// progress바 조회
+const getStatusCnt = async () => {
+  const result = await clientApi.getStatusCnt().then((result) => {
+    statusCount.status.OrderPlan = 200;
+    statusCount.status.statusOrd = result[0] + result[1] + result[2] + result[3] + result[4];
+    statusCount.status.statusPick = result[1] + result[2] + result[3] + result[4];
+    statusCount.status.statusPack = result[2] + result[3] + result[4];
+    statusCount.status.statusRls = result[3] + result[4];
+    statusCount.status.statusTrf = result[4];
+
+    statusCount.percent.percentOrd = parseInt((statusCount.status.statusOrd / statusCount.status.OrderPlan) * 100);
+    statusCount.percent.percentPick = parseInt((statusCount.status.statusPick / statusCount.status.statusOrd) * 100);
+    statusCount.percent.percentPack = parseInt((statusCount.status.statusPack / statusCount.status.statusPick) * 100);
+    statusCount.percent.percentRls = parseInt((statusCount.status.statusRls / statusCount.status.statusPack) * 100);
+    statusCount.percent.percentTrf = parseInt((statusCount.status.statusTrf / statusCount.status.statusRls) * 100);
+  });
+};
+getStatusCnt();
+
+// //리스트 조회
+// const getFilterList = async (filterList) => {
+//   const result = await clientApi.getFilterList(filterList).then((result) => {
+//     console.log('getFilterList - JSON.stringify(result) : ' + JSON.stringify(result));
+//     // receiptList.value = result.list;
+//     console.log("Array.isArray(result) : " + result);
+//     console.log("Array.isArray(result) : " + Array.isArray(result));
+//     for (let i = 0; i < result.length; i++) {
+//       items.push({
+//         client: result[i]['client']['clientName'],
+//         level: result[i]['status'],
+//       });
+//     }
+//   });
+// };
+// getFilterList(filterList);
 
 //ngrid 페이지 설정
 const retrieve = (param) => {
@@ -288,94 +414,104 @@ async function read(query, pageNo, pageSize) {
   return result;
 }
 
-export default {
-  name: 'TheOwNewGrid',
-  components: {
-    OwNGrid,
-  },
-  setup(props) {
-    const state = reactive({
-      visibleRowsCount: 15,
-    });
+const state = reactive({
+  visibleRowsCount: 15,
+});
 
-    const initialize = (s) => {};
+const initialize = (s) => {};
 
-    let globalIndex = 0;
+let globalIndex = 0;
 
-    const checkboxGroup1 = ref([
-      { name: '일반', value: '일반' },
-      { name: '긴급', value: '긴급' },
-    ]);
-    const checkboxGroup3 = ref([
-      { name: '전체', value: '0' },
-      { name: '주문확인', value: '1' },
-      { name: '피킹', value: '2' },
-      { name: '출고검수', value: '3' },
-      { name: '출고', value: '4' },
-      { name: '택배사 인계', value: '5' },
-    ]);
+// //미출고
+const checkbox1 = ref([]);
 
-    // filter 초기값 : '일반','긴급', '0', 미출고만 보기 'false'
-    const checkboxGroup2 = ref(['일반', '긴급']);
-    const checkboxGroup4 = ref('0');
-    const checkbox1 = ref('false');
+// filter 초기값 : 배송구분 = '일반','긴급', 회사 = '0', 미출고 = 'false'
+const checkboxGroup2 = ref(['긴급', '일반']);
+const checkboxGroup4 = ref([]);
 
-    // db에 filter값 보내기
-    const dummy = async () => {
-      let list = await clientApi.getFilterList(checkboxGroup2, checkboxGroup4, checkbox1);
-      return list;
-    };
+//배송구분
+const checkboxGroup1 = ref([
+  { name: '긴급', value: '긴급' },
+  { name: '일반', value: '일반' },
+]);
 
-    dummy().then((list) => {
-      for (let i = 0; i < list.length; i++) {
-        items.push({
-          client: list[i]['client']['clientName'],
-          level: list[i]['status'],
-        });
-      }
-    });
+//회사
+const checkboxGroup3 = ref([
+  { name: '전체', value: '0' },
+  { name: '주문확인', value: '1' },
+  { name: '피킹', value: '2' },
+  { name: '출고검수', value: '3' },
+  { name: '출고', value: '4' },
+  { name: '택배사 인계', value: '5' },
+]);
 
-    //주문 단계 카운트
-    async function getCnt() {
-      const cnt = await clientApi.getStatusCnt();
-      statusOrd.value = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4];
-      statusPick.value = cnt[1] + cnt[2] + cnt[3] + cnt[4];
-      statusPack.value = cnt[2] + cnt[3] + cnt[4];
-      statusRls.value = cnt[3] + cnt[4];
-      statusTrf.value = cnt[4];
-      //주문 단계마다 완료 퍼센트
-      percentOrd.value = parseInt((statusOrd.value / 200) * 100);
-      percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
-      percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
-      percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
-      percentTrf.value = parseInt((statusTrf.value / statusRls.value) * 100);
+//검색
+const searchCategoryList = [
+  { name: '주문번호', value: '주문번호' },
+  { name: '거래처', value: '거래처' },
+];
 
-      return cnt;
+watch(
+  [checkboxGroup2, checkboxGroup4, checkbox1],
+  ([new1, new2, new3], [old1, old2, old3]) => {
+    console.log('new1 : ', new1);
+    console.log('new2 : ', new2);
+    console.log('new3 : ', new3);
+    console.log('new1.length : ', new1.length);
+    console.log('new1[0] : ', new1[0]);
+    if (new1.length == 2) {
+      filterList.shippingCategory = ['긴급', '일반'];
+    } else {
+      filterList.shippingCategory = new1[0];
     }
-    getCnt();
 
-    return {
-      initialize,
-      read,
-      state,
-      checkboxGroup1,
-      checkboxGroup2,
-      checkboxGroup3,
-      checkboxGroup4,
-      checkbox1,
-      statusOrd,
-      statusPick,
-      statusPack,
-      statusRls,
-      statusTrf,
-      percentOrd,
-      percentPick,
-      percentPack,
-      percentRls,
-      percentTrf,
-    };
+    if (new2 == 0) {
+      filterList.status = '0';
+    } else {
+      filterList.status = new2[0];
+    }
+
+    if (new3 == 'true') {
+      filterList.unreleased = 'true';
+    } else {
+      filterList.unreleased = 'false';
+    }
+    console.log(
+      'watch([checkboxGroup2, checkboxGroup4, checkbox1] : ' +
+        filterList.shippingCategory +
+        filterList.status +
+        filterList.unreleased
+    );
+    getFilterList(filterList).then(() => {});
   },
+  { deep: true }
+);
+
+function search() {
+  if (searchCategory.value === '주문번호') {
+    filterList.orderNo = searchCategoryContent.value;
+  } else if (searchCategory.value === '거래처') {
+    filterList.clientName = searchCategoryContent.value;
+  }
+  getFilterList(filterList).then(() => {});
+}
+
+//리스트 조회
+const getFilterList = async (filterList) => {
+  const result = await clientApi.getFilterList(filterList).then((result) => {
+    console.log('getFilterList - JSON.stringify(result) : ' + JSON.stringify(result));
+    // receiptList.value = result.list;
+    console.log("result.length : " + result.length);
+    console.log("Array.isArray(result) : " + Array.isArray(result));
+    for (let i = 0; i < result.length; i++) {
+      items.push({
+        client: result[i]['client']['clientName'],
+        level: result[i]['status'],
+      });
+    }
+  });
 };
+getFilterList(filterList);
 </script>
 
 <style>
