@@ -202,6 +202,7 @@
       >
         <template #left>&nbsp;</template>
         <wj-flex-grid-column binding="client" header="거래처" width="*" align="center" />
+        
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <span class="ow-tag type-category"><i class="o">주</i></span>
@@ -219,7 +220,7 @@
             <span v-else class="ow-tag type-category"><i class="n">인</i></span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
-        <!-- <wj-flex-grid-column cssClass="unrelease" binding="client" header="거래처" width="*" align="center">
+        <wj-flex-grid-column cssClass="unrelease" binding="client" header="거래처" width="*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <span class="ow-tag type-category"><i class="u">미</i><strong style="color : rgb(210, 57, 46);">{{ cell.item.client }}</strong></span>
           </wj-flex-grid-cell-template>
@@ -240,7 +241,7 @@
             <span v-if="cell.item.level == 5" class="ow-tag type-category"><i class="t">인</i></span>
             <span v-else class="ow-tag type-category"><i class="n">인</i></span>
           </wj-flex-grid-cell-template>
-        </wj-flex-grid-column> -->
+        </wj-flex-grid-column>
       </ow-n-grid>
     </div>
   </div>

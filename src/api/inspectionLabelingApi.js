@@ -21,10 +21,27 @@ async function getTreeList() {
     console.log(response);
 
     response.data.item.map((i) => {
+      i.startTime = "dd";
+      i.workTime = "dd";
+      i.progressRate = "dd";
+      i.status = "dd";
+      i.lateTime = "dd";
+      i.passItemQuantity = "dd";
+      i.inspectionQuantity = "dd";
+      i.labelingItemQuantity = "dd";
+
       i.child.map((k) => {
-        k.colspan = 8;
+        k.startTime = "dd";
+        k.workTime = "dd";
+        k.progressRate = "dd";
+        k.status = "dd";
+        k.lateTime = "dd";
+        k.passItemQuantity = "dd";
+        k.inspectionQuantity = "dd";
+        k.labelingItemQuantity = "dd";
         //지연시간에 분 붙이기
         k.childrennn.map((m) => {
+          m.inspectionQuantity = 222;
           if (m.lateTime) {
             m.lateTime = m.lateTime + '분';
           }
@@ -45,6 +62,13 @@ async function getListByEmployeeName(employeeName, searchSelected, searchContent
       params: { employeeName, searchSelected, searchContent, pageNo, pageSize },
     });
     console.log(response);
+    response.data.data.map((data) => {
+      if(data.accepted === false) {
+        data.accepted = null;
+      } else {
+        data.accepted = "승인";
+      }
+    })
   } catch (error) {
     console.log(error);
   }

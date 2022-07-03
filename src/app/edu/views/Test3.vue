@@ -1,282 +1,471 @@
 <template>
-  <div class="ow-flex-wrap dir-col" style="--gap: 10px">
-    <div class="item">
-      <div class="ow-flex-wrap">
-        <div class="item size-fix" style="--gap-item: 6px">
-          <div class="title-field">현황</div>
-        </div>
+  <div class="1 h-100">
+    <!-- 현황 화면 -->
+    <div class="ow-flex-wrap">
+      <div class="item size-fix" style="--gap-item: 6px">
+        <div class="title-field">현황</div>
         <div class="item">
           <div class="state">
             <div class="state-item">
-              전체 : <strong>{{ statusBar.total }}</strong
-              >건
+              물품수령 : <strong>{{ statusBar.receiveItem }}</strong
+              >품목/ <strong>{{ statusBar.receiveItemQuantity }}</strong
+              >개
             </div>
             <div class="state-item">
-              오스템 : <strong>{{ statusBar.osstem }}</strong
-              >건
+              검품검수 : <strong>{{ statusBar.inspectionItem }}</strong
+              >품목/<strong>{{ statusBar.inspectionItemQuantity }}</strong
+              >개
             </div>
             <div class="state-item">
-              협력사합배송 : <strong>{{ statusBar.vendorShippingPlus }}</strong
-              >건
+              라벨링 : <strong>{{ statusBar.labelingItem }}</strong
+              >품목/<strong>{{ statusBar.labelingItemQuantity }}</strong
+              >개
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="item size-fix" style="--gap-item: 6px">
+        <div class="title-field">검품검수현황</div>
+        <div class="item">
+          <div class="state">
+            <div class="state-item">
+              양품 : <strong>{{ statusBar.passedItem }}</strong
+              >품목/<strong>{{ statusBar.passedItemQuantity }}</strong
+              >개
             </div>
             <div class="state-item">
-              협력사직배송 : <strong>{{ statusBar.vendorShippingDir }}</strong
-              >건
+              누락 : <strong>{{ statusBar.missingItem }}</strong
+              >품목/<strong>{{ statusBar.missingItemQuantity }}</strong
+              >개
             </div>
-            <div class="state-item" style="color: red">
-              미출고 : <strong class="color-type-1">{{ statusBar.unreleased }}</strong
-              >건
+            <div class="state-item">
+              파손 : <strong>{{ statusBar.damagedItem }}</strong
+              >품목/<strong>{{ statusBar.damagedItemQuantity }}</strong
+              >개
             </div>
           </div>
         </div>
       </div>
     </div>
     <hr />
-    <!-- 배열을 이용한 동적 헤더  -->
-    <div class="ow-flex-wrap item-size-content" style="--gap: 10px">
-      <ow-filter-checkbox
-        name="checkboxGp1"
-        :items="checkboxGroup1"
-        v-model:modelValue="checkboxGroup4"
-        :label="`회사`"
-      />
-      <ow-filter-checkbox name="checkboxGp2" :items="checkboxGroup2" v-model="checkboxGroup5" :label="`배송구분`" />
-      <ow-filter-checkbox name="checkboxGp3" :items="checkboxGroup3" v-model="checkboxGroup6" :label="`미출고`" />
-      <div class="title-field">지점별 보기</div>
-      <button class="ow-btn type-util">지점선택(전체)</button>
-
-      <div class="item align-to-right" style="--gap-item: 6px">
-        <div class="title-field">검색</div>
-        <div class="ow-select" style="--width: 97px">
-          <select name="" id="" v-model="searchSelected">
-            <option value="" selected hidden>선택</option>
-            <option value="주문번호">주문번호</option>
-            <option value="거래처">거래처</option>
-          </select>
+    <div class="d-flex">
+      <!-- 왼쪽 화면 -->
+      <div class="left h-100">
+        <div class="d-flex justify-content-end mt-5 mb-5">
+          <button class="ow-btn type-util">예정시간수정</button>
+          <button class="ow-btn type-util" @click="getListByEmployeeName()">추가</button>
         </div>
-        <div class="ow-input type-button" style="--width: 200px">
-          <input type="text" v-model="searchContent" placeholder="검색어를 입력하세요." />
-          <input type="submit" class="btn-search" @click="getSearchList()" />
+        <ow-tree-grid
+          :read="getTree"
+          :childItemsPath="['child', 'childrennn']"
+          :selectionChanged="onSelectionChanged"
+          :initialized="treeInitialized"
+        >
+          <wj-flex-grid-column
+            header="담당자/업체명"
+            binding="employeeName"
+            :width="130"
+            align="center"
+          ></wj-flex-grid-column>
+          <wj-flex-grid-column
+            header="수령일"
+            binding="receiveHourMinute"
+            :width="100"
+            align="center"
+          ></wj-flex-grid-column>
+          <wj-flex-grid-column
+            header="수령<br>품목"
+            binding="receiveItem"
+            :width="60"
+            align="center"
+          ></wj-flex-grid-column>
+          <wj-flex-grid-column
+            header="수령<br>수량"
+            binding="receiveQuantity"
+            :width="50"
+            align="center"
+          ></wj-flex-grid-column>
+          <wj-flex-grid-column
+            header="예정시간"
+            binding="scheduledStartTime"
+            :width="50"
+            align="center"
+          ></wj-flex-grid-column>
+          <wj-flex-grid-column header="시작시간" binding="startTime" :width="50" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column header="작업시간" binding="workTime" :width="50" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column header="진행률" binding="progressRate" :width="50" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column header="상태" binding="status" :width="50" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column
+            header="지연<br>시간"
+            binding="lateTime"
+            :width="50"
+            align="center"
+          ></wj-flex-grid-column>
+          <wj-flex-grid-column
+            header="검수<br>수량"
+            binding="inspectionQuantity"
+            :width="50"
+            align="center"
+          ></wj-flex-grid-column>
+          <wj-flex-grid-column
+            header="양품<br>수량"
+            binding="passItemQuantity"
+            :width="50"
+            align="center"
+          ></wj-flex-grid-column>
+          <wj-flex-grid-column
+            header="라벨링<br>수량"
+            binding="labelingItemQuantity"
+            :width="50"
+            align="center"
+          ></wj-flex-grid-column>
+        </ow-tree-grid>
+        <div class="lee">
+          <div class="container">
+            <div class="leeStatus">
+              <div class="item">
+                <div class="state">
+                  <div class="state-item">
+                    진행률 : <strong>{{ statusBar.receiveItemQuantity }}</strong> /
+                    <strong>{{ statusBar.passedItemQuantity }}</strong> /
+                    <strong>20%</strong>
+                  </div>
+                  <div class="state-item">
+                    현재달성률 : <strong>{{ statusBar.receiveItemQuantity }}</strong> /
+                    <strong>{{ statusBar.passedItemQuantity }}</strong> /
+                    <strong>30%</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm border">100%</div>
+              <div class="col-sm border">100%</div>
+              <div class="col-sm border">100%</div>
+              <div class="col-sm border">100%</div>
+              <div class="col-sm border">100%</div>
+              <div class="col-sm border">0</div>
+              <div class="col-sm border"></div>
+              <div class="col-sm border"></div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="progress">
+          <div
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="4"
+            aria-valuenow="1"
+            class="progress-bar"
+            :style="`width: ${70}%`"
+          />
+        </div> -->
+        <!-- <div class="progress-bar">
+          <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
+          <progress class="low" v-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
+          <progress class="mid" v-else-if="percentOrd < 100" :value="percentOrd" :max="100"></progress>
+          <progress class="high" v-else :value="percentOrd" :max="100"></progress>
+        </div> -->
+      </div>
+      <!-- 오른쪽 화면 -->
+      <div class="right flex-fill">
+        <div class="d-flex justify-content-end mt-5 mb-5">
+          <div class="item align-to-right" style="--gap-item: 6px">
+            <div class="title-field">검색</div>
+            <div class="ow-select" style="--width: 97px">
+              <select name="" id="" v-model="searchSelected">
+                <option value="" selected hidden>선택</option>
+                <option value="업체명">업체명</option>
+                <option value="발주번호">발주번호</option>
+                <option value="품목명">품목명</option>
+                <option value="품목코드">품목코드</option>
+              </select>
+            </div>
+            <div class="ow-input type-button" style="--width: 200px">
+              <input type="text" v-model="searchContent" placeholder="검색어를 입력하세요." />
+              <input type="submit" class="btn-search" @click="searchData()" />
+            </div>
+          </div>
+        </div>
+        <div class="ow-panel">
+          <div class="ow-panel-header">
+            <div class="ow-panel-title">
+              ■<span v-if="employeeName">[{{ employeeName }}]</span>검품검수 및 라벨링 내역
+            </div>
+          </div>
+          <div class="ow-panel-body1">
+            <div class="ow-grid-wrap">
+              <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
+              <ow-grid
+                v-if="employeeName"
+                headersVisibility="Column"
+                :allowMerging="'Cells'"
+                selectionMode="None"
+                :read="getGrid"
+                :key="keyData"
+                :initialized="onInitialized"
+              >
+                <template #left>&nbsp;</template>
+                <wj-flex-grid-column binding="vendorName" header="업체명" :width="100" align="center" />
+                <wj-flex-grid-column binding="itemName" header="품목명" width="*" align="center" />
+                <wj-flex-grid-column binding="itemCode" header="품목코드" :width="100" align="center" />
+                <wj-flex-grid-column binding="placingOrderNo" header="발주번호" :width="100" align="center" />
+                <wj-flex-grid-column binding="lotCode" header="LOT번호" :width="100" align="center" />
+                <wj-flex-grid-column binding="recievedQuantity" header="수령<br>수량" :width="50" align="center" />
+                <wj-flex-grid-column binding="inspectionQuantity" header="검수<br>수량" :width="50" align="center" />
+                <wj-flex-grid-column binding="passedItemQuantity" header="양품<br>수량" :width="50" align="center" />
+                <wj-flex-grid-column binding="missingItemQuantity" header="누락<br>수량" :width="50" align="center" />
+                <wj-flex-grid-column binding="damagedItemQuantity" header="파손<br>수량" :width="50" align="center" />
+                <wj-flex-grid-column binding="etcQuantity" header="기타<br>수량" :width="50" align="center" />
+                <wj-flex-grid-column binding="accepted" header="승인<br>여부" :width="50" align="center" />
+                <wj-flex-grid-column
+                  binding="labelingItemQuantity"
+                  header="라벨링<br>수량"
+                  :width="50"
+                  align="center"
+                />
+              </ow-grid>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- 그리드 부분 -->
-  <div class="ow-grid-wrap">
-    <ow-grid
-      :allowMerging="'Cells'"
-      :key="keyData"
-      :read="read"
-      :visibleRowsCount="15"
-      :initialized="onInitialized"
-    >
-      <template #left>&nbsp;</template>
-      <wj-flex-grid-column-group header="주문">
-        <wj-flex-grid-column-group
-          binding="orderDate"
-          header="주문일시"
-          :width="90"
-          align="center"
-          :allowMerging="true"
-          cssClassAll="border-center"
-        />
-        <wj-flex-grid-column-group
-          binding="orderNo"
-          header="주문번호"
-          :width="90"
-          align="left"
-          :allowMerging="true"
-          cssClassAll="border-center"
-        />
-        <wj-flex-grid-column-group
-          binding="clientName"
-          header="거래처"
-          width="*"
-          align="left"
-          :allowMerging="true"
-          cssClassAll="border-center"
-        />
-        <wj-flex-grid-column-group
-          binding="itemName"
-          header="품목명"
-          :width="130"
-          :wordWrap="true"
-          :multiLine="true"
-          cssClassAll="border-left"
-        />
-        <wj-flex-grid-column-group binding="itemCode" header="품목코드" :width="110" align="left" />
-        <wj-flex-grid-column-group binding="orderItemQuantity" header="주문수량" :width="50" align="right" />
-        <wj-flex-grid-column-group binding="shippingCategory" header="배송구분" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="vendorName" header="업체명" :width="90" align="left" />
-      </wj-flex-grid-column-group>
-      <wj-flex-grid-column-group header="피킹지시">
-        <wj-flex-grid-column-group binding="pickingDirectionAttempt" header="차수" :width="30" align="center" />
-        <wj-flex-grid-column-group binding="pickingDirectionDate" header="지시일시" :width="90" align="center" />
-        <wj-flex-grid-column-group binding="pickingDirectionQuantity" header="지시수량" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="pickingDirectionUnrelease" header="미출고" :width="50" align="center" />
-      </wj-flex-grid-column-group>
-      <wj-flex-grid-column-group header="피킹">
-        <wj-flex-grid-column-group binding="pickingEmployee" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="pickingQuantity" header="피킹수량" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="pickingDate" header="피킹일시" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="pickingUnrelease" header="미출고" :width="50" align="center" />
-      </wj-flex-grid-column-group>
-      <wj-flex-grid-column-group header="협력사">
-        <wj-flex-grid-column-group binding="orderShippingWay" header="배송방식" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="orderCheckDate" header="주문확인<br>일시" :width="100" align="center" />
-        <wj-flex-grid-column-group binding="releaseQuantity" header="출고수량" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="releaseScheduleDate" header="출고예정<br>일자" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="100" align="center" />
-      </wj-flex-grid-column-group>
-      <wj-flex-grid-column-group header="출고검수/패킹">
-        <wj-flex-grid-column-group binding="packingInspectionEmployee" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="inspectionDate" header="검수일시" :width="70" align="center" />
-      </wj-flex-grid-column-group>
-      <wj-flex-grid-column-group header="출고">
-        <wj-flex-grid-column-group binding="releaseEmployee" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="releaseDate" header="출고일시" :width="70" align="center" />
-      </wj-flex-grid-column-group>
-      <wj-flex-grid-column-group header="인계">
-        <wj-flex-grid-column-group binding="transferEmployee" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="transferDate" header="인계일시" :width="70" align="center" />
-      </wj-flex-grid-column-group>
-    </ow-grid>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
-import orderApi from '@/api/orderApi';
-import { SimpleMergeManager } from '@/utils/wijmo.grid';
+import inspectionLabelingApi from '@/api/inspectionLabelingApi';
+import { TreeMergeManager, SimpleMergeManager } from '@/utils/wijmo.grid';
 
-const checkboxGroup1 = ref([
-  { name: '오스템제품', value: 'osstemItem' },
-  { name: '오스템상품', value: 'osstemProduct' },
-  { name: '협력사상품(합배송)', value: 'vendorproductPlus' },
-  { name: '협력사상품(직배송)', value: 'vendorproductDir' },
-]);
+const childItemsPath = ['child', 'childrennn'];
 
-const checkboxGroup2 = ref([
-  { name: '긴급', value: 'emergency' },
-  { name: '일반', value: 'normal' },
-]);
-
-const checkboxGroup3 = ref([
-  { name: '출고', value: 'released' },
-  { name: '미출고', value: 'unreleased' },
-]);
-
-const checkboxGroup4 = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
-const checkboxGroup5 = ref(['emergency', 'normal']);
-const checkboxGroup6 = ref(['released', 'unreleased']);
-
-const getData = ref([]);
+const getTree = ref([]);
+const getGrid = ref([]);
 const keyData = ref(0);
 
+getTree.value = async function (query, pageNo, pageSize) {
+  const treeList = await inspectionLabelingApi.getTreeList();
 
+  const result = {
+    totalCount: 1,
+    data: treeList,
+  };
+
+  return result;
+};
+
+const employeeName = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
-const dummy = ref(null);
-
 const statusBar = reactive({
-  total: null,
-  osstem: null,
-  vendorShippingPlus: null,
-  vendorShippingDir: null,
-  unreleased: null,
+  receiveItem: null,
+  receiveItemQuantity: null,
+
+  inspectionItem: null,
+  inspectionItemQuantity: null,
+
+  labelingItem: null,
+  labelingItemQuantity: null,
+
+  passedItem: null,
+  passedItemQuantity: null,
+
+  missingItem: null,
+  missingItemQuantity: null,
+
+  damagedItem: null,
+  damagedItemQuantity: null,
 });
 
-//현황 가져오는 함수
 async function getStatus() {
-  const result = await orderApi.getStatus().then((data) => {
-    statusBar.total = data.total;
-    statusBar.osstem = data.osstem;
-    statusBar.vendorShippingPlus = data.vendorShippingPlus;
-    statusBar.vendorShippingDir = data.vendorShippingDir;
-    statusBar.unreleased = data.unreleased;
-    console.log(data);
+  const result = await inspectionLabelingApi.getStatus().then((data) => {
+    statusBar.receiveItem = data.receiveItem;
+    statusBar.receiveItemQuantity = data.receiveItemQuantity;
+
+    statusBar.inspectionItem = data.inspectionItem;
+    statusBar.inspectionItemQuantity = data.inspectionItemQuantity;
+
+    statusBar.labelingItem = data.labelingItem;
+    statusBar.labelingItemQuantity = data.labelingItemQuantity;
+
+    statusBar.passedItem = data.passedItem;
+    statusBar.passedItemQuantity = data.passedItemQuantity;
+
+    statusBar.missingItem = data.missingItem;
+    statusBar.missingItemQuantity = data.missingItemQuantity;
+
+    statusBar.damagedItem = data.damagedItem;
+    statusBar.damagedItemQuantity = data.damagedItemQuantity;
   });
 }
 getStatus();
 
-const retrieve = (param) => {
-  const lee = orderApi.getFilterList(checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value
-  , searchSelected.value, searchContent.value, param.pageNo, param.pageSize);
-  console.log(lee);
-  return Promise.resolve({
-    data: lee,
-    status: 200,
-    code: 'OK',
-    message: 'Success',
-    totalCount,
-  });
+//트리 그리드 셀렉션 핸들러
+const onSelectionChanged = (grid, target) => {
+  //반응형 변수 세팅(검색 조건 리셋)
+  searchSelected.value = '';
+  searchContent.value = '';
+  console.log(grid);
+  //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
+  if (target.row !== -1) {
+    //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
+    if (typeof grid.selectedItems[0].childrennn == 'object') {
+      employeeName.value = grid.selectedItems[0].employeeName;
+
+      getGrid.value = async function (query, pageNo, pageSize) {
+        //pageNo = "페이지번호"
+        //pageSize = "한페이지 몇 행"
+        //totalCount = "전체 행 수"
+        const lee = await inspectionLabelingApi.getListByEmployeeName(
+          employeeName.value,
+          searchSelected.value,
+          searchContent.value,
+          pageNo,
+          pageSize
+        );
+
+        const result = {
+          ...lee,
+          pageNo,
+          pageSize,
+        };
+        return result;
+      };
+      keyData.value++;
+    }
+  }
 };
 
-async function read(query, pageNo, pageSize) {
-  const result = await retrieve({
-    ...query,
-    pageNo,
-    pageSize,
-  });
-  console.log('result', result);
-  return result;
+function searchData() {
+  keyData.value++;
 }
 
-//그리드에 바인딩 하는 함수
-getData.value = async function (query, pageNo, pageSize) {
-  console.log(pageNo, pageSize, checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value);
-  //pageNo = "페이지번호"
-  //pageSize = "한페이지 몇 행"
-  //totalCount = "전체 행 수"
-
-  const lee = await orderApi.getFilterList(checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value, searchSelected.value, searchContent.value, pageNo, pageSize);
-
-  const result = {
-    ...lee,
-    pageNo,
-  };
-
-  console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', result);
-  return result;
-}
-
-const onInitialized = (grid) => {
+//트리 그리드 설정
+const treeInitialized = (grid) => {
   grid.autoSizeRow(0, true);
 
   const config = {
-    groupingColumns: ['orderDate'],
-    mergedColumns: ['orderDate', 'orderNo', 'clientName'],
+    groupingColumns: [],
+    mergedColumns: [
+      'startTime',
+      'workTime',
+      'progressRate',
+      'status',
+      'lateTime',
+      'inspectionQuantity',
+      'passItemQuantity',
+      'labelingItemQuantity',
+    ],
   };
+  console.log(grid);
+  console.log(grid.cells);
+  console.log(grid.cells._rng);
+  const leeMergeManager = new TreeMergeManager(config);
 
-  grid.mergeManager = new SimpleMergeManager(config);
+  grid.mergeManager = leeMergeManager;
+
+  grid.formatItem.addHandler((grid, e) => {
+    //헤더에 html태그 사용하게 하는 설정
+    if (e.panel == grid.columnHeaders) {
+      e.cell.innerHTML = e.cell.textContent;
+    }
+    console.log(e.cell.textContent)
+    // console.log(grid);
+    // console.log(e);
+
+    if (e.panel == grid.cells) {
+      var col = grid.columns[e.col];
+      var row = grid.rows[e.row];
+      // console.log(row.dataItem);
+      // console.log(row.dataItem.child);
+      // console.log(e.row);
+      // console.log(col);
+      if ((e.row < 1 || row.dataItem.childrennn) && (col.binding == 'startTime')) {
+        // var vnow = grid.getCellData(e.row, e.col - 1),
+        //   vprev = grid.getCellData(e.row - 1, e.col - 1),
+        //   diff = vnow / vprev - 1;
+        // format the cell
+        var html =
+        '<div class="lee">' +
+          '<div class="container">' +
+            '<div class="leeStatus">' +
+              '<div class="item">' +
+                '<div class="state">' +
+                  '<div class="state-item">' +
+                    '진행률 : <strong>{{ statusBar.receiveItemQuantity }}</strong> /' +
+                    '<strong>{{ statusBar.passedItemQuantity }}</strong> /' +
+                    '<strong>20%</strong>' +
+                  '</div>' +
+                  '<div class="state-item">' +
+                    '현재달성률 : <strong>{{ statusBar.receiveItemQuantity }}</strong> /' +
+                    '<strong>{{ statusBar.passedItemQuantity }}</strong> /' +
+                    '<strong>30%</strong>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="row">' +
+              '<div class="col-sm border">100%</div>' +
+              '<div class="col-sm border">100%</div>' +
+              '<div class="col-sm border">100%</div>' +
+              '<div class="col-sm border">100%</div>' +
+              '<div class="col-sm border">100%</div>' +
+              '<div class="col-sm border">0</div>' +
+              '<div class="col-sm border"></div>' +
+              '<div class="col-sm border"></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+        e.cell.innerHTML = html;
+      }
+    }
+  });
+  //그리드 셀렉션모드 설정(Row)
+  grid.selectionMode = 3;
+};
+
+//그리드 설정
+const onInitialized = (grid) => {
+  console.log(grid);
+  grid.autoSizeRow(0, true);
 
   grid.formatItem.addHandler((flex, e) => {
+    //헤더에 html태그 사용하게 하는 설정
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
     }
   });
+
+  //-----------------------------------------------------
+  const config = {
+    groupingColumns: ['vendorName'],
+    mergedColumns: ['vendorName', 'inspectionQuantity', 'passItemQuantity', 'labelingItemQuantity'],
+  };
+  const leeMergeManager = new SimpleMergeManager(config);
+  const r = { col: 0, col2: 12, row: 0, row2: 0 };
+  console.log(grid.cells);
+  console.log(grid.cells._rng);
+  leeMergeManager.rowMergedRange(grid, r);
+  grid.mergeManager = leeMergeManager;
+  //-----------------------------------------------------
+
+  //그리드 셀렉션모드 설정(None)
+  grid.selectionMode = 0;
 };
-
-//체크된 데이터 감시해서 api요청
-watch(
-  () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
-  (newGroup, oldGroup) => {
-
-    keyData.value++;
-    dummy.value = false;
-  },
-  { deep: true }
-);
-
-function getSearchList() {
-  dummy.value = true;
-}
-
-
 </script>
+
 <style>
+.ow-panel .ow-panel-body1 {
+  display: flex;
+  /* flex-direction: column; */
+  flex: 1;
+  border: 2px solid #6980af;
+  border-top: 0;
+  background-color: #fff;
+  padding: var(--ow-gutter);
+}
 .wj-cell.wj-header {
   display: flex;
   align-items: center;
@@ -284,15 +473,22 @@ function getSearchList() {
   line-height: inherit;
 }
 
-.wj-cell.border-left {
-  display: flex;
-  align-items: center;
-  line-height: inherit;
+.progress-bar-success {
+  background-color: #198754;
 }
 
-.wj-cell.border-center {
-  display: flex;
-  align-items: center;
-  line-height: inherit;
+.progress-bar-warning {
+  background-color: #ffc107;
+}
+
+.progress-bar-danger {
+  background-color: #dc3545;
+}
+
+.border {
+  border: 1px solid black;
+  background-color: grey;
+  color: white;
+  text-align: center;
 }
 </style>

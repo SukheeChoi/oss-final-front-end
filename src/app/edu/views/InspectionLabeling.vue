@@ -152,9 +152,7 @@
               <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
               <ow-grid
                 v-if="employeeName"
-                headersVisibility="Column"
                 :allowMerging="'Cells'"
-                selectionMode="None"
                 :read="getGrid"
                 :key="keyData"
                 :initialized="onInitialized"
@@ -191,12 +189,14 @@
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
 
+//트리 그리드 자식 경로 설정
 const childItemsPath = ['child', 'childrennn'];
 
 const getTree = ref([]);
 const getGrid = ref([]);
 const keyData = ref(0);
 
+//트리 그리드 데이터 바인딩
 getTree.value = async function (query, pageNo, pageSize) {
   const treeList = await inspectionLabelingApi.getTreeList();
   console.log(treeList);
@@ -216,6 +216,7 @@ const employeeName = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
+//현황 Bar
 const statusBar = reactive({
   receiveItem: null,
   receiveItemQuantity: null,
@@ -236,7 +237,9 @@ const statusBar = reactive({
   damagedItemQuantity: null,
 });
 
+//현황 가져오는 함수
 async function getStatus() {
+  //현황 api 호출
   const result = await inspectionLabelingApi.getStatus().then((data) => {
     statusBar.receiveItem = data.receiveItem;
     statusBar.receiveItemQuantity = data.receiveItemQuantity;
@@ -262,6 +265,7 @@ getStatus();
 
 //트리 그리드 셀렉션 핸들러
 const onSelectionChanged = (grid, target) => {
+
   //반응형 변수 세팅(검색 조건 리셋)
   searchSelected.value = '';
   searchContent.value = '';
@@ -300,6 +304,7 @@ const onSelectionChanged = (grid, target) => {
   }
 };
 
+//검색 클릭 버튼
 function searchData() {
   keyData.value++;
 }
