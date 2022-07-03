@@ -15,7 +15,7 @@ export default [
       {
         path: 'Main',
         name: 'DISTSub',
-        redirect: '/edu/CustomerReceipt',
+        redirect: '/edu/Order',
       },
       // detail ( 3depth)
       {
@@ -46,7 +46,7 @@ export default [
       {
         path: 'InspectionLabelling',
         name: 'DISTSub6',
-        component: () => import('@@/edu/views/InspectionLabelling'),
+        component: () => import('@@/edu/views/InspectionLabeling'),
       },
       {
         path: 'test',
@@ -57,6 +57,16 @@ export default [
         path: 'test1',
         name: 'test1',
         component: () => import('@@/edu/views/Test1'),
+      },
+      {
+        path: 'test2',
+        name: 'test2',
+        component: () => import('@@/edu/views/Test2'),
+      },
+      {
+        path: 'test3',
+        name: 'test3',
+        component: () => import('@@/edu/views/Test3'),
       },
     ],
   },

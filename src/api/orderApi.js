@@ -4,7 +4,7 @@ axios.defaults.headers.post["Content-Type"] = "application/json; charset=utf-8"
 
 
 //맨 위에 현황 List(전체: 1360건 | 오스템: 530건 | 협력사직배송: 470건 | 미출고: 2건)
-async function getTotal() {
+async function getStatus() {
   let response = null;
   try {
     response = await axios.get("/order/orderStatus");
@@ -26,7 +26,7 @@ async function getAllList() {
   return response.data;
 }
 
-async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent) {
+async function getFilterList(company, shippingway, unreleased, searchSelected, searchContent, pageNo, pageSize) {
   let response = null;
   let companyURI = encodeURI(company);
   let shippingwayURI = encodeURI(shippingway);
@@ -36,20 +36,49 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
       response = await axios.get("/order/orderfilter", { params: {company: companyURI
                                                                 , shippingway: shippingwayURI
                                                                 , unreleased: unreleasedURI
-                                                                , searchSelected: searchSelected
-                                                                , searchContent: searchContent
+                                                                , searchSelected
+                                                                , searchContent
+                                                                , pageNo
+                                                                , pageSize 
                                                         } });
       console.log(response);
     } catch (error) {
       console.log(error);
     }
   }
-  return response;
+  // result.map((i) => {
+  //   //오스템 제품 & 오스템 상품 (협력사 => 하이픈 처리)
+  //   if (i.vendorName === '오스템제품' || i.vendorName === '오스템상품') {
+  //     i.orderCheckDate = '-';
+  //     i.releaseQuantity = '-';
+  //     i.releaseScheduleDate = '-';
+  //     i.recieveDate = '-';
+  //   }
+
+  //   //협력사 상품 합배송 & 직배송 (피킹 => 하이픈 처리)
+  //   if (i.vendorName !== '오스템제품' && i.vendorName !== '오스템상품') {
+  //     i.pickingDate = '-';
+  //     i.pickingEmployee = '-';
+  //     i.pickingQuantity = '-';
+  //     i.pickingUnrelease = '-';
+  //   }
+
+  //   //협력사 상품 직배송 (출고검수/패킹, 출고, 인계 => 하이픈 처리)
+  //   if (i.vendorName !== '오스템제품' && i.vendorName !== '오스템상품' && i.orderShippingWay === '직배송') {
+  //     i.packingInspectionEmployee = '-';
+  //     i.inspectionDate = '-';
+  //     i.releaseEmployee = '-';
+  //     i.releaseDate = '-';
+  //     i.transferEmployee = '-';
+  //     i.transferDate = '-';
+  //   }
+  // });
+  return response.data;
 }
 
 
 export default {
-  getTotal,
+  getStatus,
   getAllList,
   getFilterList,
 };

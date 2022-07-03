@@ -68,9 +68,6 @@ export default {
       overflow: false,
     },);
 
-    console.log("checkedValues", state.checkedValues);
-    console.log("enabledValues", state.enabledValues);
-    
     watch(
       () => state.checkedValues,
       (newCheckedValues, oldCheckedValues = []) => {
@@ -91,7 +88,6 @@ export default {
       if (!state.isAllChecked) {
         state.checkedValues = state.enabledValues.map((item) => item.value);
       }
-      console.log("isAllChecked", state.isAllChecked);
       console.log("checkedValues", state.checkedValues);
     };
     

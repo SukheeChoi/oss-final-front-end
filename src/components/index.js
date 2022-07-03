@@ -11,6 +11,7 @@ import OwContainer from '@/components/common/OwContainer';
 import OwContent from '@/components/common/OwContent';
 import OwDialog from '@/components/common/OwDialog';
 import OwFilterCheckbox from '@/components/common/OwFilterCheckbox';
+import OwFilterCheckboxHJ from '@/components/common/OwFilterCheckboxHJ';
 import OwFilterRadio from '@/components/common/OwFilterRadio';
 import OwFilterTab from '@/components/common/OwFilterTab';
 import OwFlexWrap from '@/components/common/OwFlexWrap';
@@ -32,7 +33,7 @@ import OwSpinner from '@/components/common/OwSpinner';
 import OwSwitch from '@/components/common/OwSwitch';
 import OwTab from '@/components/common/OwTab';
 
-import OwGrid from '@/components/grid/OwGrid';
+import OwGrid from '@/components/grid/new/OwGrid';
 import OwNGrid from '@/components/grid/new/OwNGrid';
 import OwFlexGrid from '@/components/grid/OwFlexGrid';
 import OwTreeGrid from '@/components/grid/new/OwTreeGrid';
@@ -55,6 +56,7 @@ let COMMON_COMPONENTS = {
   OwContent,
   OwDialog,
   OwFilterCheckbox,
+  OwFilterCheckboxHJ,
   OwFilterRadio,
   OwFilterTab,
   OwFlexWrap,
