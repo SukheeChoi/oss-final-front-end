@@ -406,9 +406,9 @@ const treeInitialized = (grid) => {
           '<tr>' +
           '<td>' +
           '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class=" progress-bar-{LWTNineColor} progress-bar" style="width: {LWTNine}%"/>' +
-          '{LWTNine}%</div>' +
-          '</td>' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTNineColor}" style="width: {LWTNine}%"/>' +
+          '{LWTNine%}</div>' +
+          '<div class="lee">{LWTNine}%</div></td>' +
           '<td>' +
           '<div class="progress">' +
           '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTTenColor}" style="width: {LWTTen}%"/>' +
@@ -453,13 +453,23 @@ const treeInitialized = (grid) => {
         html = html.replace('{receivePercent}', receivePercent);
         html = html.replace('{currentPercent}', currentPercent);
 
-        if (LWTNine >= 50 && LWTNine < 80) {
+        if(LWTNine < 50) {
+          html = html.replace('{LWTNineColor}', 'normal');
+        } else if (LWTNine >= 50 && LWTNine < 80) {
           html = html.replace('{LWTNineColor}', 'warning');
         } else if (LWTNine >= 80 && LWTNine < 100) {
           html = html.replace('{LWTNineColor}', 'success');
         } else if (LWTNine == 100) {
           html = html.replace('{LWTNineColor}', 'done');
         }
+
+        if(LWTNine < 50) {
+          html = html.replace('{LWTNine%}', '');
+        } else {
+          html = html.replace('{LWTNine%}', LWTNine + '%');
+          html = html.replace('<div class="lee">{LWTNine}%</div>', '');
+        }
+        html = html.replaceAll('{LWTNine}', LWTNine);
 
         if (LWTTen >= 50 && LWTTen < 80) {
           html = html.replace('{LWTTenColor}', 'warning');
@@ -517,7 +527,7 @@ const treeInitialized = (grid) => {
           html = html.replace('{LWTSeventeenColor}', 'done');
         }
 
-        html = html.replaceAll('{LWTNine}', LWTNine);
+        
         html = html.replaceAll('{LWTTen}', LWTTen);
         html = html.replaceAll('{LWTEleven}', LWTEleven);
         html = html.replaceAll('{LWTThirteen}', LWTThirteen);
@@ -593,6 +603,10 @@ const onInitialized = (grid) => {
   background-color: #0d6efd;
 }
 
+.progress-bar-normal {
+  background-color: #495057;
+}
+
 .border {
   border: 1px solid black;
   background-color: grey;
@@ -625,5 +639,14 @@ table td {
   text-align: center;
   white-space: nowrap;
   transition: width 0.6s ease;
+}
+.lee {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  color: red;
+  text-align: center;
+  white-space: nowrap;
 }
 </style>

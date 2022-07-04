@@ -41,7 +41,6 @@ async function getTreeList() {
         k.labelingItemQuantity = "dd";
         //지연시간에 분 붙이기
         k.childrennn.map((m) => {
-          m.inspectionQuantity = 222;
           if (m.lateTime) {
             m.lateTime = m.lateTime + '분';
           }
