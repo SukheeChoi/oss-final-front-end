@@ -96,7 +96,7 @@ function setDefaultProperties(s) {
   // 헤더 설정
   s.headersVisibility = HeadersVisibility.All;
   // 선택 모드 설정
-  s.selectionMode = SelectionMode.Row;
+  s.selectionMode = SelectionMode.RowRange;
   // 헤더 고정 설정
   s.stickyHeaders = true;
   // 마퀴 설정
