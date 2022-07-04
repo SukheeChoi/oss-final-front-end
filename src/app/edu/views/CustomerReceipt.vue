@@ -9,7 +9,8 @@
         <div class="ow-panel-body">
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
-            <div class="progress-bar"><!-- 컴포넌트화 하기-->
+            <div class="progress-bar">
+              <!-- 컴포넌트화 하기-->
               <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
               <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
               <!-- 퍼센트마다 progress바 다르게 적용 -->
@@ -245,7 +246,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import OwNGrid from '@/components/grid/new/OwNGrid';
 import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
@@ -294,101 +295,72 @@ async function read(query, pageNo, pageSize) {
   return result;
 }
 
-export default {
-  name: 'TheOwNewGrid',
-  components: {
-    OwNGrid,
-  },
-  setup(props) {
-    //보여지는 행 수
-    const state = reactive({
-      visibleRowsCount: 15,
-    });
+//보여지는 행 수
+const state = reactive({
+  visibleRowsCount: 15,
+});
 
-    //초기화
-    const initialize = (s) => {};
+//초기화
+const initialize = (s) => {};
 
-    // let globalIndex = 0;
+// let globalIndex = 0;
 
-    //배송구분
-    const checkboxGroup1 = ref([
-      { name: '일반', value: '일반' },
-      { name: '긴급', value: '긴급' },
-    ]);
+//배송구분
+const checkboxGroup1 = ref([
+  { name: '일반', value: '일반' },
+  { name: '긴급', value: '긴급' },
+]);
 
-    //주문 단계
-    const checkboxGroup3 = ref([
-      { name: '전체', value: '0' },
-      { name: '주문확인', value: '1' },
-      { name: '피킹', value: '2' },
-      { name: '출고검수', value: '3' },
-      { name: '출고', value: '4' },
-      { name: '택배사 인계', value: '5' },
-    ]);
+//주문 단계
+const checkboxGroup3 = ref([
+  { name: '전체', value: '0' },
+  { name: '주문확인', value: '1' },
+  { name: '피킹', value: '2' },
+  { name: '출고검수', value: '3' },
+  { name: '출고', value: '4' },
+  { name: '택배사 인계', value: '5' },
+]);
 
-    // filter 초기값 : 배송구분 : '일반','긴급', 주문 단계 : '0', 미출고만 보기 : 'false'
-    const checkboxGroup2 = ref(['일반', '긴급']);
-    const checkboxGroup4 = ref('0');
-    const checkbox1 = ref('false');
+// filter 초기값 : 배송구분 : '일반','긴급', 주문 단계 : '0', 미출고만 보기 : 'false'
+const checkboxGroup2 = ref(['일반', '긴급']);
+const checkboxGroup4 = ref('0');
+const checkbox1 = ref('false');
 
-    // db에 filter값 보내기
-    const dummy = async () => {
-      let list = await clientApi.getFilterList(checkboxGroup2, checkboxGroup4, checkbox1);
-      return list;
-    };
-
-    dummy().then((list) => {
-      for (let i = 0; i < list.length; i++) {
-        items.value.push({
-          //데이터 정제
-          client: list[i]['client']['clientName'],
-          level: list[i]['status'],
-          unrelease: list[i]['orderUnrelease'],
-        });
-      }
-    });
-
-    //주문 단계 별 건수 요청
-    async function getCnt() {
-      const cnt = await clientApi.getStatusCnt();
-      statusOrd.value = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4];
-      statusPick.value = cnt[1] + cnt[2] + cnt[3] + cnt[4];
-      statusPack.value = cnt[2] + cnt[3] + cnt[4];
-      statusRls.value = cnt[3] + cnt[4];
-      statusTrf.value = cnt[4];
-      //주문 단계마다 완료 퍼센트
-      percentOrd.value = parseInt((statusOrd.value / 200) * 100);
-      percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
-      percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
-      percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
-      percentTrf.value = parseInt((statusTrf.value / statusRls.value) * 100);
-
-      return cnt;
-    }
-    getCnt();
-
-    return {
-      initialize,
-      read,
-      state,
-      checkboxGroup1,
-      checkboxGroup2,
-      checkboxGroup3,
-      checkboxGroup4,
-      checkbox1,
-      statusOrd,
-      statusPick,
-      statusPack,
-      statusRls,
-      statusTrf,
-      percentOrd,
-      percentPick,
-      percentPack,
-      percentRls,
-      percentTrf,
-    };
-  },
+// db에 filter값 보내기
+const dummy = async () => {
+  let list = await clientApi.getFilterList(checkboxGroup2, checkboxGroup4, checkbox1);
+  return list;
 };
+
+dummy().then((list) => {
+  for (let i = 0; i < list.length; i++) {
+    items.value.push({
+      //데이터 정제
+      client: list[i]['client']['clientName'],
+      level: list[i]['status'],
+      unrelease: list[i]['orderUnrelease'],
+    });
+  }
+});
+
+//주문 단계 별 건수 요청
+async function getCnt() {
+  const cnt = await clientApi.getStatusCnt();
+  statusOrd.value = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4];
+  statusPick.value = cnt[1] + cnt[2] + cnt[3] + cnt[4];
+  statusPack.value = cnt[2] + cnt[3] + cnt[4];
+  statusRls.value = cnt[3] + cnt[4];
+  statusTrf.value = cnt[4];
+  //주문 단계마다 완료 퍼센트
+  percentOrd.value = parseInt((statusOrd.value / 200) * 100);
+  percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
+  percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
+  percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
+  percentTrf.value = parseInt((statusTrf.value / statusRls.value) * 100);
+
+  return cnt;
+}
+getCnt();
 </script>
 
 <style>
