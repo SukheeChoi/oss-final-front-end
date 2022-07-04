@@ -447,8 +447,7 @@ class TreeMergeManager extends MergeManager {
   }
 
   colMergedRange(p, r) {
-    console.log(p);
-    console.log(r);
+
     for (let i = r.col; i > 0; i -= 1) {
       if (this.equals(p, r.row, i, 'col_prev')) {
         r.col = i - 1;
@@ -466,9 +465,7 @@ class TreeMergeManager extends MergeManager {
   }
 
   getMergedRange(p, r, c) {
-    console.log("실행");
     const range = new CellRange(r, c);
-    console.log(range);
     switch (p.cellType) {
       case CellType.ColumnHeader:
         this.colMergedRange(p, range);

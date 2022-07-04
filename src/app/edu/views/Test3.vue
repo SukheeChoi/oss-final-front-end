@@ -138,34 +138,8 @@
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col-sm border">100%</div>
-              <div class="col-sm border">100%</div>
-              <div class="col-sm border">100%</div>
-              <div class="col-sm border">100%</div>
-              <div class="col-sm border">100%</div>
-              <div class="col-sm border">0</div>
-              <div class="col-sm border"></div>
-              <div class="col-sm border"></div>
-            </div>
           </div>
         </div>
-        <!-- <div class="progress">
-          <div
-            role="progressbar"
-            aria-valuemin="0"
-            aria-valuemax="4"
-            aria-valuenow="1"
-            class="progress-bar"
-            :style="`width: ${70}%`"
-          />
-        </div> -->
-        <!-- <div class="progress-bar">
-          <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
-          <progress class="low" v-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
-          <progress class="mid" v-else-if="percentOrd < 100" :value="percentOrd" :max="100"></progress>
-          <progress class="high" v-else :value="percentOrd" :max="100"></progress>
-        </div> -->
       </div>
       <!-- 오른쪽 화면 -->
       <div class="right flex-fill">
@@ -307,7 +281,7 @@ const onSelectionChanged = (grid, target) => {
   //반응형 변수 세팅(검색 조건 리셋)
   searchSelected.value = '';
   searchContent.value = '';
-  console.log(grid);
+
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
@@ -371,9 +345,10 @@ const treeInitialized = (grid) => {
     if (e.panel == grid.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
     }
-    console.log(e.cell.textContent)
     // console.log(grid);
     // console.log(e);
+
+    const gridItem = grid.itemsSource.items;
 
     if (e.panel == grid.cells) {
       var col = grid.columns[e.col];
@@ -382,42 +357,175 @@ const treeInitialized = (grid) => {
       // console.log(row.dataItem.child);
       // console.log(e.row);
       // console.log(col);
-      if ((e.row < 1 || row.dataItem.childrennn) && (col.binding == 'startTime')) {
-        // var vnow = grid.getCellData(e.row, e.col - 1),
+      if ((e.row < 1 || row.dataItem.childrennn) && col.binding == 'startTime') {
+        var vnow = grid.getCellData(e.row, e.col - 1);
+        console.log('grid', grid);
+        const receiveQuantity = row.dataItem.receiveQuantity; //진행률 전체 작업량
+        const currentQuantity = row.dataItem.currentQuantity; //현재 달성률 전체 작업량
+
+        const progressQuantity = row.dataItem.progressQuantity; //현재 작업량
+
+        const receivePercent = Math.round((progressQuantity / receiveQuantity) * 100); //진행률 퍼센트(계산)
+        const currentPercent = Math.round((progressQuantity / currentQuantity) * 100); //현재 달성률 퍼센트(계산)
+
+        const LWTNine = row.dataItem.LWTNine;
+        const LWTTen = row.dataItem.LWTTen;
+        const LWTEleven = row.dataItem.LWTEleven;
+        const LWTThirteen = row.dataItem.LWTThirteen;
+        const LWTFourteen = row.dataItem.LWTFourteen;
+        const LWTFifteen = row.dataItem.LWTFifteen;
+        const LWTSixteen = row.dataItem.LWTSixteen;
+        const LWTSeventeen = row.dataItem.LWTSeventeen;
+
+        console.log('e', gridItem);
+        console.log('row', e.row);
+        console.log('col', e.col);
+        console.log('vnow', LWTNine);
         //   vprev = grid.getCellData(e.row - 1, e.col - 1),
         //   diff = vnow / vprev - 1;
         // format the cell
         var html =
-        '<div class="lee">' +
-          '<div class="container">' +
-            '<div class="leeStatus">' +
-              '<div class="item">' +
-                '<div class="state">' +
-                  '<div class="state-item">' +
-                    '진행률 : <strong>{{ statusBar.receiveItemQuantity }}</strong> /' +
-                    '<strong>{{ statusBar.passedItemQuantity }}</strong> /' +
-                    '<strong>20%</strong>' +
-                  '</div>' +
-                  '<div class="state-item">' +
-                    '현재달성률 : <strong>{{ statusBar.receiveItemQuantity }}</strong> /' +
-                    '<strong>{{ statusBar.passedItemQuantity }}</strong> /' +
-                    '<strong>30%</strong>' +
-                  '</div>' +
-                '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="row">' +
-              '<div class="col-sm border">100%</div>' +
-              '<div class="col-sm border">100%</div>' +
-              '<div class="col-sm border">100%</div>' +
-              '<div class="col-sm border">100%</div>' +
-              '<div class="col-sm border">100%</div>' +
-              '<div class="col-sm border">0</div>' +
-              '<div class="col-sm border"></div>' +
-              '<div class="col-sm border"></div>' +
-            '</div>' +
+          '<div class="lee">' +
+          '<div class="leeStatus">' +
+          '<div class="item">' +
+          '<div class="state">' +
+          '<div class="state-item">' +
+          '진행률 : <strong>{receiveItemQuantity}</strong> /' +
+          '<strong>{progressQuantity}</strong> /' +
+          '<strong>{receivePercent}%</strong>' +
           '</div>' +
-        '</div>'
+          '<div class="state-item">' +
+          '현재달성률 : <strong>{currentQuantity}</strong> /' +
+          '<strong>{progressQuantity}</strong> /' +
+          '<strong>{currentPercent}%</strong>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '<table>' +
+          '<tr>' +
+          '<td>' +
+          '<div class="progress">' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class=" progress-bar-{LWTNineColor} progress-bar" style="width: {LWTNine}%"/>' +
+          '{LWTNine}%</div>' +
+          '</td>' +
+          '<td>' +
+          '<div class="progress">' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTTenColor}" style="width: {LWTTen}%"/>' +
+          '{LWTTen}%</div>' +
+          '</td>' +
+          '<td>' +
+          '<div class="progress">' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTElevenColor}" style="width: {LWTEleven}%"/>' +
+          '{LWTEleven}%</div>' +
+          '</td>' +
+          '<td>' +
+          '<div class="progress">' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTThirteenColor}" style="width: {LWTThirteen}%"/>' +
+          '{LWTThirteen}%</div>' +
+          '</td>' +
+          '<td>' +
+          '<div class="progress">' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTFourteenColor}" style="width: {LWTFourteen}%"/>' +
+          '{LWTFourteen}%</div>' +
+          '</td>' +
+          '<td>' +
+          '<div class="progress">' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTFifteenColor}" style="width: {LWTFifteen}%"/>' +
+          '{LWTFifteen}%</div>' +
+          '</td>' +
+          '<td>' +
+          '<div class="progress">' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTSixteenColor}" style="width: {LWTSixteen}%"/>' +
+          '{LWTSixteen}%</div>' +
+          '</td>' +
+          '<td>' +
+          '<div class="progress">' +
+          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTSeventeenColor}" style="width: {LWTSeventeen}%"/>' +
+          '{LWTSeventeen}%</div>' +
+          '</td>' +
+          '</tr>' +
+          '</table>' +
+          '</div>';
+        html = html.replace('{receiveItemQuantity}', receiveQuantity);
+        html = html.replace('{currentQuantity}', currentQuantity);
+        html = html.replaceAll('{progressQuantity}', progressQuantity);
+        html = html.replace('{receivePercent}', receivePercent);
+        html = html.replace('{currentPercent}', currentPercent);
+
+        if (LWTNine >= 50 && LWTNine < 80) {
+          html = html.replace('{LWTNineColor}', 'warning');
+        } else if (LWTNine >= 80 && LWTNine < 100) {
+          html = html.replace('{LWTNineColor}', 'success');
+        } else if (LWTNine == 100) {
+          html = html.replace('{LWTNineColor}', 'done');
+        }
+
+        if (LWTTen >= 50 && LWTTen < 80) {
+          html = html.replace('{LWTTenColor}', 'warning');
+        } else if (LWTTen >= 80 && LWTTen < 100) {
+          html = html.replace('{LWTTenColor}', 'success');
+        } else if (LWTTen == 100) {
+          html = html.replace('{LWTTenColor}', 'done');
+        }
+
+        if (LWTEleven >= 50 && LWTEleven < 80) {
+          html = html.replace('{LWTElevenColor}', 'warning');
+        } else if (LWTEleven >= 80 && LWTEleven < 100) {
+          html = html.replace('{LWTElevenColor}', 'success');
+        } else if (LWTEleven == 100) {
+          html = html.replace('{LWTElevenColor}', 'done');
+        }
+
+        if (LWTThirteen >= 50 && LWTThirteen < 80) {
+          html = html.replace('{LWTThirteenColor}', 'warning');
+        } else if (LWTThirteen >= 80 && LWTThirteen < 100) {
+          html = html.replace('{LWTThirteenColor}', 'success');
+        } else if (LWTThirteen == 100) {
+          html = html.replace('{LWTThirteenColor}', 'done');
+        }
+
+        if (LWTFourteen >= 50 && LWTFourteen < 80) {
+          html = html.replace('{LWTFourteenColor}', 'warning');
+        } else if (LWTFourteen >= 80 && LWTFourteen < 100) {
+          html = html.replace('{LWTFourteenColor}', 'success');
+        } else if (LWTFourteen == 100) {
+          html = html.replace('{LWTFourteenColor}', 'done');
+        }
+
+        if (LWTFifteen >= 50 && LWTFifteen < 80) {
+          html = html.replace('{LWTFifteenColor}', 'warning');
+        } else if (LWTFifteen >= 80 && LWTFifteen < 100) {
+          html = html.replace('{LWTFifteenColor}', 'success');
+        } else if (LWTFifteen == 100) {
+          html = html.replace('{LWTFifteenColor}', 'done');
+        }
+
+        if (LWTSixteen >= 50 && LWTSixteen < 80) {
+          html = html.replace('{LWTSixteenColor}', 'warning');
+        } else if (LWTSixteen >= 80 && LWTSixteen < 100) {
+          html = html.replace('{LWTSixteenColor}', 'success');
+        } else if (LWTSixteen == 100) {
+          html = html.replace('{LWTSixteenColor}', 'done');
+        }
+
+        if (LWTSeventeen >= 50 && LWTSeventeen < 80) {
+          html = html.replace('{LWTSeventeenColor}', 'warning');
+        } else if (LWTSeventeen >= 80 && LWTSeventeen < 100) {
+          html = html.replace('{LWTSeventeenColor}', 'success');
+        } else if (LWTSeventeen == 100) {
+          html = html.replace('{LWTSeventeenColor}', 'done');
+        }
+
+        html = html.replaceAll('{LWTNine}', LWTNine);
+        html = html.replaceAll('{LWTTen}', LWTTen);
+        html = html.replaceAll('{LWTEleven}', LWTEleven);
+        html = html.replaceAll('{LWTThirteen}', LWTThirteen);
+        html = html.replaceAll('{LWTFourteen}', LWTFourteen);
+        html = html.replaceAll('{LWTFifteen}', LWTFifteen);
+        html = html.replaceAll('{LWTSixteen}', LWTSixteen);
+        html = html.replaceAll('{LWTSeventeen}', LWTSeventeen);
+
         e.cell.innerHTML = html;
       }
     }
@@ -481,8 +589,8 @@ const onInitialized = (grid) => {
   background-color: #ffc107;
 }
 
-.progress-bar-danger {
-  background-color: #dc3545;
+.progress-bar-done {
+  background-color: #0d6efd;
 }
 
 .border {
@@ -490,5 +598,32 @@ const onInitialized = (grid) => {
   background-color: grey;
   color: white;
   text-align: center;
+}
+
+table th,
+table td {
+  border: 1px solid #d7dce3;
+  padding-right: 0;
+  padding-left: 0;
+  height: 0;
+  vertical-align: middle;
+}
+.progress {
+  display: flex;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  background-color: #e9ecef;
+  border-radius: 0;
+}
+.progress-bar {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  overflow: hidden;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  transition: width 0.6s ease;
 }
 </style>
