@@ -3,13 +3,17 @@
     <div class="row mb-4">
       <div class="ow-panel">
         <div class="ow-panel-header">
+          <!-- 주문 단계를 누르면 해당 단계 관리 페이지로 이동 -->
           <div class="ow-panel-title" onclick="location.href='/edu/Order'">주문</div>
         </div>
         <div class="ow-panel-body">
           <div class="ow-flex-wrap">
             <div class="item">계획 대비 실적 달성률</div>
             <div class="progress-bar">
+              <!-- 컴포넌트화 하기-->
+              <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
               <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
+              <!-- 퍼센트마다 progress바 다르게 적용 -->
               <progress class="low" v-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
               <progress class="mid" v-else-if="percentOrd < 100" :value="percentOrd" :max="100"></progress>
               <progress class="high" v-else :value="percentOrd" :max="100"></progress>
@@ -20,7 +24,7 @@
             <div class="item">계획</div>
             <div class="align-to-right">
               200건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 200 - statusOrd }}건</strong> /
-              <strong style="color: rgb(210, 57, 46)">미출고 6건</strong>)
+              <strong style="color: rgb(210, 57, 46)">미출고 5건</strong>)
             </div>
           </div>
           <div class="ow-flex-wrap">
@@ -133,50 +137,61 @@
     <hr />
     <div class="item mt-4 mb-4">
       <div class="ow-flex-wrap item-size-content">
+        <!-- 배송구분(긴급/일반)으로 필터링 : 동시 선택 가능하기 때문에 checkbox -->
         <ow-filter-checkbox v-bind:items="checkboxGroup1" v-model="checkboxGroup2" :label="`배송구분`" />
-        <ow-filter-radio v-bind:items="checkboxGroup3" v-model="checkboxGroup4" :label="`회사`" />
+        <!-- 주문 단계(주문확인/피킹/출고검수/출고/택배사 인계)로 필터링 : 하나의 단계만 선택 가능하기 때문에 radio -->
+        <ow-filter-radio v-bind:items="checkboxGroup3" v-model="checkboxGroup4" :label="`단계`" />
+        <!-- 미출고 필터링 : true, false -->
         <div class="item" style="--gap-item: 6px">
           <div class="ow-checkbox">
-            <input type="checkbox" id="ow-chk" />
+            <input type="checkbox" id="ow-chk" v-model="checkbox1" />
             <label for="ow-chk">미출고만 보기</label>
           </div>
         </div>
         <div class="item align-to-right" style="--gap-item: 6px">
           <div>
-            <button class="ow-btn type-icon arrow-down arrow_down"></button>
+            <!-- hover 했을 때 범례 띄워줌 -->
+            <button type="button" class="ow-btn type-icon arrow_down">
+              <img
+                src="@/assets/images/icon/ico_list.svg"
+                style="border: 0.8px solid gray; width: 20px; padding: 2px"
+              />
+            </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
               <div>
-                <span class="ow-tag type-category"><i class="o">주</i></span>
-                피킹지시 내려야할 건
+                <span class="ow-tag type-category"><i class="o">주</i></span
+                >피킹지시 내려야할 건
               </div>
               <div>
-                <span class="ow-tag type-category"><i class="p">피</i></span>
-                피킹해야할 건
+                <span class="ow-tag type-category"><i class="p">피</i></span
+                >피킹해야할 건
               </div>
               <div>
-                <span class="ow-tag type-category"><i class="i">검</i></span>
-                출고검수/패킹해야할 건
+                <span class="ow-tag type-category"><i class="i">검</i></span
+                >출고검수/패킹해야할 건
               </div>
               <div>
-                <span class="ow-tag type-category"><i class="r">출</i></span>
-                출고(송장번호 생성)해야할 건
+                <span class="ow-tag type-category"><i class="r">출</i></span
+                >출고(송장번호 생성)해야할 건
               </div>
               <div>
-                <span class="ow-tag type-category"><i class="t">인</i></span>
-                택배사로 인계해야할 건
+                <span class="ow-tag type-category"><i class="t">인</i></span
+                >택배사로 인계해야할 건
               </div>
+              <br />
               <h3>주문번호 범례</h3>
               <div>
-                <span class="ow-tag type-category"><i class="u">미</i></span>
-                주문품목 중 미출고품목이 존재하는 주문
+                <span class="ow-tag type-category"><i class="u">미</i></span
+                >주문품목 중 미출고품목이 존재하는 주문
               </div>
               <div>
-                <span class="ow-tag type-category"><i class="n">처</i></span>
-                처리하지 않은 단계
+                <span class="ow-tag type-category"><i class="n">처</i></span
+                >처리하지 않은 단계
               </div>
             </div>
           </div>
+          <!-- -->
           <div class="title-field">검색</div>
           <div class="ow-select" style="--width: 97px">
             <select name="" id="">
@@ -201,57 +216,42 @@
         :visible-rows-count="state.visibleRowsCount"
       >
         <template #left>&nbsp;</template>
-        <wj-flex-grid-column binding="client" header="거래처" width="*" align="center" />
+        <wj-flex-grid-column binding="client" header="거래처" width="*">
+          <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
+            <!-- 행 스타일을 미출고 값에 따라 다르게 적용 -->
+            <span class="ow-tag type-category" v-if="!cell.item.unrelease"
+              ><strong>{{ cell.item.client }}</strong></span
+            >
+            <span class="ow-tag type-category" v-else
+              ><i class="u">미</i><strong style="color: rgb(210, 57, 46)">{{ cell.item.client }}</strong></span
+            >
+          </wj-flex-grid-cell-template>
+        </wj-flex-grid-column>
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
+            <!-- 주문 단계에 따라 아이콘 적용 -->
             <span class="ow-tag type-category"><i class="o">주</i></span>
-
             <span v-if="cell.item.level >= 2" class="ow-tag type-category"><i class="p">피</i></span>
             <span v-else class="ow-tag type-category"><i class="n">피</i></span>
-
             <span v-if="cell.item.level >= 3" class="ow-tag type-category"><i class="i">검</i></span>
             <span v-else class="ow-tag type-category"><i class="n">검</i></span>
-
             <span v-if="cell.item.level >= 4" class="ow-tag type-category"><i class="r">출</i></span>
             <span v-else class="ow-tag type-category"><i class="n">출</i></span>
-
             <span v-if="cell.item.level == 5" class="ow-tag type-category"><i class="t">인</i></span>
             <span v-else class="ow-tag type-category"><i class="n">인</i></span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
-        <!-- <wj-flex-grid-column cssClass="unrelease" binding="client" header="거래처" width="*" align="center">
-          <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
-            <span class="ow-tag type-category"><i class="u">미</i><strong style="color : rgb(210, 57, 46);">{{ cell.item.client }}</strong></span>
-          </wj-flex-grid-cell-template>
-        </wj-flex-grid-column>
-        <wj-flex-grid-column cssClass="unrelease" binding="level" header="처리단계" width="1.5*" align="center">
-          <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
-            <span class="ow-tag type-category"><i class="o">주</i></span>
-
-            <span v-if="cell.item.level >= 2" class="ow-tag type-category"><i class="p">피</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">피</i></span>
-
-            <span v-if="cell.item.level >= 3" class="ow-tag type-category"><i class="i">검</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">검</i></span>
-
-            <span v-if="cell.item.level >= 4" class="ow-tag type-category"><i class="r">출</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">출</i></span>
-
-            <span v-if="cell.item.level == 5" class="ow-tag type-category"><i class="t">인</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">인</i></span>
-          </wj-flex-grid-cell-template>
-        </wj-flex-grid-column> -->
       </ow-n-grid>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import OwNGrid from '@/components/grid/new/OwNGrid';
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
 
-const items = [];
+const items = ref([]);
 const statusOrd = ref(null);
 const statusPick = ref(null);
 const statusRls = ref(null);
@@ -263,28 +263,9 @@ const percentPack = ref(null);
 const percentRls = ref(null);
 const percentTrf = ref(null);
 
-// filter 초기값 : '일반', '1'
-const checkboxGroup2 = ref(['일반','긴급']);
-const checkboxGroup4 = ref('0');
-
-//db에 filter값 보내기
-const dummy = async () => {
-  let list = await clientApi.getClientInfo(checkboxGroup2, checkboxGroup4);
-  return list;
-};
-
-dummy().then((list) => {
-  for (let i = 0; i < list.length; i++) {
-    items.push({
-      client: list[i]['client']['clientName'],
-      level: list[i]['status'],
-    });
-  }
-});
-
 //ngrid 페이지 설정
 const retrieve = (param) => {
-  let filteredItems = _.cloneDeep(items);
+  let filteredItems = _.cloneDeep(items.value); //cloneDeep : 객체 복사
   const totalCount = filteredItems.length;
   if (param.sort) {
     filteredItems = _.sortBy(filteredItems, param.sort);
@@ -314,80 +295,77 @@ async function read(query, pageNo, pageSize) {
   return result;
 }
 
-export default {
-  name: 'TheOwNewGrid',
-  components: {
-    OwNGrid,
-  },
-  data() {
-    return {
-      //체크박스
-      checkboxGroup1: [
-        { name: '일반', value: '일반' },
-        { name: '긴급', value: '긴급' },
-      ],
-      checkboxGroup3: [
-        { name: '전체', value: '0'},
-        { name: '주문확인', value: '1' },
-        { name: '피킹', value: '2' },
-        { name: '출고검수', value: '3' },
-        { name: '출고', value: '4' },
-        { name: '택배사 인계', value: '5' },
-      ],
-    };
-  },
-  setup(props) {
-    const state = reactive({
-      visibleRowsCount: 15,
-    });
+//보여지는 행 수
+const state = reactive({
+  visibleRowsCount: 15,
+});
 
-    const initialize = (s) => {};
+//초기화
+const initialize = (s) => {};
 
-    let globalIndex = 0;
+// let globalIndex = 0;
 
-    //주문 단계 카운트
-    async function getCnt() {
-      const cnt = await clientApi.getStatusCnt();
-      statusOrd.value = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4];
-      statusPick.value = cnt[1] + cnt[2] + cnt[3] + cnt[4];
-      statusPack.value = cnt[2] + cnt[3] + cnt[4];
-      statusRls.value = cnt[3] + cnt[4];
-      statusTrf.value = cnt[4];
-      //주문 단계마다 완료 퍼센트
-      percentOrd.value = parseInt((statusOrd.value / 200) * 100);
-      percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
-      percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
-      percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
-      percentTrf.value = parseInt((statusTrf.value / statusRls.value) * 100);
+//배송구분
+const checkboxGroup1 = ref([
+  { name: '일반', value: '일반' },
+  { name: '긴급', value: '긴급' },
+]);
 
-      return cnt;
-    }
-    getCnt();
+//주문 단계
+const checkboxGroup3 = ref([
+  { name: '전체', value: '0' },
+  { name: '주문확인', value: '1' },
+  { name: '피킹', value: '2' },
+  { name: '출고검수', value: '3' },
+  { name: '출고', value: '4' },
+  { name: '택배사 인계', value: '5' },
+]);
 
-    return {
-      initialize,
-      read,
-      state,
-      statusOrd,
-      statusPick,
-      statusPack,
-      statusRls,
-      statusTrf,
-      percentOrd,
-      percentPick,
-      percentPack,
-      percentRls,
-      percentTrf,
-      checkboxGroup2,
-      checkboxGroup4,
-    };
-  },
+// filter 초기값 : 배송구분 : '일반','긴급', 주문 단계 : '0', 미출고만 보기 : 'false'
+const checkboxGroup2 = ref(['일반', '긴급']);
+const checkboxGroup4 = ref('0');
+const checkbox1 = ref('false');
+
+// db에 filter값 보내기
+const dummy = async () => {
+  let list = await clientApi.getFilterList(checkboxGroup2, checkboxGroup4, checkbox1);
+  return list;
 };
+
+dummy().then((list) => {
+  for (let i = 0; i < list.length; i++) {
+    items.value.push({
+      //데이터 정제
+      client: list[i]['client']['clientName'],
+      level: list[i]['status'],
+      unrelease: list[i]['orderUnrelease'],
+    });
+  }
+});
+
+//주문 단계 별 건수 요청
+async function getCnt() {
+  const cnt = await clientApi.getStatusCnt();
+  statusOrd.value = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4];
+  statusPick.value = cnt[1] + cnt[2] + cnt[3] + cnt[4];
+  statusPack.value = cnt[2] + cnt[3] + cnt[4];
+  statusRls.value = cnt[3] + cnt[4];
+  statusTrf.value = cnt[4];
+  //주문 단계마다 완료 퍼센트
+  percentOrd.value = parseInt((statusOrd.value / 200) * 100);
+  percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
+  percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
+  percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
+  percentTrf.value = parseInt((statusTrf.value / statusRls.value) * 100);
+
+  return cnt;
+}
+getCnt();
 </script>
 
 <style>
 .low {
-  display: block; /* default: inline-block */
+  display: block;
   border: 0 none;
   border-radius: 2px;
   background: gainsboro;
@@ -403,7 +381,7 @@ export default {
 }
 
 .mid {
-  display: block; /* default: inline-block */
+  display: block;
   border: 0 none;
   border-radius: 2px;
   background: gainsboro;
@@ -419,7 +397,7 @@ export default {
 }
 
 .high {
-  display: block; /* default: inline-block */
+  display: block;
   border: 0 none;
   border-radius: 2px;
   background: gainsboro;
@@ -434,18 +412,18 @@ export default {
   background: rgb(44, 112, 244);
 }
 
-.progress-bar span {
-  position: absolute;
-  display: inline-block;
-  color: white;
-  text-align: center;
-}
-
 .progress-bar {
   position: relative;
   background-color: white;
   width: 50%;
   height: 100%;
+}
+
+.progress-bar span {
+  position: absolute;
+  display: inline-block;
+  color: white;
+  text-align: center;
 }
 
 .arrow_down {
@@ -474,7 +452,7 @@ export default {
 <style lang="scss">
 .ow-grid {
   .wj-cell {
-    &.unrelease {
+    &.ifUnrelease {
       background-color: rgb(248, 229, 227);
       color: rgb(210, 57, 46);
     }
