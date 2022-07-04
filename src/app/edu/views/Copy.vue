@@ -48,7 +48,8 @@
             :header="false"
             :footer="false"
             :key = "keyData"
-            :pageNo = "pageNo"
+            :pageValue = "pageValue.value"
+            
           >
             <!-- :autoRowHeights="true" -->
             <template #left>&nbsp;</template>
@@ -336,6 +337,9 @@ export default {
       grid.mergeManager = new SimpleMergeManager(config);
     };
 
+    //
+    const pageValue = ref(1);
+
     //현황
     const statusBar = reactive({
       total: null,                //주문건
@@ -449,7 +453,6 @@ export default {
         keyData.value++;
       }
 
-      
       console.log("패킹패킹")
       console.log(apiArray);      
 
@@ -501,6 +504,27 @@ export default {
       //순수 데이터(totalCount 제외)
       rIData.value = list.data;
 
+      for (let i = 0; i < list.data.length; i++) {
+      if (list.data[i].boxQty === 0) {
+        list.data[i].boxQty = ' ';
+      }
+      if (list.data[i].releasePrintDate === null) {
+        list.data[i].releasePrintDate = ' ';
+      }
+      if (list.data[i].receiptePrintDate === null) {
+        list.data[i].receiptePrintDate = ' ';
+      }
+      if (list.data[i].done === 0) {
+        list.data[i].done = 'N';
+      }else if(list.data[i].done === 1) {
+        list.data[i].done = 'Y';
+      }
+    }
+
+      pageValue.value = pageNo;
+      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+      console.log(pageValue.value)
+
       return {"data":list.data, "pageNo":list.pageNo, pageSize, "totalCount":list.totalCount};
     }
 
@@ -541,13 +565,8 @@ export default {
     });
 
     const SelectionChanged = async (grid, e) => {
-      // console.log("=======================");
-      // console.log(grid.collectionView);
-      // var item = grid.collectionView.currentItem;
-      // console.log("============item===========");
-      // console.log(item);
 
-      console.log('범위가 제대로 나오나요?');
+      console.log('범위');
       console.log(grid.selectedRanges);
 
       console.log('첫번째 데이터');
@@ -561,17 +580,6 @@ export default {
       for (let i = 0; i < ranges.length; i++) {
         aggregateRange(tally, grid, ranges, i);
       }
-
-      //grid.getCellData(r, c, false)
-
-      // console.log(e._p);
-      // console.log(e._p._activeCell["wj-cell-index"].panel._activeCell);
-      //console.log(e._p._activeCell["wj-cell-index"]["panel"]["_rng"]["_row2"]);
-
-      // e._p._activeCell["wj-cell-index"]["rng"]["_col1"] = 16;
-      // e._p._activeCell["wj-cell-index"]["rng"]["_col2"] = 16;
-      // console.log("===========바꼈니??============");
-      // console.log(e._p._activeCell["wj-cell-index"]["rng"]);
     };
 
     function aggregateRange(tally, grid, ranges, index) {
@@ -633,7 +641,8 @@ export default {
       statusBar,
       packingDone,
       oneBoxPacking,
-      keyData
+      keyData,
+      pageValue
     };
   },
 };

@@ -16,21 +16,16 @@ async function getReleaseInspectionList(){
 
 //필터링된 데이터 가져오기
 async function getFilterList(newGroup){
+  console.log("보내는 데이터", newGroup);
   let response = null;
-  const axiosConfig = {
-    headers:{
-        "Content-Type": "application/json"
-    }
-  }  
   try{
-    axios.defaults.headers.post = null
-    response = await axios.post(`/releaseInspection/getFilterList`, newGroup, axiosConfig);
-    console.log(response)
+    response = await axios.post(`/releaseInspection/getFilterList`, newGroup);
+    console.log("getFilterList 통신성공", response);
   }catch(error){
     console.log("#######/releaseInspection/getFilterList 통신 실패######")
     console.log(error);
   }
-  return response;
+  return response.data;
 }
 
 // codes 내용: {"releaseCode":xxx, "scannedBarcode":xxx}

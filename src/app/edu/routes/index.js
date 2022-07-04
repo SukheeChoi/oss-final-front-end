@@ -68,6 +68,11 @@ export default [
           name: 'test3',
           component: () => import('@@/edu/views/Test3'),
         },
+        {
+          path: 'Copy',
+          name: 'DISTSub7',
+          component: () => import('@@/edu/views/Copy'),
+        },
       ],
     },
   ];
