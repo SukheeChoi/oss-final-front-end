@@ -61,7 +61,7 @@
     :visible-rows-count="state.visibleRowsCount"
   >
   <template #left>&nbsp;</template>
-    <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
+    <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
@@ -96,7 +96,7 @@
     :visible-rows-count="state.visibleRowsCount"
   >
     <template #left>&nbsp;</template>
-    <wj-flex-grid-column header="No" binding="No" align="center" :width="40"></wj-flex-grid-column>
+    <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
@@ -210,11 +210,12 @@
     console.log('param.label : ' + param.label);
     let items = _.cloneDeep(param.items);
     let filteredItems = [];
-
+    // back-end : 데이터 정제해서 보낼 것.
     if(param.label === 'receipt') {
       for(let i=0; i<items.length; i++) {
         filteredItems.push({
-          'No': i+1  //pagination할 때 rowNum 함께 받아서 이용할 것.
+          'rownum': receiptList.value[i]["rownum"]
+          // 'No': i+1  //pagination할 때 rowNum 함께 받아서 이용할 것.
           , 'itemName': receiptList.value[i]["item"]["itemName"]
           , 'itemCode': receiptList.value[i]["item"]["itemCode"]
           , 'releaseQuantity': receiptList.value[i]["releaseQuantity"]
@@ -231,7 +232,7 @@
       for(let i=0; i<items.length; i++) {
         filteredItems.push({
           // ROWNUM 사용할 것.
-          'No': i+1
+          'rownum': deliveryList.value[i]["rownum"]
           // 주문번호/출고번호
           , 'order_release_no': deliveryList.value[i]["orderItem"]["orderNo"] + '/' + deliveryList.value[i]["release"]["releaseNo"]
           // 품목명
@@ -328,7 +329,6 @@
   };
 
   // '전달' 탭에서 바인딩할 데이터를 불러옴.
-  // const getDeliveryList = async (toDo=1, employeeId='', dateList=[]) => {
   async function getDeliveryList() {
     const result = await combineShippingApi.getDeliveryList(toDo.value, selectedAssignee.value, Array.from(dateList.value))
         .then((result) => {
@@ -342,10 +342,9 @@
             deliveryKey.value++;
           }
           getAssigneeList();
-          assigneeKey++;
-          // 수령/전달 페이지 전환시에도 담당업체/담당자 초기화하지 않음.
+          // assigneeKey++;
+          // 수령/전달 페이지 전환시에도 담당업체/담당자 초기화하지 않음.(날짜 변경시에는 초기화.)
       });
-    // return result;
   };
 
   // 전달된 항목 정보 update.
@@ -447,13 +446,6 @@
     }
     clickSearch.value = false;
   });
-  // function updateVendor(vendor) {
-  //   // vendorKey.value++;
-  //   console.log('## vendor : ', vendor);
-  //   selectedVendor.value = vendor;
-  //   console.log('## selectedVendor.value : ', selectedVendor.value);
-  //   vendorKey.value++;
-  // }
 
   // selectedVendor
   watch(() => selectedVendor.value
@@ -590,8 +582,8 @@
     console.log('## event.target.parentNode.parentNode.parentNode.parentNode.firstChild: ', event.target.parentNode.parentNode.parentNode.parentNode.firstChild);
     console.log('## event.target.parentNode.parentNode.parentNode.parentNode.querySelector("input"): ', event.target.parentNode.parentNode.parentNode.parentNode.querySelector("input"));
     console.log('## event.target.parentNode.parentNode.parentNode.parentNode.querySelector("input").value: ', event.target.parentNode.parentNode.parentNode.parentNode.querySelector("input").value);
-    let targetRow = event.target.parentNode.parentNode.parentNode.parentNode;
-    let unreleaedTarget = targetRow.querySelector("input");
+    let targetTag = event.target.parentNode.parentNode.parentNode.parentNode;
+    let unreleaedTarget = targetTag.querySelector("input");
     let targetObject = {
       orderItemNo: orderItemNo
       , receiveUnrelease: unreleaedTarget.value

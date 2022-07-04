@@ -125,7 +125,8 @@ export default {
         patchItem: props.update,
         deleteItem: props.remove,
       },
-      isNotBlank: true,
+      isNotBlank: false,
+      // isNotBlank: true,
     });
 
     /**

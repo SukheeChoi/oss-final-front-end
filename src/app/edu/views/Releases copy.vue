@@ -87,34 +87,14 @@
     <ow-grid
       headersVisibility="Column"
       allowSorting="None"
-      selectionMode="None"
+      selectionMode="RowRange"
       class="ow-grid type-header-group"
-      :read="read"
+      :read="getAfterPickingList"
       :initialized="onInitialized"
       :allowMerging="Cells"
       style="display: flex"
-      :autoRowHeights="true"
+      :key="afterPickingKey"
     >
-      <!-- :items-source="afterPickingList" -->
-    <template #left>&nbsp;</template>
-    <!-- <wj-flex-grid
-      headersVisibility="Column"
-      allowSorting="None"
-      selectionMode="None"
-      class="ow-grid type-header-group"
-      :items-source="afterPickingList"
-      :initialized="onInitialized"
-      :allowMerging="Cells"
-      style="display: flex"
-    > -->
-      <!-- :allowResizing="Row" -->
-      <!--화이팅 이라구요! 언니 힘내라구요! -->
-      <!-- :loadedRows="onloadedRows" -->
-      <!-- :autoGenerateColumns="false" -->
-      <!-- :alternatingRowStep="0" -->
-      <!-- :allowMerging="'Cells'" -->
-      <!-- :autoRowHeights="true" -->
-
       <!-- 출고검수/패킹 탭 -->
       <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm">
         <wj-flex-grid-column-group
@@ -128,8 +108,9 @@
         <wj-flex-grid-column-group
           binding="ITM_NAME"
           header="품목명"
-          align="left"
+          align="center"
           cssClassAll="ta-c border-right-sm"
+          style="text-align: left;"
         />
         <wj-flex-grid-column-group
           binding="ITM_CODE"
@@ -268,28 +249,21 @@
         :allowMerging="true"
       >
       </wj-flex-grid-column-group>
-    <!-- </wj-flex-grid> -->
     </ow-grid>
   </div>
 </template>
 
 <script setup>
-import OwGrid from '@/components/grid/new/OwGrid';
-
-
-///
-
   import afterPickingApi from '@/api/afterPickingApi.js';
   // 셀 병합 기준 조절 위함.
   import { SimpleMergeManager } from '@/utils/wijmo.grid';
   import { ref, reactive, watch } from 'vue';
-////
-///
+
   const dropboxAssigneeLabel = '출고검수/패킹담당자';
   //출고검수/패킹 담당자 필터링 드롭박스 바인딩 객체.
   const dropboxAssigneeList = ref([]);
   // 선택된 출고검수/패킹담당자
-  const selectedAssignee = ref(null);
+  const selectedAssignee = ref('');
   // 선택된 검색기준
   const selectedSearchCategory = ref('주문번호');
   // 검색 키워드
@@ -319,6 +293,7 @@ import OwGrid from '@/components/grid/new/OwGrid';
   });
   // 통신을 통한 데이터 바인딩.
   const afterPickingList = ref([]);
+  const afterPickingKey = ref(1);
 
   // 현황/배송구분 정보 불러오기.(새로고침 시에만 통신.)
   const getSummary = async () => {
@@ -360,28 +335,46 @@ import OwGrid from '@/components/grid/new/OwGrid';
         }
     });
   };
-  getAssigneeList();
+  // getAssigneeList();
 
   // 리스트 전체 조회.(페이지네이션 필요.)
-  const getAfterPickingList = async () => {
-    const result = await afterPickingApi.getAfterPickingList(filterList)
-      .then((result) => {
-        if(result != null && result.list != null) {
-          afterPickingList.value = result.list;
-          console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
-          // 리스트를 조회할 때 마다, 조회되는 리스트에 맞는 출고검수/패킹 담당자 목록을 조회해서 동적으로 드롭박스에 할당.
-          getAssigneeList(filterList);
-
-        } else {
-          // 조회된 목록이 없는 경우:
-          // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
-          afterPickingList.value = [];
-          dropboxAssigneeList.value = [];
-
-        }
-      });
+  const getAfterPickingList = async (query, pageNo, pageSize) => {
+    console.log('$$ query : ', query);
+    const result = await afterPickingApi.getAfterPickingList(filterList, pageNo, pageSize);
+      // .then((result) => {
+      //   if(result != null && result.list != null) {
+      //     afterPickingList.value = result.list;
+      //     console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
+      //     // 리스트를 조회할 때 마다, 조회되는 리스트에 맞는 출고검수/패킹 담당자 목록을 조회해서 동적으로 드롭박스에 할당.
+      //     getAssigneeList(filterList);
+      //   } else {
+      //     // 조회된 목록이 없는 경우:
+      //     // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
+      //     afterPickingList.value = [];
+      //     dropboxAssigneeList.value = [];
+      //   }
+      // });
+    if(result != null && result.list != null) {
+      afterPickingList.value = result.list;
+      console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
+      // 리스트를 조회할 때 마다, 조회되는 리스트에 맞는 출고검수/패킹 담당자 목록을 조회해서 동적으로 드롭박스에 할당.
+      getAssigneeList(filterList);
+    } else {
+      // 조회된 목록이 없는 경우:
+      // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
+      afterPickingList.value = [];
+      // dropboxAssigneeList.value = []; // 담당자 드롭박스 안 비우는게 낫나?
+    }
+    const result2 = {
+        data: afterPickingList.value
+        , pageNo: result.pager.pageNo
+        , pageSize: result.pager.rowsPerPage
+        , totalCount: result.pager.totalRows
+    };
+    console.log('$$ result2 : ', result2);
+    return result2;
   };
-  getAfterPickingList();
+  // getAfterPickingList();
 
   const state = reactive({
     flex: undefined,
@@ -443,7 +436,8 @@ import OwGrid from '@/components/grid/new/OwGrid';
         filterList.released = new3[0];
       }
       console.log('watch([checkedGroup1, checkedGroup2, checkedGroup3] : ', filterList);
-      getAfterPickingList();
+      // getAfterPickingList();
+      afterPickingKey.value++;
     }
     , {deep:true}
   );
@@ -453,7 +447,9 @@ import OwGrid from '@/components/grid/new/OwGrid';
     console.log('newSelectedAssignee : ', newSelectedAssignee);
     filterList.assignee = newSelectedAssignee;
     console.log('watch(() => selectedAssignee.value : ' + filterList);
-    getAfterPickingList();
+    // getAfterPickingList();
+    console.log('$$ selectedAssignee.value : ', selectedAssignee.value);
+    afterPickingKey.value++;
   });
 
   // 필터링 키워드를 입력해서 조회한 경우.
@@ -482,49 +478,8 @@ import OwGrid from '@/components/grid/new/OwGrid';
       filterList.vendorName = inputKeyword.value
     }
     console.log('## function search() : ', filterList);
-    getAfterPickingList();
-  }
-
-
-  ////////
-  const retrieve = (param) => {
-    let items = _.cloneDeep(param.items);
-
-  const totalCount = items.length;
-  console.log('## totalCount : ', totalCount);
-    if (param.sort) {
-      items = _.sortBy(items, param.sort);
-      if (['desc', 'DESC'].includes(param.direction)) {
-        items = items.reverse();
-      }
-    }
-    if (param.pageNo) {
-      items = items.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
-    }
-
-    return Promise.resolve({
-      data: items,
-      status: 200,
-      code: 'OK',
-      message: 'Success',
-      totalCount: totalCount,
-    });
-  }
-
-  async function read(query, pageNo, pageSize) {
-    await getAfterPickingList();
-    const result = await retrieve({
-      ...query,
-        pageNo: pageNo
-        , pageSize: pageSize
-        , pageSizeList: pageSizeList
-        , totalCount: totalCount
-        , items: afterPickingList.value
-      });
-      data: afterPickingList.value
-    console.log('## result', result);
-    // initialize();
-    return result;
+    // getAfterPickingList();
+    afterPickingKey.value++;
   }
 
 </script>

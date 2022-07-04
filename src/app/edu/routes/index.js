@@ -39,6 +39,11 @@ export default [
           component: () => import('@@/edu/views/Releases'),
         },
         {
+          path: 'Releases2',
+          name: 'DISTSub4-2',
+          component: () => import('@@/edu/views/Releases copy'),
+        },
+        {
           path: 'Picking',
           name: 'DISTSub5',
           component: () => import('@@/edu/views/Picking'),

@@ -51,7 +51,7 @@ async function getAssigneeList(filterList) {
   // 5-2. 거래처: 부분만 일치해도 검색되도록.
   // 5-3. 배송지: 부분만 일치해도 검색되도록.
   // 5-4. 업체명: 부분만 일치해도 검색되도록.
-async function getAfterPickingList(filterList) {
+async function getAfterPickingList(filterList, pageNo=1, pageSize=10) {
   let afterPickingList = null;
   try {
     let params = new URLSearchParams();
@@ -63,6 +63,8 @@ async function getAfterPickingList(filterList) {
     params.append('clientName', filterList.clientName);
     params.append('shippingDestination', filterList.shippingDestination);
     params.append('vendorName', filterList.vendorName);
+    params.append('pageNo', pageNo);
+    params.append('pageSize', pageSize);
     const response = await axios.post(`/afterPicking/`, params);
     afterPickingList = response.data;
     console.log('## afterPickingList : ', afterPickingList);
