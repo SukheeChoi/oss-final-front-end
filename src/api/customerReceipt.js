@@ -1,13 +1,31 @@
 import axios from 'axios';
 
-//주문을 한 거래처의 이름과 주문 상태 가져오기
-async function getClientInfo(checkboxGroup2, checkboxGroup4) {
-  const shippingCategory = checkboxGroup2._rawValue.join(',');
-  const status = checkboxGroup4.value;
+//DB에 각 조건에 맞는 데이터 요청
+// async function getFilterList(checkboxGroup2, checkboxGroup4, checkbox1) {
+//   const shippingCategory = checkboxGroup2._rawValue.join(','); //배열
+//   const status = checkboxGroup4.value;
+//   const unreleaseChk = checkbox1.value;
+  
+//   let receiptList = [];
+//   try {
+//     const response = await axios.get(`/client/getFilterList`,{params:{shippingCategory, status, unreleaseChk}});
+//     receiptList = response.data.list;
+//   } catch (error) {
+//     console.log(error);
+//   }
+//   return receiptList;
+// }
 
-  let receiptList = [];
+async function getFilterList(filterList) {
+  let receiptList = null;
   try {
-    const response = await axios.get(`/client/`,{params:{shippingCategory, status}});
+    let params = new URLSearchParams();
+    params.append('shippingCategory',filterList.shippingCategory);
+    params.append('status',filterList.status);
+    params.append('unreleased',filterList.unreleased);
+    // params.append('orderNo',filterList.orderNo);
+    // params.append('clientName',filterList.clientName);
+    const response = await axios.get(`/client/getFilterList`, params);
     receiptList = response.data.list;
   } catch (error) {
     console.log(error);
@@ -15,7 +33,8 @@ async function getClientInfo(checkboxGroup2, checkboxGroup4) {
   return receiptList;
 }
 
-//주문 상태 별 건수 가져오기
+
+//주문 단계 별 건수 요청
 async function getStatusCnt() {
   let status = [];
   try {
@@ -29,6 +48,6 @@ async function getStatusCnt() {
 }
 
 export default {
-  getClientInfo,
+  getFilterList,
   getStatusCnt
 };
