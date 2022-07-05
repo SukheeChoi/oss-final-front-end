@@ -512,6 +512,23 @@ const getFilterList = async (filterList) => {
   });
 };
 getFilterList(filterList);
+
+// // db에 filter값 보내기
+// const dummy = async () => {
+//   let list = await clientApi.getFilterList(checkboxGroup2, checkboxGroup4, checkbox1);
+//   return list;
+// };
+
+// dummy().then((list) => {
+//   for (let i = 0; i < list.length; i++) {
+//     items.value.push({
+//       //데이터 정제
+//       client: list[i]['client']['clientName'],
+//       level: list[i]['status'],
+//       unrelease: list[i]['orderUnrelease'],
+//     });
+//   }
+// });
 </script>
 
 <style>

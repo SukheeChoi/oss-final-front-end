@@ -14,8 +14,8 @@
             <!-- Left -->
             <div class="ow-content" :class="{ 'pr-3': openLeft }">
               <app-article v-show="left.show">
-                <the-action-plan style="flex: 7"></the-action-plan>
-                <the-approval style="flex: 3"></the-approval>
+                <!-- <the-action-plan style="flex: 7"></the-action-plan>
+                <the-approval style="flex: 3"></the-approval> -->
                 <!-- <main-portlet style="flex: 3"></main-portlet> -->
               </app-article>
             </div>

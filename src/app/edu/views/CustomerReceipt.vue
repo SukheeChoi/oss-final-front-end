@@ -191,18 +191,13 @@
               </div>
             </div>
           </div>
-          <!-- -->
           <div class="title-field">검색</div>
-          <div class="ow-select" style="--width: 97px">
-            <select name="" id="">
-              <option value="" selected hidden>선택</option>
-              <option value="주문번호">주문번호</option>
-              <option value="거래처">거래처</option>
-            </select>
+          <div style="--width: 97px">
+            <ow-select v-bind:items="searchCategoryList" v-model="searchCategory"></ow-select>
           </div>
           <div class="ow-input type-button" style="--width: 200px">
-            <input type="text" placeholder="검색어를 입력하세요." />
-            <input type="submit" class="btn-search" />
+            <input type="text" v-model="searchCategoryContent" placeholder="검색어를 입력하세요." />
+            <input type="submit" class="btn-search" @click="search" />
           </div>
         </div>
       </div>
@@ -210,35 +205,41 @@
     <div>
       <ow-n-grid
         :n="9"
+        :itemsSource="items.value"
         :initialized="initialize"
         :read="read"
         :autoRowHeights="true"
+        selectionMode="None"
         :visible-rows-count="state.visibleRowsCount"
       >
         <template #left>&nbsp;</template>
+        <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 행 스타일을 미출고 값에 따라 다르게 적용 -->
-            <span class="ow-tag type-category" v-if="!cell.item.unrelease"
-              ><strong>{{ cell.item.client }}</strong></span
-            >
-            <span class="ow-tag type-category" v-else
+            <span class="ow-tag type-category" :class="{ 'ow-tag-background': cell.item.unrelease }">
+              <i class="u" v-if="cell.item.unrelease">미</i>
+              <strong>{{ cell.item.client }}</strong>
+            </span>
+            <!-- <span class="ow-tag type-category" v-else
               ><i class="u">미</i><strong style="color: rgb(210, 57, 46)">{{ cell.item.client }}</strong></span
-            >
+            > -->
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 주문 단계에 따라 아이콘 적용 -->
-            <span class="ow-tag type-category"><i class="o">주</i></span>
-            <span v-if="cell.item.level >= 2" class="ow-tag type-category"><i class="p">피</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">피</i></span>
-            <span v-if="cell.item.level >= 3" class="ow-tag type-category"><i class="i">검</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">검</i></span>
-            <span v-if="cell.item.level >= 4" class="ow-tag type-category"><i class="r">출</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">출</i></span>
-            <span v-if="cell.item.level == 5" class="ow-tag type-category"><i class="t">인</i></span>
-            <span v-else class="ow-tag type-category"><i class="n">인</i></span>
+            <div :class="{ 'ow-tag-background': cell.item.unrelease }">
+              <span class="ow-tag type-category"><i class="o">주</i></span>
+              <span v-if="cell.item.level >= 2" class="ow-tag type-category"><i class="p">피</i></span>
+              <span v-else class="ow-tag type-category"><i class="n">피</i></span>
+              <span v-if="cell.item.level >= 3" class="ow-tag type-category"><i class="i">검</i></span>
+              <span v-else class="ow-tag type-category"><i class="n">검</i></span>
+              <span v-if="cell.item.level >= 4" class="ow-tag type-category"><i class="r">출</i></span>
+              <span v-else class="ow-tag type-category"><i class="n">출</i></span>
+              <span v-if="cell.item.level == 5" class="ow-tag type-category"><i class="t">인</i></span>
+              <span v-else class="ow-tag type-category"><i class="n">인</i></span>
+            </div>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
       </ow-n-grid>
@@ -262,6 +263,21 @@ const percentPick = ref(null);
 const percentPack = ref(null);
 const percentRls = ref(null);
 const percentTrf = ref(null);
+
+//검색 카테고리
+const searchCategory = ref(null);
+//검색 내용
+const searchCategoryContent = ref(null);
+
+// const receiptList = ref([]);
+
+const filterList = reactive({
+  shippingCategory: '',
+  status: '',
+  unreleased: '',
+  // orderNo: '',
+  // clientName: '',
+});
 
 //ngrid 페이지 설정
 const retrieve = (param) => {
@@ -307,8 +323,8 @@ const initialize = (s) => {};
 
 //배송구분
 const checkboxGroup1 = ref([
-  { name: '일반', value: '일반' },
   { name: '긴급', value: '긴급' },
+  { name: '일반', value: '일반' },
 ]);
 
 //주문 단계
@@ -321,27 +337,88 @@ const checkboxGroup3 = ref([
   { name: '택배사 인계', value: '5' },
 ]);
 
+const searchCategoryList = [
+  { name: '주문번호', value: '주문번호' },
+  { name: '거래처', value: '거래처' },
+];
+
 // filter 초기값 : 배송구분 : '일반','긴급', 주문 단계 : '0', 미출고만 보기 : 'false'
 const checkboxGroup2 = ref(['일반', '긴급']);
 const checkboxGroup4 = ref('0');
 const checkbox1 = ref('false');
 
-// db에 filter값 보내기
-const dummy = async () => {
-  let list = await clientApi.getFilterList(checkboxGroup2, checkboxGroup4, checkbox1);
-  return list;
-};
+watch(
+  [checkboxGroup2, checkboxGroup4, checkbox1],
+  ([new1, new2, new3], [old1, old2, old3]) => {
+    console.log('new1 : ', new1);
+    console.log('new2 : ', new2);
+    console.log('new3 : ', new3);
+    console.log('new1.length : ', new1.length);
+    console.log('new1[0] : ', new1[0]);
+    if (new1.length == 2) {
+      filterList.shippingCategory = ['긴급', '일반'];
+    } else {
+      filterList.shippingCategory = new1[0];
+    }
 
-dummy().then((list) => {
-  for (let i = 0; i < list.length; i++) {
-    items.value.push({
-      //데이터 정제
-      client: list[i]['client']['clientName'],
-      level: list[i]['status'],
-      unrelease: list[i]['orderUnrelease'],
-    });
-  }
-});
+    if (new2 == 0) {
+      filterList.status = '0';
+    } else {
+      filterList.status = new2[0];
+    }
+
+    if (new3 == 'true') {
+      filterList.unreleased = 'true';
+    } else {
+      filterList.unreleased = 'false';
+    }
+    getFilterList().then(() => {});
+  },
+  { deep: true }
+);
+
+// function search() {
+//   if (searchCategory.value === '주문번호') {
+//     filterList.orderNo = searchCategoryContent.value;
+//   } else if (searchCategory.value === '거래처') {
+//     filterList.clientName = searchCategoryContent.value;
+//   }
+//   getFilterList(filterList).then(() => {});
+// }
+
+const getFilterList = async () => {
+  const result = await clientApi.getFilterList(filterList).then((result) => {
+    console.log('getFilterList - JSON.stringify(result) : ' + JSON.stringify(result));
+    // receiptList.value = result.list;
+    console.log('result.length : ' + result.length);
+    console.log('Array.isArray(result) : ' + Array.isArray(result));
+    for (let i = 0; i < result.length; i++) {
+      items.value.push({
+        client: result[i]['client']['clientName'],
+        level: result[i]['status'],
+        unrelease: result[i]['orderUnrelease'],
+      });
+    }
+  });
+};
+getFilterList();
+
+// // db에 filter값 보내기
+// const dummy = async () => {
+//   let list = await clientApi.getFilterList(checkboxGroup2, checkboxGroup4, checkbox1);
+//   return list;
+// };
+
+// dummy().then((list) => {
+//   for (let i = 0; i < list.length; i++) {
+//     items.value.push({
+//       //데이터 정제
+//       client: list[i]['client']['clientName'],
+//       level: list[i]['status'],
+//       unrelease: list[i]['orderUnrelease'],
+//     });
+//   }
+// });
 
 //주문 단계 별 건수 요청
 async function getCnt() {
@@ -450,12 +527,23 @@ getCnt();
 </style>
 
 <style lang="scss">
-.ow-grid {
-  .wj-cell {
-    &.ifUnrelease {
-      background-color: rgb(248, 229, 227);
-      color: rgb(210, 57, 46);
-    }
-  }
+// .ow-grid {
+//   .wj-cell {
+//     &.ifUnrelease {
+//       background-color: rgb(248, 229, 227);
+//       color: rgb(210, 57, 46);
+//     }
+//   }
+// }
+
+.ow-tag-background::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(248, 229, 227, 0.5);
+  // z-index: -1;
 }
 </style>
