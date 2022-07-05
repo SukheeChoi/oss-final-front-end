@@ -33,7 +33,7 @@
     </b-col>
     <hr />
     <!-- 배열을 이용한 동적 헤더  -->
-    <div class="ow-flex-wrap item-size-content" style="--gap: 10px">
+    <div class="ow-flex-wrap item-size-content mt-5" style="--gap: 10px">
       <ow-filter-checkbox
         name="checkboxGp1"
         :items="companyCheckbox"
@@ -269,8 +269,13 @@ function getSearchList() {
   align-items: center;
   justify-content: center;
   line-height: inherit;
+  
 }
 
+.ow-grid .wj-cell.wj-header {
+    color: #333333;
+    background-color: #e9ecef;
+}
 .wj-cell.border-left {
   display: flex;
   align-items: center;

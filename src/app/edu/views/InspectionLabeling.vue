@@ -60,6 +60,7 @@
           :childItemsPath="['child', 'childrennn']"
           :selectionChanged="onSelectionChanged"
           :initialized="treeInitialized"
+          :visibleRowsCount="15"
         >
           <wj-flex-grid-column
             header="담당자/업체명"
@@ -87,8 +88,8 @@
           ></wj-flex-grid-column>
           <wj-flex-grid-column
             header="예정시간"
-            binding="scheduledStartTime"
-            :width="50"
+            binding="scheduledTime"
+            :width="150"
             align="center"
           ></wj-flex-grid-column>
           <wj-flex-grid-column header="시작시간" binding="startTime" :width="50" align="center"></wj-flex-grid-column>
@@ -152,7 +153,9 @@
               <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
               <ow-grid
                 v-if="employeeName"
+                headersVisibility="Column"
                 :allowMerging="'Cells'"
+                selectionMode="None"
                 :read="getGrid"
                 :key="keyData"
                 :initialized="onInitialized"
@@ -188,27 +191,22 @@
 <script setup>
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
+import { TreeMergeManager, SimpleMergeManager } from '@/utils/wijmo.grid';
 
-//트리 그리드 자식 경로 설정
 const childItemsPath = ['child', 'childrennn'];
 
 const getTree = ref([]);
 const getGrid = ref([]);
 const keyData = ref(0);
 
-//트리 그리드 데이터 바인딩
 getTree.value = async function (query, pageNo, pageSize) {
   const treeList = await inspectionLabelingApi.getTreeList();
-  console.log(treeList);
-  console.log('queryqueryqueryquery', query);
-  console.log('result', result);
 
   const result = {
     totalCount: 1,
     data: treeList,
   };
 
-  console.log('result', result);
   return result;
 };
 
@@ -216,7 +214,6 @@ const employeeName = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
-//현황 Bar
 const statusBar = reactive({
   receiveItem: null,
   receiveItemQuantity: null,
@@ -237,9 +234,7 @@ const statusBar = reactive({
   damagedItemQuantity: null,
 });
 
-//현황 가져오는 함수
 async function getStatus() {
-  //현황 api 호출
   const result = await inspectionLabelingApi.getStatus().then((data) => {
     statusBar.receiveItem = data.receiveItem;
     statusBar.receiveItemQuantity = data.receiveItemQuantity;
@@ -258,26 +253,20 @@ async function getStatus() {
 
     statusBar.damagedItem = data.damagedItem;
     statusBar.damagedItemQuantity = data.damagedItemQuantity;
-    console.log(data);
   });
 }
 getStatus();
 
 //트리 그리드 셀렉션 핸들러
 const onSelectionChanged = (grid, target) => {
-
   //반응형 변수 세팅(검색 조건 리셋)
   searchSelected.value = '';
   searchContent.value = '';
-
-  console.log(grid);
-  console.log(target);
 
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
     if (typeof grid.selectedItems[0].childrennn == 'object') {
-      console.log('api통신입니다!');
       employeeName.value = grid.selectedItems[0].employeeName;
 
       getGrid.value = async function (query, pageNo, pageSize) {
@@ -304,20 +293,172 @@ const onSelectionChanged = (grid, target) => {
   }
 };
 
-//검색 클릭 버튼
 function searchData() {
   keyData.value++;
 }
 
 //트리 그리드 설정
 const treeInitialized = (grid) => {
-  console.log(grid);
   grid.autoSizeRow(0, true);
 
-  //헤더에 html태그 사용하게 하는 설정
-  grid.formatItem.addHandler((flex, e) => {
-    if (e.panel == flex.columnHeaders) {
+  const config = {
+    groupingColumns: [],
+    mergedColumns: [
+      'startTime',
+      'workTime',
+      'progressRate',
+      'status',
+      'lateTime',
+      'inspectionQuantity',
+      'passItemQuantity',
+      'labelingItemQuantity',
+    ],
+  };
+
+  grid.mergeManager = new TreeMergeManager(config);
+
+  grid.formatItem.addHandler((grid, e) => {
+    //헤더에 html태그 사용하게 하는 설정
+    if (e.panel == grid.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
+    }
+
+    if (e.panel == grid.cells) {
+      var col = grid.columns[e.col];
+      var row = grid.rows[e.row];
+
+      if ((e.row < 1 || row.dataItem.childrennn) && col.binding == 'startTime') {
+        var vnow = grid.getCellData(e.row, e.col - 1);
+
+        const receiveQuantity = row.dataItem.receiveQuantity; //진행률 전체 작업량
+        const currentQuantity = row.dataItem.currentQuantity; //현재 달성률 전체 작업량
+
+        const progressQuantity = row.dataItem.progressQuantity; //현재 작업량
+
+        const receivePercent = Math.round((progressQuantity / receiveQuantity) * 100); //진행률 퍼센트(계산)
+        const currentPercent = Math.round((progressQuantity / currentQuantity) * 100); //현재 달성률 퍼센트(계산)
+
+        const LWTNine = row.dataItem.LWTNine;
+        const LWTTen = row.dataItem.LWTTen;
+        const LWTEleven = row.dataItem.LWTEleven;
+        const LWTThirteen = row.dataItem.LWTThirteen;
+        const LWTFourteen = row.dataItem.LWTFourteen;
+        const LWTFifteen = row.dataItem.LWTFifteen;
+        const LWTSixteen = row.dataItem.LWTSixteen;
+        const LWTSeventeen = row.dataItem.LWTSeventeen;
+
+        const startTime = row.dataItem.scheduledStartTime.slice(0, 2);
+        const endTime = row.dataItem.scheduledEndTime.slice(0, 2);
+
+        function timeCheckFunc(params) {
+          let timeCheck = false;
+          let paramTime = 0;
+          switch (params) {
+            case LWTNine:
+              paramTime = 9;
+              break;
+            case LWTTen:
+              paramTime = 10;
+              break;
+            case LWTEleven:
+              paramTime = 11;
+              break;
+            case LWTThirteen:
+              paramTime = 13;
+              break;
+            case LWTFourteen:
+              paramTime = 14;
+              break;
+            case LWTFifteen:
+              paramTime = 15;
+              break;
+            case LWTSixteen:
+              paramTime = 16;
+              break;
+            case LWTSeventeen:
+              paramTime = 17;
+              break;
+          }
+          if (paramTime > startTime && paramTime < endTime) {
+            timeCheck = true;
+          }
+          return timeCheck;
+        }
+
+        function createTag(params) {
+          const timeCheck = timeCheckFunc(params);
+          let html =
+            '<td>' +
+            '<div class="{progress}">' +
+            '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{paramsColor}" style="width: {params}%"/>' +
+            '{params%}</div>' +
+            '<div class="normal-text">{params}%</div></td>';
+          if (params < 50) {
+            html = html.replace('{paramsColor}', 'normal');
+          } else if (params >= 50 && params < 80) {
+            html = html.replace('{paramsColor}', 'warning');
+          } else if (params >= 80 && params < 100) {
+            html = html.replace('{paramsColor}', 'success');
+          } else if (params == 100) {
+            html = html.replace('{paramsColor}', 'done');
+          }
+          if (params < 50) {
+            html = html.replace('{params%}', '');
+          } else {
+            html = html.replace('{params%}', params + '%');
+            html = html.replace('<div class="normal-text">{params}%</div>', '');
+          }
+          html = html.replaceAll('{params}', params);
+
+          if (timeCheck) {
+            html = html.replaceAll('{progress}', 'progress');
+          } else {
+            html = html.replaceAll('{progress}', 'progress-none');
+          }
+          return html;
+        }
+
+        let html =
+          '<div class="lee">' +
+          '<div class="leeStatus">' +
+          '<div class="item">' +
+          '<div class="state">' +
+          '<div class="state-item">' +
+          '진행률 : <strong>{receiveItemQuantity}</strong> /' +
+          '<strong>{progressQuantity}</strong> /' +
+          '<strong>{receivePercent}%</strong>' +
+          '</div>' +
+          '<div class="state-item">' +
+          '현재달성률 : <strong>{currentQuantity}</strong> /' +
+          '<strong>{progressQuantity}</strong> /' +
+          '<strong>{currentPercent}%</strong>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '<table>' +
+          '<tr>' +
+          createTag(LWTNine) +
+          createTag(LWTTen) +
+          createTag(LWTEleven) +
+          createTag(LWTThirteen) +
+          createTag(LWTFourteen) +
+          createTag(LWTFifteen) +
+          createTag(LWTSixteen) +
+          createTag(LWTSeventeen) +
+          '</tr>' +
+          '</table>' +
+          '</div>';
+
+        html = html.replace('{receiveItemQuantity}', receiveQuantity);
+        html = html.replace('{currentQuantity}', currentQuantity);
+        html = html.replaceAll('{progressQuantity}', progressQuantity);
+        html = html.replace('{receivePercent}', receivePercent);
+        html = html.replace('{currentPercent}', currentPercent);
+
+        html = html.replaceAll('undefined%', '');
+        e.cell.innerHTML = html;
+      }
     }
   });
   //그리드 셀렉션모드 설정(Row)
@@ -326,15 +467,23 @@ const treeInitialized = (grid) => {
 
 //그리드 설정
 const onInitialized = (grid) => {
-  console.log(grid);
+
   grid.autoSizeRow(0, true);
 
-  //헤더에 html태그 사용하게 하는 설정
   grid.formatItem.addHandler((flex, e) => {
+    //헤더에 html태그 사용하게 하는 설정
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
     }
   });
+
+  //-----------------------------------------------------
+  const config = {
+    groupingColumns: ['vendorName'],
+    mergedColumns: ['vendorName', 'inspectionQuantity', 'passItemQuantity', 'labelingItemQuantity'],
+  };
+  grid.mergeManager = new SimpleMergeManager(config);
+  //-----------------------------------------------------
 
   //그리드 셀렉션모드 설정(None)
   grid.selectionMode = 0;
@@ -356,5 +505,75 @@ const onInitialized = (grid) => {
   align-items: center;
   justify-content: center;
   line-height: inherit;
+}
+
+.progress-bar-success {
+  background-color: #198754;
+}
+
+.progress-bar-warning {
+  background-color: #ffc107;
+}
+
+.progress-bar-done {
+  background-color: #0d6efd;
+}
+
+.progress-bar-normal {
+  background-color: #495057;
+}
+
+.border {
+  border: 1px solid black;
+  background-color: grey;
+  color: white;
+  text-align: center;
+}
+
+table th,
+table td {
+  border: 1px solid #d7dce3;
+  padding-right: 0;
+  padding-left: 0;
+  height: 0;
+  vertical-align: middle;
+}
+
+.progress {
+  display: flex;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  background-color: #e9ecef;
+  border-radius: 0;
+}
+
+.progress-none {
+  display: flex;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  border-radius: 0;
+}
+
+.progress-bar {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  overflow: hidden;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  transition: width 0.6s ease;
+}
+
+.normal-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  color: red;
+  text-align: center;
+  white-space: nowrap;
 }
 </style>
