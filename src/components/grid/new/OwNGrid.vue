@@ -131,8 +131,7 @@ export default {
       type: Object,
       default: () => ({
         pageNo: 1,
-        pageSize: 20,
-        // pageSizeList: [pageSize]
+        pageSize: 10,
       }),
     },
     read: { type: Function, required: true },

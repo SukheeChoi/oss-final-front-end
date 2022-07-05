@@ -1,7 +1,7 @@
 <template>
   <div>
-    <template v-if="isNotBlank">
-      <!-- <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
+    <!-- <template v-if="isNotBlank">
+      <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
         <slot name="left">
           <h1 class="h1">그리드</h1>
         </slot>
@@ -10,21 +10,21 @@
             <button type="button" class="ow-btn type-state" v-if="insert" @click="addNew">추가</button>
           </template>
         </slot>
-      </div> -->
-    </template>
+      </div>
+    </template> -->
     <div class="ow-grid-wrap mt-8 mb-8">
       <ow-flex-grid :initialized="initialize" v-bind="$attrs">
         <slot></slot>
       </ow-flex-grid>
     </div>
-    <!-- <div class="d-flex justify-content-end align-items-center">
+    <div class="d-flex justify-content-end align-items-center">
       <div>전체 {{ totalCount }} 건</div>
     </div>
     <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
       <template #default="item">
         <slot name="editor" :item="item.data"> </slot>
       </template>
-    </ow-flex-grid-editor> -->
+    </ow-flex-grid-editor>
   </div>
 </template>
 
@@ -148,7 +148,7 @@ export default {
         // 들여쓰기 설정
         if (col.index === 0 && !row.hasChildren) {
           const paddingLeft = s.treeIndent * (row.level + 1) + s._cellPadLeft;
-          setCss(cell, { paddingLeft });
+          // setCss(cell, { paddingLeft });
         }
         // 셀 템플릿 설정
         if (col.cellTemplate && s.columns.firstVisibleIndex === col.index && row.hasChildren) {
