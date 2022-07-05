@@ -226,6 +226,11 @@
             > -->
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
+
+        <!-- <wj-flex-grid-column v-if="!unrelease" binding="client" header="거래처" width="*">
+        </wj-flex-grid-column> -->
+
+
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 주문 단계에 따라 아이콘 적용 -->

@@ -358,7 +358,8 @@ export class GridRestCollectionView extends RestCollectionView {
     // wijmo는 zero-base
     this._pgIdx = (options.pageNo ?? 1) - 1;
     this._pgSz = options.pageSize ?? 10;
-    this._pageSizeList = options.pageSizeList ?? [5, 10, 20, 30, 50, 100];
+    this._pageSizeList = options.pageSizeList ?? [10];
+    // this._pageSizeList = options.pageSizeList ?? [5, 10, 20, 30, 50, 100];
     this.scrollRestoration = options.scrollRestoration ?? false;
     // 쿼리 정보 설정
     this._query = options.query ?? {};
