@@ -42,7 +42,9 @@ const MenuList2 = [
       Menu.create('주문확인', 'DISTSub2'),
       Menu.create('출고검수/패킹', 'DISTSub3'),
       Menu.create('출고검수/패킹 진행', 'DISTSub4'),
+      Menu.create('출고검수/패킹 진행 copy', 'DISTSub4-2'),
       Menu.create('합배송 품목 수령/전달', 'DISTSub5'),
+      Menu.create('합배송 품목 수령/전달 copy', 'DISTSub5-2'),
       Menu.create('검품검수 및 라벨링 모니터링', 'DISTSub6'),
     ])
   ])
