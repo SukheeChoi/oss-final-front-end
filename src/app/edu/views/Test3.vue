@@ -87,8 +87,8 @@
           ></wj-flex-grid-column>
           <wj-flex-grid-column
             header="예정시간"
-            binding="scheduledStartTime"
-            :width="50"
+            binding="scheduledTime"
+            :width="150"
             align="center"
           ></wj-flex-grid-column>
           <wj-flex-grid-column header="시작시간" binding="startTime" :width="50" align="center"></wj-flex-grid-column>
@@ -336,9 +336,8 @@ const treeInitialized = (grid) => {
   console.log(grid);
   console.log(grid.cells);
   console.log(grid.cells._rng);
-  const leeMergeManager = new TreeMergeManager(config);
 
-  grid.mergeManager = leeMergeManager;
+  grid.mergeManager = new TreeMergeManager(config);
 
   grid.formatItem.addHandler((grid, e) => {
     //헤더에 html태그 사용하게 하는 설정
@@ -377,14 +376,83 @@ const treeInitialized = (grid) => {
         const LWTSixteen = row.dataItem.LWTSixteen;
         const LWTSeventeen = row.dataItem.LWTSeventeen;
 
+        const startTime = row.dataItem.scheduledStartTime.slice(0, 2);
+        const endTime = row.dataItem.scheduledEndTime.slice(0, 2);
+
         console.log('e', gridItem);
         console.log('row', e.row);
         console.log('col', e.col);
-        console.log('vnow', LWTNine);
-        //   vprev = grid.getCellData(e.row - 1, e.col - 1),
-        //   diff = vnow / vprev - 1;
-        // format the cell
-        var html =
+        console.log('vnow', row);
+
+        function timeCheckFunc(params) {
+          let timeCheck = false;
+          let paramTime = 0;
+          switch (params) {
+            case LWTNine:
+              paramTime = 9;
+              break;
+            case LWTTen:
+              paramTime = 10;
+              break;
+            case LWTEleven:
+              paramTime = 11;
+              break;
+            case LWTThirteen:
+              paramTime = 13;
+              break;
+            case LWTFourteen:
+              paramTime = 14;
+              break;
+            case LWTFifteen:
+              paramTime = 15;
+              break;
+            case LWTSixteen:
+              paramTime = 16;
+              break;
+            case LWTSeventeen:
+              paramTime = 17;
+              break;
+          }
+          if (paramTime > startTime && paramTime < endTime) {
+            timeCheck = true;
+          }
+          return timeCheck;
+        }
+
+        function createTag(params) {
+          const timeCheck = timeCheckFunc(params);
+          let html =
+            '<td>' +
+            '<div class="{progress}">' +
+            '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{paramsColor}" style="width: {params}%"/>' +
+            '{params%}</div>' +
+            '<div class="normal-text">{params}%</div></td>';
+          if (params < 50) {
+            html = html.replace('{paramsColor}', 'normal');
+          } else if (params >= 50 && params < 80) {
+            html = html.replace('{paramsColor}', 'warning');
+          } else if (params >= 80 && params < 100) {
+            html = html.replace('{paramsColor}', 'success');
+          } else if (params == 100) {
+            html = html.replace('{paramsColor}', 'done');
+          }
+          if (params < 50) {
+            html = html.replace('{params%}', '');
+          } else {
+            html = html.replace('{params%}', params + '%');
+            html = html.replace('<div class="normal-text">{params}%</div>', '');
+          }
+          html = html.replaceAll('{params}', params);
+
+          if (timeCheck) {
+            html = html.replaceAll('{progress}', 'progress');
+          } else {
+            html = html.replaceAll('{progress}', 'progress-none');
+          }
+          return html;
+        }
+
+        let html =
           '<div class="lee">' +
           '<div class="leeStatus">' +
           '<div class="item">' +
@@ -404,138 +472,25 @@ const treeInitialized = (grid) => {
           '</div>' +
           '<table>' +
           '<tr>' +
-          '<td>' +
-          '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTNineColor}" style="width: {LWTNine}%"/>' +
-          '{LWTNine%}</div>' +
-          '<div class="lee">{LWTNine}%</div></td>' +
-          '<td>' +
-          '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTTenColor}" style="width: {LWTTen}%"/>' +
-          '{LWTTen}%</div>' +
-          '</td>' +
-          '<td>' +
-          '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTElevenColor}" style="width: {LWTEleven}%"/>' +
-          '{LWTEleven}%</div>' +
-          '</td>' +
-          '<td>' +
-          '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTThirteenColor}" style="width: {LWTThirteen}%"/>' +
-          '{LWTThirteen}%</div>' +
-          '</td>' +
-          '<td>' +
-          '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTFourteenColor}" style="width: {LWTFourteen}%"/>' +
-          '{LWTFourteen}%</div>' +
-          '</td>' +
-          '<td>' +
-          '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTFifteenColor}" style="width: {LWTFifteen}%"/>' +
-          '{LWTFifteen}%</div>' +
-          '</td>' +
-          '<td>' +
-          '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTSixteenColor}" style="width: {LWTSixteen}%"/>' +
-          '{LWTSixteen}%</div>' +
-          '</td>' +
-          '<td>' +
-          '<div class="progress">' +
-          '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{LWTSeventeenColor}" style="width: {LWTSeventeen}%"/>' +
-          '{LWTSeventeen}%</div>' +
-          '</td>' +
+          createTag(LWTNine) +
+          createTag(LWTTen) +
+          createTag(LWTEleven) +
+          createTag(LWTThirteen) +
+          createTag(LWTFourteen) +
+          createTag(LWTFifteen) +
+          createTag(LWTSixteen) +
+          createTag(LWTSeventeen) +
           '</tr>' +
           '</table>' +
           '</div>';
+
         html = html.replace('{receiveItemQuantity}', receiveQuantity);
         html = html.replace('{currentQuantity}', currentQuantity);
         html = html.replaceAll('{progressQuantity}', progressQuantity);
         html = html.replace('{receivePercent}', receivePercent);
         html = html.replace('{currentPercent}', currentPercent);
 
-        if(LWTNine < 50) {
-          html = html.replace('{LWTNineColor}', 'normal');
-        } else if (LWTNine >= 50 && LWTNine < 80) {
-          html = html.replace('{LWTNineColor}', 'warning');
-        } else if (LWTNine >= 80 && LWTNine < 100) {
-          html = html.replace('{LWTNineColor}', 'success');
-        } else if (LWTNine == 100) {
-          html = html.replace('{LWTNineColor}', 'done');
-        }
-
-        if(LWTNine < 50) {
-          html = html.replace('{LWTNine%}', '');
-        } else {
-          html = html.replace('{LWTNine%}', LWTNine + '%');
-          html = html.replace('<div class="lee">{LWTNine}%</div>', '');
-        }
-        html = html.replaceAll('{LWTNine}', LWTNine);
-
-        if (LWTTen >= 50 && LWTTen < 80) {
-          html = html.replace('{LWTTenColor}', 'warning');
-        } else if (LWTTen >= 80 && LWTTen < 100) {
-          html = html.replace('{LWTTenColor}', 'success');
-        } else if (LWTTen == 100) {
-          html = html.replace('{LWTTenColor}', 'done');
-        }
-
-        if (LWTEleven >= 50 && LWTEleven < 80) {
-          html = html.replace('{LWTElevenColor}', 'warning');
-        } else if (LWTEleven >= 80 && LWTEleven < 100) {
-          html = html.replace('{LWTElevenColor}', 'success');
-        } else if (LWTEleven == 100) {
-          html = html.replace('{LWTElevenColor}', 'done');
-        }
-
-        if (LWTThirteen >= 50 && LWTThirteen < 80) {
-          html = html.replace('{LWTThirteenColor}', 'warning');
-        } else if (LWTThirteen >= 80 && LWTThirteen < 100) {
-          html = html.replace('{LWTThirteenColor}', 'success');
-        } else if (LWTThirteen == 100) {
-          html = html.replace('{LWTThirteenColor}', 'done');
-        }
-
-        if (LWTFourteen >= 50 && LWTFourteen < 80) {
-          html = html.replace('{LWTFourteenColor}', 'warning');
-        } else if (LWTFourteen >= 80 && LWTFourteen < 100) {
-          html = html.replace('{LWTFourteenColor}', 'success');
-        } else if (LWTFourteen == 100) {
-          html = html.replace('{LWTFourteenColor}', 'done');
-        }
-
-        if (LWTFifteen >= 50 && LWTFifteen < 80) {
-          html = html.replace('{LWTFifteenColor}', 'warning');
-        } else if (LWTFifteen >= 80 && LWTFifteen < 100) {
-          html = html.replace('{LWTFifteenColor}', 'success');
-        } else if (LWTFifteen == 100) {
-          html = html.replace('{LWTFifteenColor}', 'done');
-        }
-
-        if (LWTSixteen >= 50 && LWTSixteen < 80) {
-          html = html.replace('{LWTSixteenColor}', 'warning');
-        } else if (LWTSixteen >= 80 && LWTSixteen < 100) {
-          html = html.replace('{LWTSixteenColor}', 'success');
-        } else if (LWTSixteen == 100) {
-          html = html.replace('{LWTSixteenColor}', 'done');
-        }
-
-        if (LWTSeventeen >= 50 && LWTSeventeen < 80) {
-          html = html.replace('{LWTSeventeenColor}', 'warning');
-        } else if (LWTSeventeen >= 80 && LWTSeventeen < 100) {
-          html = html.replace('{LWTSeventeenColor}', 'success');
-        } else if (LWTSeventeen == 100) {
-          html = html.replace('{LWTSeventeenColor}', 'done');
-        }
-
-        
-        html = html.replaceAll('{LWTTen}', LWTTen);
-        html = html.replaceAll('{LWTEleven}', LWTEleven);
-        html = html.replaceAll('{LWTThirteen}', LWTThirteen);
-        html = html.replaceAll('{LWTFourteen}', LWTFourteen);
-        html = html.replaceAll('{LWTFifteen}', LWTFifteen);
-        html = html.replaceAll('{LWTSixteen}', LWTSixteen);
-        html = html.replaceAll('{LWTSeventeen}', LWTSeventeen);
-
+        html = html.replaceAll('undefined%', '');
         e.cell.innerHTML = html;
       }
     }
@@ -561,12 +516,7 @@ const onInitialized = (grid) => {
     groupingColumns: ['vendorName'],
     mergedColumns: ['vendorName', 'inspectionQuantity', 'passItemQuantity', 'labelingItemQuantity'],
   };
-  const leeMergeManager = new SimpleMergeManager(config);
-  const r = { col: 0, col2: 12, row: 0, row2: 0 };
-  console.log(grid.cells);
-  console.log(grid.cells._rng);
-  leeMergeManager.rowMergedRange(grid, r);
-  grid.mergeManager = leeMergeManager;
+  grid.mergeManager = new SimpleMergeManager(config);
   //-----------------------------------------------------
 
   //그리드 셀렉션모드 설정(None)
@@ -622,6 +572,7 @@ table td {
   height: 0;
   vertical-align: middle;
 }
+
 .progress {
   display: flex;
   height: 1rem;
@@ -630,6 +581,15 @@ table td {
   background-color: #e9ecef;
   border-radius: 0;
 }
+
+.progress-none {
+  display: flex;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  border-radius: 0;
+}
+
 .progress-bar {
   display: flex;
   flex-direction: column;
@@ -640,7 +600,8 @@ table td {
   white-space: nowrap;
   transition: width 0.6s ease;
 }
-.lee {
+
+.normal-text {
   display: flex;
   flex-direction: column;
   justify-content: center;

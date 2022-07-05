@@ -1,6 +1,6 @@
 <template>
-  <div class="ow-flex-wrap dir-col" style="--gap: 10px">
-    <div class="item">
+  <b-row style="--gap: 10px">
+    <b-col>
       <div class="ow-flex-wrap">
         <div class="item size-fix" style="--gap-item: 6px">
           <div class="title-field">현황</div>
@@ -30,7 +30,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </b-col>
     <hr />
     <!-- 배열을 이용한 동적 헤더  -->
     <div class="ow-flex-wrap item-size-content" style="--gap: 10px">
@@ -42,8 +42,6 @@
       />
       <ow-filter-checkbox name="checkboxGp2" :items="shippingCheckbox" v-model="selectShipping" :label="`배송구분`" />
       <ow-filter-checkbox name="checkboxGp3" :items="unreleaseCheckbox" v-model="selectUnrelease" :label="`미출고`" />
-      <div class="title-field">지점별 보기</div>
-      <button class="ow-btn type-util">지점선택(전체)</button>
 
       <div class="item align-to-right" style="--gap-item: 6px">
         <div class="title-field">검색</div>
@@ -60,10 +58,10 @@
         </div>
       </div>
     </div>
-  </div>
+  </b-row>
 
   <!-- 그리드 부분 -->
-  <div class="ow-grid-wrap">
+  <b-row>
     <ow-grid
       :allowMerging="'Cells'"
       :key="keyData"
@@ -100,7 +98,7 @@
         <wj-flex-grid-column-group
           binding="itemName"
           header="품목명"
-          :width="130"
+          width="*"
           :wordWrap="true"
           :multiLine="true"
           cssClassAll="border-left"
@@ -142,7 +140,7 @@
         <wj-flex-grid-column-group binding="transferDate" header="인계일시" :width="90" align="center" />
       </wj-flex-grid-column-group>
     </ow-grid>
-  </div>
+  </b-row>
 </template>
 
 <script setup>
@@ -214,10 +212,11 @@ getData.value = async function (query, pageNo, pageSize) {
     selectCompany.value, selectShipping.value, selectUnrelease.value, searchSelected.value, searchContent.value
     , pageNo, pageSize);
   
+  const page = {pageNo, pageSize: 20}
+
   const result = {
     ...list,
-    pageNo,
-    pageSize,
+    page,
   };
 
   console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', result);
@@ -244,6 +243,7 @@ const onInitialized = (grid) => {
       e.cell.innerHTML = e.cell.textContent;
     }
   });
+  
 };
 
 //체크박스, 검색버튼 감시해서 read 재호출

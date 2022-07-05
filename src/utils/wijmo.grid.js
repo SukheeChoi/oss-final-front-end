@@ -109,7 +109,6 @@ class SimpleMergeManager extends MergeManager {
   }
 
   getMergedRange(p, r, c) {
-    console.log("실행");
     const range = new CellRange(r, c);
     switch (p.cellType) {
       case CellType.ColumnHeader:
@@ -471,7 +470,7 @@ class TreeMergeManager extends MergeManager {
         this.colMergedRange(p, range);
         break;
       case CellType.Cell:
-        if (this.isMerged(p, c)) {
+        if (this.isMerged(p, c) && p.getCellData(r, c) === "dd") {
           this.colMergedRange(p, range);
         }
         break;

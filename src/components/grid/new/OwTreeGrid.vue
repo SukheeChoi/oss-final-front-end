@@ -148,7 +148,7 @@ export default {
         // 들여쓰기 설정
         if (col.index === 0 && !row.hasChildren) {
           const paddingLeft = s.treeIndent * (row.level + 1) + s._cellPadLeft;
-          setCss(cell, { paddingLeft });
+          // setCss(cell, { paddingLeft });
         }
         // 셀 템플릿 설정
         if (col.cellTemplate && s.columns.firstVisibleIndex === col.index && row.hasChildren) {
