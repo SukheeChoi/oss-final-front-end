@@ -51,8 +51,7 @@ export default {
     },
   },
   setup(props, { slots, emit }) {
-    console.log("props", props);
-    console.log("slots", slots);
+
     const state = reactive({
       checkedValues: computed({
         get: () => props.modelValue,
@@ -60,8 +59,7 @@ export default {
       }),
       hasSlots: computed(() => !!slots.default),
     });
-    console.log("state.checkedValues", state.checkedValues);
-    console.log("modelValue", props.modelValue);
+
     return {
       ...toRefs(state),
     };
