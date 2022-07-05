@@ -88,65 +88,66 @@
       headersVisibility="Column"
       allowSorting="None"
       selectionMode="RowRange"
+      :autoGenerateColumns="false"
       class="ow-grid type-header-group"
       :read="getAfterPickingList"
       :initialized="onInitialized"
-      :allowMerging="Cells"
+      :allowMerging="ColumnHeaders"
       style="display: flex"
       :key="afterPickingKey"
     >
       <!-- 출고검수/패킹 탭 -->
-      <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm">
+      <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm border-center">
         <wj-flex-grid-column-group
           binding="RLS_NO"
           header="출고번호"
           align="center"
-          :width="85"
-          cssClassAll="ta-c border-right-sm"
+          :width="80"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="ITM_NAME"
           header="품목명"
-          align="center"
-          cssClassAll="ta-c border-right-sm"
-          style="text-align: left;"
+          align="left"
+          width="*"
+          cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
           binding="ITM_CODE"
           header="품목코드"
           align="left"
           :width="110"
-          cssClassAll="ta-c border-right-sm"
+          cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
           binding="PIC_QTY"
           header="피킹수량"
           align="right"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          :width="50"
+          cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
           binding="RI_QTY"
           header="검수수량"
           align="right"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          :width="50"
+          cssClassAll="ta-c border-right-sm border-center"
         />
         <!-- 합산 불필요(로직변경) -->
         <wj-flex-grid-column-group
           binding="RI_URLS"
           header="미출고수량"
           align="right"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          :width="55"
+          cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
           binding="CLT_NAME"
           header="거래처"
           align="left"
           :width="100"
-          cssClassAll="ta-c border-right-sm"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
@@ -154,48 +155,50 @@
           header="배송지"
           align="left"
           :width="100"
-          cssClassAll="ta-c border-right-sm"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="ORD_SHP_CAT"
           header="배송구분"
           align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          :width="70"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="ORD_SHP_WAY"
           header="배송방식"
           align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          :width="70"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="RI_EMP_NAME"
           header="담당자"
           align="center"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          :width="60"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="RI_RLS_PRT_DT"
-          header="출고요청서 출력일시"
+          header="출고요청서
+          출력일시          "
           align="center"
-          :width="110"
-          cssClassAll="ta-c border-right-sm"
+          :width="100"
+          cssClassAll="border-right-sm border-center"
           multiLine="true"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="RI_RCPT_PRT_DT"
-          header="거래명세서 출력일시"
+          header="거래명세서
+          출력일시          "
           align="center"
-          :width="110"
-          cssClassAll="ta-c border-right-sm"
+          :width="100"
+          cssClassAll="border-right-sm border-center"
           multiLine="true"
           :allowMerging="true"
         />
@@ -203,16 +206,16 @@
           binding="RI_DT"
           header="검수일시"
           align="center"
-          :width="100"
-          cssClassAll="ta-c border-right-sm"
+          :width="90"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="PAC_BX_QTY"
           header="Box수량"
           align="right"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          :width="60"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
       </wj-flex-grid-column-group>
@@ -221,22 +224,25 @@
         <wj-flex-grid-column-group
           binding="RLS_EMP_NAME"
           header="담당자"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          align="center"
+          :width="60"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="RLS_SHP_CPN"
           header="택배사"
-          width="*"
-          cssClassAll="ta-c border-right-sm"
+          align="center"
+          :width="70"
+          cssClassAll="border-right-sm border-center"
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="RLS_RLS_IVC_CODE"
           header="송장번호"
-          width="*"
-          cssClassAll="ta-c"
+          align="left"
+          :width="100"
+          cssClassAll="border-center"
           :allowMerging="true"
         />
       </wj-flex-grid-column-group>
@@ -244,10 +250,19 @@
         binding="PAC_NT"
         header="비고"
         align="center"
-        width="*"
-        cssClassAll="ta-c"
+        :width="100"
+        cssClassAll="border-center"
         :allowMerging="true"
       >
+      <!-- <wj-flex-grid-column-group
+        binding="PAC_NT"
+        header="비고"
+        align="center"
+        :width="100"
+        cssClassAll="border-center"
+        :allowMerging="true"
+      >
+      </wj-flex-grid-column-group> -->
       </wj-flex-grid-column-group>
     </ow-grid>
   </div>
@@ -335,11 +350,9 @@
         }
     });
   };
-  // getAssigneeList();
 
-  // 리스트 전체 조회.(페이지네이션 필요.)
+  // 리스트 전체 조회.
   const getAfterPickingList = async (query, pageNo, pageSize) => {
-    console.log('$$ query : ', query);
     const result = await afterPickingApi.getAfterPickingList(filterList, pageNo, pageSize);
       // .then((result) => {
       //   if(result != null && result.list != null) {
@@ -374,7 +387,6 @@
     console.log('$$ result2 : ', result2);
     return result2;
   };
-  // getAfterPickingList();
 
   const state = reactive({
     flex: undefined,
@@ -388,6 +400,20 @@
     };
 
     flex.mergeManager = new SimpleMergeManager(config);
+
+    // create extra header row
+    // var extraRow = new wjGrid.Row();
+    // extraRow.allowMerging = true;
+    // add extra header row to the grid
+    // var panel = flex.columnHeaders;
+    // var panel = grid.columnHeaders;
+    // panel.rows.splice(0, 0, extraRow);
+    // ["PAC_NT"].forEach(function(binding) {
+    //     let col = flex.getColumn(binding);
+    //     // let col = grid.getColumn(binding);
+    //     col.allowMerging = true;
+    //     panel.setCellData(0, col.index, col.header);
+    // });
   };
   
   const selectSearchLabel = '검색';
@@ -484,34 +510,17 @@
 
 </script>
 
-<style lang="scss">
-.ow-grid {
-  .wj-cell {
-    &.clr-red {
-      color: #f60808;
-    }
-  }
-}
-</style>
-
 <style>
-/* use flex display to center-align cells vertically */
-.wj-flexgrid .wj-cell {
+.wj-cell.wj-header {
   display: flex;
   align-items: center;
-}
-.wj-flexgrid .wj-cell.wj-align-left {
-  justify-content: flex-start;
-}
-.wj-flexgrid .wj-cell.wj-align-right {
-  justify-content: flex-end;
-}
-
-.wj-flexgrid .wj-cell.wj-align-center {
   justify-content: center;
+  line-height: inherit;
 }
 
-.span.align-left {
-  justify-content: flex-start;
+.wj-cell.border-center {
+  display: flex;
+  align-items: center;
+  line-height: inherit;
 }
 </style>

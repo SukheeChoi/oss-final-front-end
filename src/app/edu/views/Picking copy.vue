@@ -115,7 +115,6 @@
 <script setup>
   import combineShippingApi from '../../../api/combineShippingApi';
   import { ref, reactive, watch } from 'vue';
-  import OwNGrid from '@/components/grid/new/OwNGrid';
 
   const receiptKey = ref(0);
   const deliveryKey = ref(0);

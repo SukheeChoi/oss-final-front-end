@@ -107,14 +107,27 @@ class SimpleMergeManager extends MergeManager {
   }
 
   getMergedRange(p, r, c) {
+    console.log('&& p : ', p);
+    console.log('&& r : ', r);
+    console.log('&& c : ', c);
     const range = new CellRange(r, c);
+    console.log('&&* p.cellType : ', p.cellType);
     switch (p.cellType) {
       case CellType.ColumnHeader:
-        this.colMergedRange(p, range);
+        console.log('&&* CellType.ColumnHeader : ', CellType.ColumnHeader);
+        console.log('&&* p._cols : ', p._cols);
+        console.log('&&* p : ', p);
+        console.log('&&* p.owner : ', p.owner);
+        console.log('&&* range : ', range);
+        this.rowMergedRange(p, range);
+        this.colMergedRange(p, range);//
+        console.log('&& case ColumnHeader.Cell: : ');
         break;
-      case CellType.Cell:
-        if (this.isMerged(p, c)) {
-          this.rowMergedRange(p, range);
+        case CellType.Cell:
+          if (this.isMerged(p, c)) {
+            this.rowMergedRange(p, range);
+            // this.colMergedRange(p, range);//
+          console.log('&& case CellType.Cell: : ');
         }
         break;
     }

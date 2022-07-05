@@ -1,6 +1,6 @@
 <template>
   <div>
-    <template v-if="isNotBlank">
+    <!-- <template v-if="isNotBlank">
       <div class="d-flex justify-content-between align-items-end mt-10" ref="header">
         <slot name="left">
           <h1 class="h1">그리드</h1>
@@ -11,7 +11,7 @@
           </template>
         </slot>
       </div>
-    </template>
+    </template> -->
     <div class="ow-grid-wrap mt-8 mb-8">
       <ow-flex-grid :initialized="initialize" v-bind="$attrs">
         <slot></slot>
@@ -116,7 +116,7 @@ export default {
       grid: null,
       query: Object.assign({}, props.query),
       pageNo: 1,
-      pageSize: 15,
+      pageSize: 10,
       pageSizeList: [],
       totalCount: 0,
       api: {
@@ -125,8 +125,7 @@ export default {
         patchItem: props.update,
         deleteItem: props.remove,
       },
-      isNotBlank: false,
-      // isNotBlank: true,
+      isNotBlank: true,
     });
 
     /**
@@ -212,8 +211,10 @@ export default {
 
     onMounted(async () => {
       await nextTick();
-      const el = header.value;
+      // const el = header.value;
+      const el = '가나다라마바사';
       const textContent = el.textContent.trim();
+      // const textContent = el.textContent.trim();
       state.isNotBlank = textContent !== '';
     });
 

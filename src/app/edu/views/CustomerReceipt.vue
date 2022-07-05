@@ -219,14 +219,21 @@
         <wj-flex-grid-column binding="client" header="거래처" width="*">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 행 스타일을 미출고 값에 따라 다르게 적용 -->
+            <!-- background-color: rgb(248, 229, 227);
+      color: rgb(210, 57, 46);  cssClass="ifUnrelease" -->
             <span class="ow-tag type-category" v-if="!cell.item.unrelease"
               ><strong>{{ cell.item.client }}</strong></span
             >
             <span class="ow-tag type-category" v-else
-              ><i class="u">미</i><strong style="color: rgb(210, 57, 46)">{{ cell.item.client }}</strong></span
+              ><i class="u">미</i><strong style="color: rgb(210, 57, 46);">{{ cell.item.client }}</strong></span
             >
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
+
+        <!-- <wj-flex-grid-column v-if="!unrelease" binding="client" header="거래처" width="*">
+        </wj-flex-grid-column> -->
+
+
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 주문 단계에 따라 아이콘 적용 -->
