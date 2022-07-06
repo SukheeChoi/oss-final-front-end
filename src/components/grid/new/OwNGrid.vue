@@ -1,10 +1,3 @@
-OwGrid
-OwTreeGrid
-OwNGrid
-OwGrid
-OwTreeGrid
-OwNGrid
-
 <template>
   <div>
     <template v-if="isNotBlank">

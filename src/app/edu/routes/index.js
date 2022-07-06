@@ -54,7 +54,7 @@ export default [
         component: () => import('@@/edu/views/Picking copy'),
       },
       {
-        path: 'InspectionLabelling',
+        path: 'InspectionLabeling',
         name: 'DISTSub6',
         component: () => import('@@/edu/views/InspectionLabeling'),
       },
