@@ -50,14 +50,11 @@
   <!-- '수령'탭이 선택된 경우. -->
   <ow-n-grid
     v-if="showReceipt"
-    :initialized="initialize"
     :n="2"
     :read="read"
     :key="receiptKey"
-    :insert="insert"
-    :update="update"
-    :remove="remove"
   >
+    <!-- :initialized="initialize" -->
   <template #left>&nbsp;</template>
     <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목명" binding="itemName" align="left" width="3*"></wj-flex-grid-column>
@@ -67,15 +64,14 @@
     <wj-flex-grid-column v-if="toDo==1" header="미출고" binding="unreleased" :width="60">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <div class="ow-input">
-          <input id="receiptUnreleaseInput" type="text" v-model="cell.item.unreleased"/>
+          <input id="receiptUnreleaseInput" type="text" v-model="cell.item.unreleased" @change="changeReceiptUnrelease($event, cell.item.orderItemNo, cell.item.unreleased)" />
         </div>
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==0" header="미출고" binding="unreleased" :width="60" />
     <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
-        <!-- <button class="ow-btn type-icon check-state" @click="checkReceiptCheckBtn($event, cell.item.orderItemNo, cell.item.No)"></button> -->
-        <button class="ow-btn type-icon check-state" @click="checkReceiptCheckBtn($event, cell.item.orderItemNo)"></button>
+        <button id="receipt-check-btn" class="ow-btn type-icon check-state" @click="checkReceiptCheckBtn($event, cell.item.orderItemNo)"></button>
         <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
@@ -83,14 +79,11 @@
   <!-- '전달'탭이 선택된 경우. -->
   <ow-n-grid
     v-if="!showReceipt"
-    :initialized="initialize"
     :n="2"
     :read="read"
     :key="deliveryKey"
-    :insert="insert"
-    :update="update"
-    :remove="remove"
   >
+    <!-- :initialized="initialize" -->
     <template #left>&nbsp;</template>
     <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
@@ -208,7 +201,6 @@
       for(let i=0; i<items.length; i++) {
         filteredItems.push({
           'rownum': receiptList.value[i]["rownum"]
-          // 'No': i+1  //pagination할 때 rowNum 함께 받아서 이용할 것.
           , 'itemName': receiptList.value[i]["item"]["itemName"]
           , 'itemCode': receiptList.value[i]["item"]["itemCode"]
           , 'releaseQuantity': receiptList.value[i]["releaseQuantity"]
@@ -312,6 +304,7 @@
   // 수령 Update.
   console.log('before updateReceiptList');
   const updateReceiptList = async () => {
+    console.log('++ receiptedList.value : ', receiptedList.value);
     const result = await combineShippingApi.updateReceiptList(Array.from(receiptedList.value))
       .then((result) => {
         console.log('updateReceiptList - result : ' + result);
@@ -566,6 +559,31 @@
     clickSearch.value = true;
   }
 
+  // ReceiptList의 unreleased update에 대한 handler.
+  function changeReceiptUnrelease(event, orderItemNo, unreleased) {
+    console.log('++ event : ', event);
+    console.log('++ event.target : ', event.target);
+    console.log('++ event.target.parentNode.parentNode.parentNode.parentNode.parentNode : ', event.target.parentNode.parentNode.parentNode.parentNode.parentNode);
+    console.log('++ event.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("#receipt-check-btn") : ', event.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('#receipt-check-btn'));
+    let btnTag = event.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('#receipt-check-btn');
+    console.log('++ btnTag.classList.contains("active") : ', btnTag.classList.contains('active'));
+    console.log('++ orderItemNo : ', orderItemNo);
+    console.log('++ unreleased : ', unreleased);
+    if(btnTag.classList.contains('active')) { // 수령여부 체크된 상태. -> 수정.
+      for(let i=0; i<receiptedList.value.length; i++) {
+        console.log('++ receiptedList.value[i] : ', receiptedList.value[i]);
+        console.log('++ receiptedList.value[i]["orderItemNo"] : ', receiptedList.value[i]['orderItemNo']);
+        if(receiptedList.value[i]['orderItemNo'] === orderItemNo) {
+          console.log('++ inside if(receiptedList.value[i]["orderItemNo"] === orderItemNo) : ', receiptedList.value[i]['orderItemNo']);
+          receiptedList.value[i]['receiveUnrelease'] = parseInt(unreleased);
+          console.log('++ inside if(receiptedList.value[i]["orderItemNo"] === orderItemNo) : ', receiptedList.value[i]['receiveUnrelease']);
+          
+          break;
+        }
+      }
+    }
+  }
+
   // 수령여부 체크 버튼 클릭시.
   function checkReceiptCheckBtn(event, orderItemNo) {
     console.log('## event.target.parentElement: ', event.target.parentElement);
@@ -591,6 +609,7 @@
       checkedReceiptCount.value++;
       // 수령객체에 update할 객체 추가.
       receiptedList.value.push(targetObject);
+      console.log('++ receiptedList.value : ', receiptedList.value);
     }
     // 활성화 클래스 toggle.
     event.target.classList.toggle('active');
@@ -629,15 +648,11 @@
     justify-content: center;
     line-height: inherit;
   }
-}
-  
-:deep {
+
   .wj-flexgrid .wj-cell.wj-align-center {
     justify-content: center;
   }
-}
 
-:deep {
   .wj-cell.border-center {
     display: flex;
     align-items: center;
