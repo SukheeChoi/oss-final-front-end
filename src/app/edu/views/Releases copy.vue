@@ -520,15 +520,11 @@ function search() {
     justify-content: center;
     line-height: inherit;
   }
-}
-  
-:deep {
+
   .wj-flexgrid .wj-cell.wj-align-center {
     justify-content: center;
   }
-}
 
-:deep {
   .wj-cell.border-center {
     display: flex;
     align-items: center;
