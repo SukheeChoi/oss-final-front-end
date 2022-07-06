@@ -104,10 +104,10 @@
       class="ow-grid type-header-group"
       :read="getAfterPickingList"
       :initialized="onInitialized"
-      allowMerging = 'ColumnHeaders'
       style="display: flex"
       :key="afterPickingKey"
     >
+      <!-- :allowMerging="All" -->
       <!-- 출고검수/패킹 탭 -->
       <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm border-center">
         <wj-flex-grid-column-group
@@ -266,7 +266,7 @@
         cssClassAll="border-center"
         :allowMerging="true"
       >
-        <!-- <wj-flex-grid-column-group
+      <wj-flex-grid-column-group
         binding="PAC_NT"
         header="비고"
         align="center"
@@ -274,7 +274,7 @@
         cssClassAll="border-center"
         :allowMerging="true"
       >
-      </wj-flex-grid-column-group> -->
+      </wj-flex-grid-column-group>
       </wj-flex-grid-column-group>
     </ow-grid>
   </div>
@@ -512,17 +512,27 @@ function search() {
 }
 </script>
 
-<style>
-.wj-cell.wj-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: inherit;
+<style lang="scss" scoped>
+:deep {
+  .wj-cell.wj-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: inherit;
+  }
+}
+  
+:deep {
+  .wj-flexgrid .wj-cell.wj-align-center {
+    justify-content: center;
+  }
 }
 
-.wj-cell.border-center {
-  display: flex;
-  align-items: center;
-  line-height: inherit;
+:deep {
+  .wj-cell.border-center {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
 }
 </style>

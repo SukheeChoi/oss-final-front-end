@@ -1,12 +1,12 @@
 <template>
-  <b-row style="--gap: 10px">
-    <b-col>
+  <div class="ow-flex-wrap dir-col" style="--gap: 10px">
+    <div class="item">
       <div class="ow-flex-wrap">
         <div class="item size-fix" style="--gap-item: 6px">
           <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
         </div>
       </div>
-    </b-col>
+    </div>
     <hr />
     <!-- 배열을 이용한 동적 체크박스  -->
     <div class="ow-flex-wrap item-size-content mt-5" style="--gap: 10px">
@@ -29,7 +29,7 @@
         </div>
       </div>
     </div>
-  </b-row>
+  </div>
 
   <!-- 그리드 부분 -->
   <b-row>
@@ -55,7 +55,7 @@
         <wj-flex-grid-column-group
           binding="clientName"
           header="거래처"
-          :width="100"
+          width="*"
           align="left"
           :allowMerging="true"
           cssClassAll="border-center"
@@ -63,7 +63,7 @@
         <wj-flex-grid-column-group
           binding="itemName"
           header="품목명"
-          width="*"
+          :width="130"
           :wordWrap="true"
           :multiLine="true"
           cssClassAll="border-left"
@@ -80,9 +80,9 @@
         <wj-flex-grid-column-group binding="pickingDirectionUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="피킹">
-        <wj-flex-grid-column-group binding="pickingEmployee" header="담당자" :width="60" align="center" />
+        <wj-flex-grid-column-group binding="pickingEmployee" header="담당자" :width="50" align="center" />
         <wj-flex-grid-column-group binding="pickingQuantity" header="피킹수량" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="pickingDate" header="피킹일시" :width="90" align="center" />
+        <wj-flex-grid-column-group binding="pickingDate" header="피킹일시" :width="50" align="center" />
         <wj-flex-grid-column-group binding="pickingUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="협력사">
@@ -93,16 +93,16 @@
         <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="100" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고검수/패킹">
-        <wj-flex-grid-column-group binding="packingInspectionEmployee" header="담당자" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="inspectionDate" header="검수일시" :width="90" align="center" />
+        <wj-flex-grid-column-group binding="packingInspectionEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="inspectionDate" header="검수일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고">
-        <wj-flex-grid-column-group binding="releaseEmployee" header="담당자" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="releaseDate" header="출고일시" :width="90" align="center" />
+        <wj-flex-grid-column-group binding="releaseEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="releaseDate" header="출고일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="인계">
-        <wj-flex-grid-column-group binding="transferEmployee" header="담당자" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="transferDate" header="인계일시" :width="90" align="center" />
+        <wj-flex-grid-column-group binding="transferEmployee" header="담당자" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="transferDate" header="인계일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
     </ow-grid>
   </b-row>
@@ -129,27 +129,28 @@ const companyCheckbox = ref([
   { name: '협력사상품(직배송)', value: 'vendorproductDir' },
 ]);
 
-const shippingCheckbox = ref([
+const checkboxGroup2 = ref([
   { name: '긴급', value: 'emergency' },
   { name: '일반', value: 'normal' },
 ]);
 
-const unreleaseCheckbox = ref([
+const checkboxGroup3 = ref([
   { name: '출고', value: 'released' },
   { name: '미출고', value: 'unreleased' },
 ]);
 
-const selectCompany = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
-const selectShipping = ref(['emergency', 'normal']);
-const selectUnrelease = ref(['released', 'unreleased']);
+const checkboxGroup4 = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
+const checkboxGroup5 = ref(['emergency', 'normal']);
+const checkboxGroup6 = ref(['released', 'unreleased']);
 
 const getData = ref([]);
 const keyData = ref(0);
 
+
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
-const selectButton = ref(null);
+const dummy = ref(null);
 
 //현황 가져오는 함수
 async function getStatus() {
@@ -163,12 +164,14 @@ async function getStatus() {
     console.log(data);
   });
 }
-getStatus();
+// getStatus();
 
 //그리드에 바인딩 하는 함수
 getData.value = async function (query, pageNo, pageSize) {
-  console.log(pageNo, pageSize, selectCompany.value, selectShipping.value, selectUnrelease.value);
-  //pageNo = "페이지번호", pageSize = "한페이지 몇 행", totalCount = "전체 행 수"
+  console.log(pageNo, pageSize, checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value);
+  //pageNo = "페이지번호"
+  //pageSize = "한페이지 몇 행"
+  //totalCount = "전체 행 수"
 
   //그리드 데이터 api 호출
   const list = await orderApi.getFilterList(
@@ -184,14 +187,13 @@ getData.value = async function (query, pageNo, pageSize) {
   const page = { pageNo, pageSize: 20 };
 
   const result = {
-    ...list,
-    page,
+    ...lee,
+    pageNo,
   };
 
   return result;
 };
 
-//그리드 초기화 및 세팅
 const onInitialized = (grid) => {
   //병합 기준 컬럼과, 병합 컬럼 설정
   const config = {
@@ -199,10 +201,8 @@ const onInitialized = (grid) => {
     mergedColumns: ['orderDate', 'orderNo', 'clientName'],
   };
 
-  //그리드 병합 세팅
   grid.mergeManager = new SimpleMergeManager(config);
 
-  //그리드 헤더에 <br>태그 넣는 세팅
   grid.formatItem.addHandler((flex, e) => {
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
@@ -210,7 +210,7 @@ const onInitialized = (grid) => {
   });
 };
 
-//체크박스, 검색버튼 감시해서 read 재호출
+//체크된 데이터 감시해서 api요청
 watch(
   () => [selectCompany, selectShipping, selectUnrelease],
   (newGroup, oldGroup) => {
@@ -219,7 +219,6 @@ watch(
   { deep: true }
 );
 
-//검색 클릭 버튼
 function getSearchList() {
   keyData.value++;
 }
