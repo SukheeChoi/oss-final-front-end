@@ -35,21 +35,16 @@
       <div class="container-fluid">
         <div class="ow-grid-wrap">
           <ow-grid
-            class="ow-grid"
             headersVisibility="Column"
-            selectionMode="RowRange"
             :read="releaseInspectionData"
             :allowMerging="'Cells'"
             :initialized="onInitialized"
             :autoRowHeights="true"
             :autoGenerateColumns="false"
             :selectionChanged="SelectionChanged"
-            :is-read-only="true"
-            :header="false"
-            :footer="false"
             :key = "keyData"
             :pageValue = "pageValue.value"
-            
+            :page="page"         
           >
             <!-- :autoRowHeights="true" -->
             <template #left>&nbsp;</template>
@@ -184,9 +179,10 @@
               <div class="state">
                 <div class="state-item w-100">{{ tally.clientName }}</div>
                 <div class="state-item ow-select">
-                  <select name="" id="">
-                    <option value="긴급" selected>긴급</option>
-                    <option value="일반">일반</option>
+                  <select v-model="tally.category">
+                    <option>긴급</option>
+                    <option>일반</option>
+                    <span>Selected: {{ tally.category }}</span>
                   </select>
                 </div>
               </div>
@@ -230,6 +226,7 @@
                 <td>
                   <div class="ow-input">
                     <input type="text" v-model="tally.releaseCode" />
+                    <button class="ow-btn type-state ml-3" v-on:click="scan(tally.releaseCode, 'releaseCode')">스캔</button>
                   </div>
                 </td>
               </tr>
@@ -237,8 +234,8 @@
                 <th scope="row">바코드스캔</th>
                 <td>
                   <div class="ow-input">
-                    <input type="text" v-model="scannedBarcode" />
-                    <button class="ow-btn type-state ml-3" v-on:click="scan(tally.releaseCode)">스캔</button>
+                    <input type="text" v-model="tally.barCode"/>
+                    <button class="ow-btn type-state ml-3" v-on:click="scan(tally.barCode, 'barCode')">스캔</button>
                   </div>
                 </td>
               </tr>
@@ -249,18 +246,10 @@
             </tbody>
           </table>
           <div class="container">
-            <button
-              class="ow-btn type-util float-right ml-2"
-              style="float: right"
-              v-on:click="unrelease(tally.releaseCode, scannedBarcode)"
-            >
+            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="unrelease(tally.releaseCode)">
               미출고처리
             </button>
-            <button
-              class="ow-btn type-util float-right"
-              style="float: right"
-              v-on:click="inspection(tally.releaseCode, scannedBarcode)"
-            >
+            <button class="ow-btn type-util float-right" style="float: right" v-on:click="inspection(tally.releaseCode)">
               검수처리
             </button>
           </div>
@@ -335,6 +324,8 @@ export default {
         mergedColumns: [0, 1, 2, 3, 4, 5, 'releasePrintDate', 'boxQty', 14, 15, 16],
       };
       grid.mergeManager = new SimpleMergeManager(config);
+
+      grid.selectionMode = 4 //RowRange
     };
 
     //
@@ -369,32 +360,34 @@ export default {
     getTotal();
 
     //검수 버튼 이벤트 함수
-    async function inspection(releaseCode, scannedBarcode) {
-      let codes = { releaseCode: releaseCode, scannedBarcode: scannedBarcode };
-      const result = await releaseInspectionApi.releaseInspectionQtyUpdate(codes);
+    async function inspection(releaseCode) {
+      const result = await releaseInspectionApi.releaseInspectionQtyUpdate(releaseCode);
       return result;
     }
 
     //미출고 버튼 이벤트 함수
-    async function unrelease(releaseCode, scannedBarcode) {
-      let codes = { releaseCode: releaseCode, scannedBarcode: scannedBarcode };
-      const result = await releaseInspectionApi.unReleaseQtyUpdate(codes);
+    async function unrelease(releaseCode) {
+      const result = await releaseInspectionApi.unReleaseQtyUpdate(releaseCode);
       return result;
     }
 
     //box테이블(오른쪽 아래) 데이터 가져오기
     const boxItemData = ref(null);
 
-    //스캔 버튼 이벤트 함수
-    async function scan(releaseCode) {
+    // 스캔 버튼 이벤트 함수
+    // 출고번호(releaseCode) or 바코드(barCode)
+    async function scan(code, kind) {
 
-      const result = await releaseInspectionApi.scan(releaseCode);
+      const result = await releaseInspectionApi.scan(code, kind);
 
       tally.clientName = result.client.clientName;
       tally.totalPickingQty = result.picking.pickingQty;
       tally.totalInspectionQty = result.releaseInspectionQuantity;
       tally.unRelease = result.unReleased;
       tally.orderNo = result.order.orderNo;
+      tally.category = result.order.shippingCategory;
+      tally.barCode = result.release.releaseBarCode;  //바코드
+      tally.releaseCode = result.release.releaseCode; //출고번호
 
       //스캔 버튼 누르면 box테이블 데이터 생성
       boxItemData.value = [];
@@ -429,6 +422,9 @@ export default {
       }
     }
 
+    //박스들(list)의 정보를 포함하는 list
+    const boxlist = ref([]);
+
     //n번째 박스 패킹처리
     async function oneBoxPacking(index) {
 
@@ -453,9 +449,13 @@ export default {
         keyData.value++;
       }
 
-      console.log("패킹패킹")
-      console.log(apiArray);      
+      console.log("패킹패킹");
+      console.log(apiArray);
+      
+      //boxlist에 push
+      boxlist.value.push(apiArray);
 
+      //api통신
       const result = await releaseInspectionApi.packing(apiArray);
       return result;
     }
@@ -492,11 +492,17 @@ export default {
     //순수 데이터
     const rIData = ref(null);
 
+    //page로 넘겨줄 object
+    const page = reactive({"pageNo":1, "pageSize" : 3});
+    
+    //read에 전달되는 function
     releaseInspectionData.value = async function (query, pageNo, pageSize) {
       
       //releaseInspectionApi 통신할 때 필요한 매개변수
       const apiData = {"emptyGroup": toRaw(emptyGroup.value), "pageNo":pageNo, "pageSize":pageSize};
-      
+      console.log("apiData >> ",apiData);
+
+
       //통신하고 받아온 값 => DB데이터&totalCount
       const list = await releaseInspectionApi.getFilterList(apiData);
       console.log("list >>", list);
@@ -521,12 +527,12 @@ export default {
       }
     }
 
-      pageValue.value = pageNo;
-      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-      console.log(pageValue.value)
+      page.pageNo = list.pageNo;
 
       return {"data":list.data, "pageNo":list.pageNo, pageSize, "totalCount":list.totalCount};
     }
+
+
 
     //Barcode
     const scannedBarcode = ref();
@@ -541,33 +547,33 @@ export default {
     {deep: true});
 
     //scannedBarcode 감시
-    watch(scannedBarcode, (newScannedBarcode, oldScannedBarcode) => {
-      console.log('scannedBarcode 객체 변경 감시');
-      console.log('newScannedBarcode:', newScannedBarcode);
-      console.log('oldScannedBarcode:', oldScannedBarcode);
-
-      /*
-        *바코드스캔에 새로운 바코드가 스캔되면 이전 바코드값은 이상이 없으므로
-        *해당 바코드값 상품의 총검수수량이 1 증가
-        *만약 이상이 있는 바코드일 경우(미출고 되어야할 바코드일 경우), 미출고 처리 버튼 클릭
-        */
-    });
+    // watch(scannedBarcode, (newScannedBarcode, oldScannedBarcode) => {
+    //   console.log('scannedBarcode 객체 변경 감시');
+    //   console.log('newScannedBarcode:', newScannedBarcode);
+    //   console.log('oldScannedBarcode:', oldScannedBarcode);
+    // });
 
 
     const tally = reactive({
       clientName: '',
-      category: 0,
+      category: '',
       totalPickingQty: 10,
       totalInspectionQty: 0,
       releaseCode: 0,
       orderNo: 0,
       unRelease: 0,
+      barCode: 0,
     });
 
     const SelectionChanged = async (grid, e) => {
 
       console.log('범위');
-      console.log(grid.selectedRanges);
+      console.log(grid.selectedRanges[0]._row);
+      console.log(grid.selectedRanges[0]._row2);
+
+      console.log("===========grid===========")
+      console.log(grid);
+      console.log(e);
 
       console.log('첫번째 데이터');
       console.log(grid.getCellData(0, 0, false));
@@ -577,15 +583,13 @@ export default {
       tally.totalPickingQty = 0;
       tally.totalInspectionQty = 0;
 
-      for (let i = 0; i < ranges.length; i++) {
-        aggregateRange(tally, grid, ranges, i);
-      }
+      aggregateRange(tally, grid, ranges);
+
     };
 
-    function aggregateRange(tally, grid, ranges, index) {
-      let rng = ranges[index];
-      for (let r = rng.topRow; r <= rng.bottomRow; r++) {
-        for (let c = rng.leftCol; c <= rng.rightCol; c++) {
+    function aggregateRange(tally, grid, ranges) {
+      for (let r = grid.selectedRanges[0]._row; r <= grid.selectedRanges[0]._row2; r++) {
+        for (let c = 0; c <= 16; c++) {
           // account for overlapping ranges
           let overlapped = false;
           for (let i = 0; i < index && !overlapped; i++) {
@@ -597,21 +601,18 @@ export default {
           // tally non-overlapped cells
           if (!overlapped) {
             let data = grid.getCellData(r, c, false);
-            if (r === rng.topRow) {
+            if (r === grid.selectedRanges[0]._row) {
               if (c === 1) {
+                tally.unRelease = '-';
                 tally.clientName = data;
               } else if (c === 2) {
-
                 tally.category = data;
               } else if (c === 3) {
-
                 tally.releaseCode = data;
               } else if (c === 5) {
-
                 tally.orderNo = data;
               }
             }
-
             if (c === 9) {
               tally.totalPickingQty += data;
             } else if (c === 10) {
@@ -642,7 +643,8 @@ export default {
       packingDone,
       oneBoxPacking,
       keyData,
-      pageValue
+      pageValue,
+      page
     };
   },
 };
