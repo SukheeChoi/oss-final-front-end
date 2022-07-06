@@ -39,9 +39,19 @@ export default [
         component: () => import('@@/edu/views/Releases'),
       },
       {
+        path: 'Releases2',
+        name: 'DISTSub4-2',
+        component: () => import('@@/edu/views/Releases copy'),
+      },
+      {
         path: 'Picking',
         name: 'DISTSub5',
         component: () => import('@@/edu/views/Picking'),
+      },
+      {
+        path: 'Picking2',
+        name: 'DISTSub5-2',
+        component: () => import('@@/edu/views/Picking copy'),
       },
       {
         path: 'InspectionLabelling',
@@ -67,6 +77,11 @@ export default [
         path: 'test3',
         name: 'test3',
         component: () => import('@@/edu/views/Test3'),
+      },
+      {
+        path: 'Copy',
+        name: 'DISTSub7',
+        component: () => import('@@/edu/views/Copy'),
       },
     ],
   },
