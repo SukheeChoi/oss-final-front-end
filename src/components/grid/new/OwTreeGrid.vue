@@ -276,3 +276,11 @@ export default {
   }
 }
 </style>
+
+<style scoped lang="scss">
+::v-deep {
+  .ow-grid .wj-cell.wj-alt {
+    background-color: #fff
+}
+}
+</style>

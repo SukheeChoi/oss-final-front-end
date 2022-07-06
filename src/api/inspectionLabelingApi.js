@@ -13,14 +13,14 @@ async function getStatus() {
   return response.data.status;
 }
 
-//왼쪽쪽 화면
+//트리 그리드 api 요청
 async function getTreeList() {
   let response = null;
   try {
-    response = await axios.get('/label/getListLeft');
-    console.log(response);
+    response = await axios.get('/label/getTreeList');
+    console.log(response.data.data);
 
-    response.data.item.map((i) => {
+    response.data.data.map((i) => {
       i.startTime = "dd";
       i.workTime = "dd";
       i.progressRate = "dd";
@@ -41,6 +41,10 @@ async function getTreeList() {
         k.labelingItemQuantity = "dd";
         //지연시간에 분 붙이기
         k.childrennn.map((m) => {
+          if(m.progressRate) {
+            m.progressRate = m.progressRate + "%"
+          }
+          
           if (m.lateTime) {
             m.lateTime = m.lateTime + '분';
           }
@@ -50,14 +54,14 @@ async function getTreeList() {
   } catch (error) {
     console.log(error);
   }
-  return response.data.item;
+  return response.data.data;
 }
 
-//오른쪽 화면
+//담당자 이름 기준으로 작업 세부사항 api 요청
 async function getListByEmployeeName(employeeName, searchSelected, searchContent, pageNo, pageSize) {
   let response = null;
   try {
-    response = await axios.get('/label/getListRight', {
+    response = await axios.get('/label/getListByEmployeeName', {
       params: { employeeName, searchSelected, searchContent, pageNo, pageSize },
     });
     console.log(response);
