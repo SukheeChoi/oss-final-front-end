@@ -406,14 +406,14 @@ const onInitialized = (flex) => {
   };
 
   flex.mergeManager = new SimMergeManager(config);
-  flex.allowMerging = true;
-  flex.formatItem.addHandler((grid, e) => {
-    console.log(grid);
-    console.log(e);
-    let col = grid.getColumn('비고');
-    console.log(col);
+  // flex.allowMerging = true;
+  // flex.formatItem.addHandler((grid, e) => {
+  //   console.log(grid);
+  //   console.log(e);
+  //   let col = grid.getColumn('비고');
+  //   console.log(col);
 
-  });
+  // });
 };
 
 const selectSearchLabel = '검색';
