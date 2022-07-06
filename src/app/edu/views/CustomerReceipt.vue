@@ -23,8 +23,7 @@
           <div class="ow-flex-wrap">
             <div class="item">계획</div>
             <div class="align-to-right">
-              200건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 200 - statusOrd }}건</strong> /
-              <strong style="color: rgb(210, 57, 46)">미출고 5건</strong>)
+              200건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 200 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 6건</strong>)
             </div>
           </div>
           <div class="ow-flex-wrap">
@@ -152,10 +151,7 @@
           <div>
             <!-- hover 했을 때 범례 띄워줌 -->
             <button type="button" class="ow-btn type-icon arrow_down">
-              <img
-                src="@/assets/images/icon/ico_list.svg"
-                style="border: 0.8px solid gray; width: 20px; padding: 2px"
-              />
+              <img src="@/assets/images/icon/ico_list.svg" style="border: 0.8px solid gray; width: 20px; padding: 2px" />
             </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
@@ -193,53 +189,38 @@
           </div>
           <div class="title-field">검색</div>
           <div style="--width: 97px">
-            <ow-select v-bind:items="searchCategoryList" v-model="searchCategory"></ow-select>
+            <ow-select :items="searchCategoryList" v-model="searchCategory"></ow-select>
           </div>
           <div class="ow-input type-button" style="--width: 200px">
             <input type="text" v-model="searchCategoryContent" placeholder="검색어를 입력하세요." />
-            <input type="submit" class="btn-search" @click="search" />
+            <input type="submit" class="btn-search" @click="search"/>
           </div>
         </div>
       </div>
     </div>
     <div>
-      <ow-n-grid
-        :n="9"
-        :itemsSource="items.value"
-        :initialized="initialize"
-        :read="read"
-        :autoRowHeights="true"
-        selectionMode="None"
-        :visible-rows-count="state.visibleRowsCount"
-      >
+      <ow-n-grid :n="9" :initialized="initialize" :key="keyData" :read="read" :autoRowHeights="true" :visible-rows-count="state.visibleRowsCount">
         <template #left>&nbsp;</template>
         <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 행 스타일을 미출고 값에 따라 다르게 적용 -->
-            <span class="ow-tag type-category" :class="{ 'ow-tag-background': cell.item.unrelease }">
-              <i class="u" v-if="cell.item.unrelease">미</i>
-              <strong>{{ cell.item.client }}</strong>
+            <p v-if="cell.item.unrelease" class="ow-tag type-category">
+              <i class="u">미</i>
+            </p>
+            <span :style="cell.item.unrelease ? 'color: rgb(210, 57, 46)' : ''">
+              {{ cell.item.client }}
             </span>
-            <!-- <span class="ow-tag type-category" v-else
-              ><i class="u">미</i><strong style="color: rgb(210, 57, 46)">{{ cell.item.client }}</strong></span
-            > -->
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 주문 단계에 따라 아이콘 적용 -->
-            <div :class="{ 'ow-tag-background': cell.item.unrelease }">
-              <span class="ow-tag type-category"><i class="o">주</i></span>
-              <span v-if="cell.item.level >= 2" class="ow-tag type-category"><i class="p">피</i></span>
-              <span v-else class="ow-tag type-category"><i class="n">피</i></span>
-              <span v-if="cell.item.level >= 3" class="ow-tag type-category"><i class="i">검</i></span>
-              <span v-else class="ow-tag type-category"><i class="n">검</i></span>
-              <span v-if="cell.item.level >= 4" class="ow-tag type-category"><i class="r">출</i></span>
-              <span v-else class="ow-tag type-category"><i class="n">출</i></span>
-              <span v-if="cell.item.level == 5" class="ow-tag type-category"><i class="t">인</i></span>
-              <span v-else class="ow-tag type-category"><i class="n">인</i></span>
-            </div>
+            <span class="ow-tag type-category"><i class="o">주</i></span>
+            <span class="ow-tag type-category"><i :class="cell.item.level >= 2 ? 'p' : 'n'">피</i></span>
+            <span class="ow-tag type-category"><i :class="cell.item.level >= 3 ? 'i' : 'n'">검</i></span>
+            <span class="ow-tag type-category"><i :class="cell.item.level >= 4 ? 'r' : 'n'">출</i></span>
+            <span class="ow-tag type-category"><i :class="cell.item.level >= 5 ? 't' : 'n'">인</i></span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
       </ow-n-grid>
@@ -252,7 +233,7 @@ import OwNGrid from '@/components/grid/new/OwNGrid';
 import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
 
-const items = ref([]);
+// const items = ref([]);
 const statusOrd = ref(null);
 const statusPick = ref(null);
 const statusRls = ref(null);
@@ -264,24 +245,24 @@ const percentPack = ref(null);
 const percentRls = ref(null);
 const percentTrf = ref(null);
 
+const receiptList = ref([]);
+
 //검색 카테고리
-const searchCategory = ref(null);
+const searchCategory = ref('주문번호');
 //검색 내용
 const searchCategoryContent = ref(null);
 
-// const receiptList = ref([]);
-
-const filterList = reactive({
+const filterList = ref({
   shippingCategory: '',
   status: '',
-  unreleased: '',
-  // orderNo: '',
-  // clientName: '',
+  unrelease: '',
+  orderNo: '',
+  clientName: '',
 });
 
 //ngrid 페이지 설정
 const retrieve = (param) => {
-  let filteredItems = _.cloneDeep(items.value); //cloneDeep : 객체 복사
+  let filteredItems = _.cloneDeep(receiptList.value); //cloneDeep : 객체 복사
   const totalCount = filteredItems.length;
   if (param.sort) {
     filteredItems = _.sortBy(filteredItems, param.sort);
@@ -317,9 +298,26 @@ const state = reactive({
 });
 
 //초기화
-const initialize = (s) => {};
+const initialize = (s) => {
+  //flexGrid 선택 모드 설정 => 선택 안되도록
+  s.selectionMode = 'None';
 
-// let globalIndex = 0;
+  //미출고일 때 cssClass 적용
+  s.itemFormatter = (panel, r) => {
+    //r번째 행 선언
+    let row = panel.rows[r];
+    //헤더가 아닌 경우
+    if (row._idxData !== -1) {
+      //미출고 값이 true인 경우
+      if (row._data.unrelease === true) {
+        //적용되어 있는 cssClass가 없을 때
+        if (row.cssClass === null) {
+          panel.rows[r].cssClass = 'ifUnrelease';
+        }
+      }
+    }
+  };
+};
 
 //배송구분
 const checkboxGroup1 = ref([
@@ -342,83 +340,74 @@ const searchCategoryList = [
   { name: '거래처', value: '거래처' },
 ];
 
-// filter 초기값 : 배송구분 : '일반','긴급', 주문 단계 : '0', 미출고만 보기 : 'false'
-const checkboxGroup2 = ref(['일반', '긴급']);
+// filter 초기값 : 배송구분 : '긴급', '일반', 주문 단계 : '0', 미출고만 보기 : 'false'
+const checkboxGroup2 = ref(['긴급', '일반']);
 const checkboxGroup4 = ref('0');
-const checkbox1 = ref('false');
+const checkbox1 = ref(false);
+
+const keyData = ref(0);
 
 watch(
   [checkboxGroup2, checkboxGroup4, checkbox1],
   ([new1, new2, new3], [old1, old2, old3]) => {
-    console.log('new1 : ', new1);
-    console.log('new2 : ', new2);
-    console.log('new3 : ', new3);
-    console.log('new1.length : ', new1.length);
-    console.log('new1[0] : ', new1[0]);
     if (new1.length == 2) {
-      filterList.shippingCategory = ['긴급', '일반'];
+      filterList.value.shippingCategory = ['긴급', '일반'];
     } else {
-      filterList.shippingCategory = new1[0];
+      filterList.value.shippingCategory = new1;
     }
 
     if (new2 == 0) {
-      filterList.status = '0';
+      filterList.value.status = 0;
     } else {
-      filterList.status = new2[0];
+      filterList.value.status = new2;
     }
 
-    if (new3 == 'true') {
-      filterList.unreleased = 'true';
-    } else {
-      filterList.unreleased = 'false';
-    }
-    getFilterList().then(() => {});
+    filterList.value.unrelease = new3;
+
+    console.log('watch - new1 : ' + new1);
+    console.log('watch - new2 : ' + new2);
+    console.log('watch - new3 : ' + new3);
+    console.log('watch - filterList.shippingCategory : ' + filterList.value.shippingCategory);
+    console.log('watch - filterList.status : ' + filterList.value.status);
+    console.log('watch - filterList.unrelease : ' + filterList.value.unrelease);
+    keyData.value++;
+    getFilterList(filterList.value);
   },
-  { deep: true }
+  { immediate: true, deep: true }
 );
 
-// function search() {
-//   if (searchCategory.value === '주문번호') {
-//     filterList.orderNo = searchCategoryContent.value;
-//   } else if (searchCategory.value === '거래처') {
-//     filterList.clientName = searchCategoryContent.value;
-//   }
-//   getFilterList(filterList).then(() => {});
-// }
+function search() {
+  if (searchCategory.value === '주문번호') {
+    filterList.value.clientName = '';
+    filterList.value.orderNo = searchCategoryContent.value;
+  } else if (searchCategory.value === '거래처') {
+    filterList.value.orderNo = '';
+    filterList.value.clientName = searchCategoryContent.value;
+  }
+  console.log('search - searchCategory.value : ', searchCategory.value);
+  console.log('search - searchCategoryContent.value : ', searchCategoryContent.value);
+  console.log('search - filterList.value.orderNo : ', filterList.value.orderNo);
+  console.log('search - filterList.value.clientName : ', filterList.value.clientName);
+  keyData.value++;
+  getFilterList(filterList.value);
+}
 
-const getFilterList = async () => {
-  const result = await clientApi.getFilterList(filterList).then((result) => {
-    console.log('getFilterList - JSON.stringify(result) : ' + JSON.stringify(result));
+async function getFilterList(afterFilterList) {
+  const result = await clientApi.getFilterList(afterFilterList).then((data) => {
+    console.log('getFilterList - JSON.stringify(result) : ' + JSON.stringify(data));
     // receiptList.value = result.list;
-    console.log('result.length : ' + result.length);
-    console.log('Array.isArray(result) : ' + Array.isArray(result));
-    for (let i = 0; i < result.length; i++) {
-      items.value.push({
-        client: result[i]['client']['clientName'],
-        level: result[i]['status'],
-        unrelease: result[i]['orderUnrelease'],
+    console.log('result.length : ' + data.length);
+    console.log('Array.isArray(result) : ' + Array.isArray(data));
+    receiptList.value = [];
+    for (let i = 0; i < data.length; i++) {
+      receiptList.value.push({
+        client: data[i]['client']['clientName'],
+        level: data[i]['status'],
+        unrelease: data[i]['orderUnrelease'],
       });
     }
   });
-};
-getFilterList();
-
-// // db에 filter값 보내기
-// const dummy = async () => {
-//   let list = await clientApi.getFilterList(checkboxGroup2, checkboxGroup4, checkbox1);
-//   return list;
-// };
-
-// dummy().then((list) => {
-//   for (let i = 0; i < list.length; i++) {
-//     items.value.push({
-//       //데이터 정제
-//       client: list[i]['client']['clientName'],
-//       level: list[i]['status'],
-//       unrelease: list[i]['orderUnrelease'],
-//     });
-//   }
-// });
+}
 
 //주문 단계 별 건수 요청
 async function getCnt() {
@@ -527,23 +516,23 @@ getCnt();
 </style>
 
 <style lang="scss">
-// .ow-grid {
-//   .wj-cell {
-//     &.ifUnrelease {
-//       background-color: rgb(248, 229, 227);
-//       color: rgb(210, 57, 46);
-//     }
-//   }
-// }
-
-.ow-tag-background::before {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: rgba(248, 229, 227, 0.5);
-  // z-index: -1;
+.ow-grid {
+  .wj-cell {
+    &.ifUnrelease {
+      background-color: rgb(248, 229, 227);
+      color: rgb(210, 57, 46);
+    }
+  }
 }
+
+// .ow-tag-background::before {
+//   content: '';
+//   position: absolute;
+//   width: 100%;
+//   height: 100%;
+//   top: 0;
+//   left: 0;
+//   background-color: rgba(248, 229, 227, 0.5);
+//   // z-index: -1;
+// }
 </style>
