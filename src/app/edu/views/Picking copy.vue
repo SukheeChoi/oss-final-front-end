@@ -7,17 +7,16 @@
         <button class="ow-btn type-group" @click="handleChangeToDelivery" v-bind:class="{ active: !showReceipt }"><span>전달</span></button>
       </div>
       <!-- 수령 대상 업체 필터링 -->
-      <div v-if="showReceipt && vendorList!=null" class="item size-fix" style="--gap-item: 6px">
+      <div v-if="showReceipt && vendorList != null && vendorList.length > 0" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 370px;">
-          <ow-filter-radio id="vendor-filter-radio" :items="vendorList" :step="5" v-model="selectedVendor" @update="selectedVendor = value('vendor-filter-radio')" :key="vendorKey"/>
-          <!-- <ow-filter-radio :items="vendorList" :step="5" :modelValue="selectedVendor" @update:modelValue="updateVendor" :key="vendorKey"/> -->
+          <ow-filter-radio :items="vendorList" :step="5" v-model="selectedVendor" @update="selectedVendor = value('vendor-filter-radio')" :key="vendorKey"/>
         </div>
       </div>
 
       <!-- 전달 담당자 이름 filter -->
-      <div v-if="!showReceipt && assigneeList!=null" class="item size-fix" style="--gap-item: 6px">
+      <div v-if="!showReceipt && assigneeList != null && assigneeList.length > 0" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 270px;">
-          <ow-filter-radio id="assignee-filter-radio" :items="assigneeList" :step="4" v-model="selectedAssignee" @update="selectedAssignee = value('assignee-filter-radio')" :key="assigneeKey"/>
+          <ow-filter-radio :items="assigneeList" :step="4" v-model="selectedAssignee" @update="selectedAssignee = value('assignee-filter-radio')" :key="assigneeKey"/>
         </div>
       </div>
 
@@ -58,14 +57,13 @@
     :insert="insert"
     :update="update"
     :remove="remove"
-    :visible-rows-count="state.visibleRowsCount"
   >
   <template #left>&nbsp;</template>
     <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
-    <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
+    <wj-flex-grid-column header="품목명" binding="itemName" align="left" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="releaseQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="showReceipt==true && toDo==0" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="releaseQuantity" align="right" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==true && toDo==0" header="수령수량" binding="receiveQuantity" align="right" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==1" header="미출고" binding="unreleased" :width="60">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <div class="ow-input">
@@ -74,7 +72,6 @@
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==0" header="미출고" binding="unreleased" :width="60" />
-    <!-- <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true"> -->
     <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <!-- <button class="ow-btn type-icon check-state" @click="checkReceiptCheckBtn($event, cell.item.orderItemNo, cell.item.No)"></button> -->
@@ -93,15 +90,14 @@
     :insert="insert"
     :update="update"
     :remove="remove"
-    :visible-rows-count="state.visibleRowsCount"
   >
     <template #left>&nbsp;</template>
     <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
     <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
-    <wj-flex-grid-column header="품목명" binding="itemName" width="3*"></wj-flex-grid-column>
+    <wj-flex-grid-column header="품목명" binding="itemName" align="left" width="3*"></wj-flex-grid-column>
     <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="showReceipt==false && toDo==1" header="수령수량" binding="receiveQuantity" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="showReceipt==false && toDo==0" header="전달수량" binding="deliveryQuantity" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==false && toDo==1" header="수령수량" binding="receiveQuantity" align="right" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==false && toDo==0" header="전달수량" binding="deliveryQuantity" align="right" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
@@ -128,10 +124,10 @@
     , value: '전체'
   });
   const selectedVendor = ref('전체');
-  const assigneeList = ref({
+  const assigneeList = ref([{
     name: '전체'
     , value: '전체'
-  });
+  }]);
   const selectedAssignee = ref('전체');
   const dateList = ref([startDate.value, endDate.value]);
   const receiptList = ref([]);
@@ -170,9 +166,7 @@
             vendorList.value = null;
           }
         });
-    // return result;
   };
-  // getVendorList();
 
   //담당자 조회. 페이지네이션 고려X.
   // 할 일: 해당기간에 수령완료된 이력의 담당자. -> 사실상 '수령 한 일'의 담당자와 같음.
@@ -283,8 +277,9 @@
       ...query,
       pageNo,
       pageSize,
-      label: label
-      , items: items
+      label: label,
+      items: items,
+      visibleRowsCount: 20
     });
     console.log('result', result);
     // initialize();
@@ -451,7 +446,7 @@
     , (newSelectedVendor, oldSelectedVendor) => {
       console.log('!! selectedVendor.value : ', selectedVendor.value);
       console.log('!! newSelectedVendor : ', newSelectedVendor);
-
+      selectedVendor.value = newSelectedVendor;
       getReceiptList();
     }
   );
@@ -496,43 +491,43 @@
   //   // , {deep:true}
   // );
 
-  async function insert(item) {
-    items.push(item);
-    return true;
-  }
+  // async function insert(item) {
+  //   items.push(item);
+  //   return true;
+  // }
 
-  async function update(item) {
-    const at = items.findIndex((target) => target.id === item.id);
-    items[at] = item;
-    return true;
-  }
+  // async function update(item) {
+  //   const at = items.findIndex((target) => target.id === item.id);
+  //   items[at] = item;
+  //   return true;
+  // }
 
-  async function remove(item) {
-    const at = items.findIndex((target) => target.id === item.id);
-    items.splice(at, 1);
-    return true;
-  }
+  // async function remove(item) {
+  //   const at = items.findIndex((target) => target.id === item.id);
+  //   items.splice(at, 1);
+  //   return true;
+  // }
 
-  // console.log('items', items);
+  // // console.log('items', items);
 
-  const state = reactive({
-    visibleRowsCount: 20,
-  });
+  // const state = reactive({
+  //   visibleRowsCount: 20,
+  // });
 
-  const initialize = (s) => {};
+  // const initialize = (s) => {};
 
-  let globalIndex = 0;
+  // let globalIndex = 0;
 
-  const start = (e) => {
-    // const index = parseInt(Math.random() * 100) % countries.length;
-    if(showReceipt.value === true) {
-      const item = 
-        e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(receiptList.value));
-    } else {
-      const item = 
-        e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(deliveryList.value));
-    }
-  };
+  // const start = (e) => {
+  //   // const index = parseInt(Math.random() * 100) % countries.length;
+  //   if(showReceipt.value === true) {
+  //     const item = 
+  //       e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(receiptList.value));
+  //   } else {
+  //     const item = 
+  //       e.dataTransfer.setData(DragDataItemFormat, JSON.stringify(deliveryList.value));
+  //   }
+  // };
 
   // 수령 탭 클릭시.
   function handleChangeToReceipt() {
@@ -558,9 +553,6 @@
 
   // 날짜 변경 핸들러.
   function updateStartDate(event) {
-    console.log('event : ' + event);
-    console.log('event - startDate.value : ' + startDate.value);
-
     // 할당해주지 않으면 바인딩 객체의 값이 바뀌진 않음.
     startDate.value = event;
     dateList.value[0] = startDate.value;
@@ -629,6 +621,27 @@
 
 </script>
 
-<style>
+<style lang="scss" scoped>
+:deep {
+  .wj-cell.wj-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: inherit;
+  }
+}
+  
+:deep {
+  .wj-flexgrid .wj-cell.wj-align-center {
+    justify-content: center;
+  }
+}
 
+:deep {
+  .wj-cell.border-center {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
+}
 </style>

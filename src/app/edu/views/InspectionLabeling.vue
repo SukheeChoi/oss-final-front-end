@@ -341,8 +341,8 @@ const onInitialized = (grid) => {
 };
 </script>
 
-<style>
-.ow-panel .ow-panel-body1 {
+<style scoped>
+::v-deep .ow-panel .ow-panel-body1 {
   display: flex;
   /* flex-direction: column; */
   flex: 1;

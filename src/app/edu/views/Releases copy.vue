@@ -92,10 +92,10 @@
       class="ow-grid type-header-group"
       :read="getAfterPickingList"
       :initialized="onInitialized"
-      :allowMerging="ColumnHeaders"
       style="display: flex"
       :key="afterPickingKey"
     >
+      <!-- :allowMerging="All" -->
       <!-- 출고검수/패킹 탭 -->
       <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm border-center">
         <wj-flex-grid-column-group
@@ -254,7 +254,7 @@
         cssClassAll="border-center"
         :allowMerging="true"
       >
-      <!-- <wj-flex-grid-column-group
+      <wj-flex-grid-column-group
         binding="PAC_NT"
         header="비고"
         align="center"
@@ -262,7 +262,7 @@
         cssClassAll="border-center"
         :allowMerging="true"
       >
-      </wj-flex-grid-column-group> -->
+      </wj-flex-grid-column-group>
       </wj-flex-grid-column-group>
     </ow-grid>
   </div>
@@ -401,19 +401,6 @@
 
     flex.mergeManager = new SimpleMergeManager(config);
 
-    // create extra header row
-    // var extraRow = new wjGrid.Row();
-    // extraRow.allowMerging = true;
-    // add extra header row to the grid
-    // var panel = flex.columnHeaders;
-    // var panel = grid.columnHeaders;
-    // panel.rows.splice(0, 0, extraRow);
-    // ["PAC_NT"].forEach(function(binding) {
-    //     let col = flex.getColumn(binding);
-    //     // let col = grid.getColumn(binding);
-    //     col.allowMerging = true;
-    //     panel.setCellData(0, col.index, col.header);
-    // });
   };
   
   const selectSearchLabel = '검색';
@@ -510,17 +497,27 @@
 
 </script>
 
-<style>
-.wj-cell.wj-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: inherit;
+<style lang="scss" scoped>
+:deep {
+  .wj-cell.wj-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: inherit;
+  }
+}
+  
+:deep {
+  .wj-flexgrid .wj-cell.wj-align-center {
+    justify-content: center;
+  }
 }
 
-.wj-cell.border-center {
-  display: flex;
-  align-items: center;
-  line-height: inherit;
+:deep {
+  .wj-cell.border-center {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
 }
 </style>

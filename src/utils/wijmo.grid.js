@@ -3,6 +3,66 @@ import { createElement, setChecked, Event, ObservableArray } from '@grapecity/wi
 import { MergeManager, CellRange, CellType, CellEditEndingEventArgs, CellFactory, Row } from '@grapecity/wijmo.grid';
 import { Selector } from '@grapecity/wijmo.grid.selector';
 
+// Cells, ColumnnHeaders 병합이 가능하도록 MergeManager를 상속받은 class를 정의.
+class ColumnHeaderMergeManager extends MergeManager {
+  constructor() {
+    console.log("## ColumnHeaderMergeManager");
+    super();
+  }
+
+  getMergedRange(p, r, c) {
+    const range = new CellRange(r, c);
+    switch (p.cellType) {
+      case CellType.ColumnHeader:
+        // this.rowMergedRange(p, range);
+        // this.colMergedRange(p, range);
+
+        var rng = new CellRange(r, c);
+        for (var i = rng.col; i < p.columns.length - 1; i++) {
+          if (
+            p.getCellData(rng.row, i, true) !=
+            p.getCellData(rng.row, i + 1, true)
+          )
+            break;
+          rng.col2 = i + 1;
+        }
+        for (var i = rng.col; i > 0; i--) {
+          if (
+            p.getCellData(rng.row, i, true) !=
+            p.getCellData(rng.row, i - 1, true)
+          )
+            break;
+          rng.col = i - 1;
+        }
+        for (var i = rng.row; i < p.rows.length - 1; i++) {
+          if (
+            p.getCellData(i, rng.col, true) !=
+            p.getCellData(i + 1, rng.col, true)
+          )
+            break;
+          rng.row2 = i + 1;
+        }
+        for (var i = rng.row; i > 0; i--) {
+          if (
+            p.getCellData(i, rng.col, true) !=
+            p.getCellData(i - 1, rng.col, true)
+          )
+            break;
+          rng.row = i - 1;
+        }
+        return rng;
+
+      case CellType.Cell:
+        if (this.isMerged(p, c)) {
+          this.rowMergedRange(p, range);
+        }
+        break;
+    }
+    return range;
+  }
+}
+
+
 class SimpleMergeManager extends MergeManager {
   constructor(config) {
     console.log("config", config)
@@ -59,8 +119,6 @@ class SimpleMergeManager extends MergeManager {
   }
 
   colMergedRange(p, r) {
-    console.log(p);
-    console.log(r);
     for (let i = r.col; i > 0; i -= 1) {
       if (this.equals(p, r.row, i, 'col_prev')) {
         r.col = i - 1;
@@ -109,27 +167,54 @@ class SimpleMergeManager extends MergeManager {
   }
 
   getMergedRange(p, r, c) {
-    console.log('&& p : ', p);
-    console.log('&& r : ', r);
-    console.log('&& c : ', c);
     const range = new CellRange(r, c);
-    console.log('&&* p.cellType : ', p.cellType);
     switch (p.cellType) {
       case CellType.ColumnHeader:
-        console.log('&&* CellType.ColumnHeader : ', CellType.ColumnHeader);
-        console.log('&&* p._cols : ', p._cols);
-        console.log('&&* p : ', p);
-        console.log('&&* p.owner : ', p.owner);
-        console.log('&&* range : ', range);
-        this.rowMergedRange(p, range);
-        this.colMergedRange(p, range);//
-        console.log('&& case ColumnHeader.Cell: : ');
+        // this.rowMergedRange(p, range);
+        // this.colMergedRange(p, range);
+
+        if (p.cellType == CellType.ColumnHeader) {
+          var rng = new CellRange(r, c);
+          for (var i = rng.col; i < p.columns.length - 1; i++) {
+            if (
+              p.getCellData(rng.row, i, true) !=
+              p.getCellData(rng.row, i + 1, true)
+            )
+              break;
+            rng.col2 = i + 1;
+          }
+          for (var i = rng.col; i > 0; i--) {
+            if (
+              p.getCellData(rng.row, i, true) !=
+              p.getCellData(rng.row, i - 1, true)
+            )
+              break;
+            rng.col = i - 1;
+          }
+          for (var i = rng.row; i < p.rows.length - 1; i++) {
+            if (
+              p.getCellData(i, rng.col, true) !=
+              p.getCellData(i + 1, rng.col, true)
+            )
+              break;
+            rng.row2 = i + 1;
+          }
+          for (var i = rng.row; i > 0; i--) {
+            if (
+              p.getCellData(i, rng.col, true) !=
+              p.getCellData(i - 1, rng.col, true)
+            )
+              break;
+            rng.row = i - 1;
+          }
+          return rng;
+        }
+
+
         break;
-        case CellType.Cell:
-          if (this.isMerged(p, c)) {
-            this.rowMergedRange(p, range);
-            // this.colMergedRange(p, range);//
-          console.log('&& case CellType.Cell: : ');
+      case CellType.Cell:
+        if (this.isMerged(p, c)) {
+          this.rowMergedRange(p, range);
         }
         break;
     }
@@ -402,94 +487,3 @@ class OwSelector extends Selector {
 }
 
 export { OwSelector };
-
-class TreeMergeManager extends MergeManager {
-  constructor(config) {
-    console.log("config", config)
-    console.log("config.groupingColumns", config.groupingColumns);
-    console.log("config.mergedColumns", config.mergedColumns);
-    super();
-    this.groupingColumns = config.groupingColumns || [];
-    this.mergedColumns = config.mergedColumns || [];
-  }
-
-  isMerged(p, c) {
-    if (this.mergedColumns.length === 0) {
-      return true;
-    }
-    for (const column of this.mergedColumns) {
-      const i = this.getColumnIndex(p, column);
-      if (i === c) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  getColumnIndex(p, c) {
-    const column = p.columns.getColumn(c);
-    if (column && typeof column.index !== 'undefined') {
-      return column.index;
-    }
-    return -1;
-  }
-
-  equals(panel, row, col, type) {
-    let row_prev = row,
-      row_next = row,
-      col_prev = col,
-      col_next = col;
-    switch (type) {
-      case 'row_prev':
-        row_prev -= 1;
-        break;
-      case 'row_next':
-        row_next += 1;
-        break;
-      case 'col_prev':
-        col_prev -= 1;
-        break;
-      case 'col_next':
-        col_next += 1;
-        break;
-    }
-    const data1 = panel.getCellData(row_prev, col_prev, false) || '';
-    const data2 = panel.getCellData(row_next, col_next, false) || '';
-    return data1 !== '' && data2 !== '' && data1 === data2;
-  }
-
-  colMergedRange(p, r) {
-
-    for (let i = r.col; i > 0; i -= 1) {
-      if (this.equals(p, r.row, i, 'col_prev')) {
-        r.col = i - 1;
-      } else {
-        break;
-      }
-    }
-    for (let i = r.col, l = p.columns.length - 1; i < l; i += 1) {
-      if (this.equals(p, r.row, i, 'col_next')) {
-        r.col2 = i + 1;
-      } else {
-        break;
-      }
-    }
-  }
-
-  getMergedRange(p, r, c) {
-    const range = new CellRange(r, c);
-    switch (p.cellType) {
-      case CellType.ColumnHeader:
-        this.colMergedRange(p, range);
-        break;
-      case CellType.Cell:
-        if (this.isMerged(p, c) && p.getCellData(r, c) === "dd") {
-          this.colMergedRange(p, range);
-        }
-        break;
-    }
-    return range;
-  }
-}
-
-export { TreeMergeManager };
