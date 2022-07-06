@@ -105,7 +105,7 @@
         <wj-flex-grid-column-group binding="transferDate" header="인계일시" :width="70" align="center" />
       </wj-flex-grid-column-group>
     </ow-grid>
-  </div>
+  </b-row>
 </template>
 
 <script setup>
