@@ -35,7 +35,7 @@ import OwTab from '@/components/common/OwTab';
 
 import OwGrid from '@/components/grid/new/OwGrid';
 import OwNGrid from '@/components/grid/new/OwNGrid';
-import OwFlexGrid from '@/components/grid/new/OwFlexGrid';
+import OwFlexGrid from '@/components/grid/OwFlexGrid';
 import OwTreeGrid from '@/components/grid/new/OwTreeGrid';
 
 import OwOrgTreeView from '@/components/tree/OwOrgTreeView';

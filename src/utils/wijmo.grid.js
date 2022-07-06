@@ -487,3 +487,248 @@ class OwSelector extends Selector {
 }
 
 export { OwSelector };
+
+class TreeMergeManager extends MergeManager {
+  constructor(config) {
+    console.log("config", config)
+    console.log("config.groupingColumns", config.groupingColumns);
+    console.log("config.mergedColumns", config.mergedColumns);
+    super();
+    this.groupingColumns = config.groupingColumns || [];
+    this.mergedColumns = config.mergedColumns || [];
+  }
+
+  isMerged(p, c) {
+    if (this.mergedColumns.length === 0) {
+      return true;
+    }
+    for (const column of this.mergedColumns) {
+      const i = this.getColumnIndex(p, column);
+      if (i === c) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getColumnIndex(p, c) {
+    const column = p.columns.getColumn(c);
+    if (column && typeof column.index !== 'undefined') {
+      return column.index;
+    }
+    return -1;
+  }
+
+  equals(panel, row, col, type) {
+    let row_prev = row,
+      row_next = row,
+      col_prev = col,
+      col_next = col;
+    switch (type) {
+      case 'row_prev':
+        row_prev -= 1;
+        break;
+      case 'row_next':
+        row_next += 1;
+        break;
+      case 'col_prev':
+        col_prev -= 1;
+        break;
+      case 'col_next':
+        col_next += 1;
+        break;
+    }
+    const data1 = panel.getCellData(row_prev, col_prev, false) || '';
+    const data2 = panel.getCellData(row_next, col_next, false) || '';
+    return data1 !== '' && data2 !== '' && data1 === data2;
+  }
+
+  colMergedRange(p, r) {
+
+    for (let i = r.col; i > 0; i -= 1) {
+      if (this.equals(p, r.row, i, 'col_prev')) {
+        r.col = i - 1;
+      } else {
+        break;
+      }
+    }
+    for (let i = r.col, l = p.columns.length - 1; i < l; i += 1) {
+      if (this.equals(p, r.row, i, 'col_next')) {
+        r.col2 = i + 1;
+      } else {
+        break;
+      }
+    }
+  }
+
+  getMergedRange(p, r, c) {
+    const range = new CellRange(r, c);
+    switch (p.cellType) {
+      case CellType.ColumnHeader:
+        this.colMergedRange(p, range);
+        break;
+      case CellType.Cell:
+        if (this.isMerged(p, c) && p.getCellData(r, c) === "dd") {
+          this.colMergedRange(p, range);
+        }
+        break;
+    }
+    return range;
+  }
+}
+
+export { TreeMergeManager };
+
+class SimMergeManager extends MergeManager {
+  constructor(config) {
+    console.log("config", config)
+    console.log("config.groupingColumns", config.groupingColumns);
+    console.log("config.mergedColumns", config.mergedColumns);
+    super();
+    this.groupingColumns = config.groupingColumns || [];
+    this.mergedColumns = config.mergedColumns || [];
+  }
+
+  isMerged(p, c) {
+    if (this.mergedColumns.length === 0) {
+      return true;
+    }
+    for (const column of this.mergedColumns) {
+      const i = this.getColumnIndex(p, column);
+      if (i === c) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getColumnIndex(p, c) {
+    const column = p.columns.getColumn(c);
+    if (column && typeof column.index !== 'undefined') {
+      return column.index;
+    }
+    return -1;
+  }
+
+  equals(panel, row, col, type) {
+    let row_prev = row,
+      row_next = row,
+      col_prev = col,
+      col_next = col;
+    switch (type) {
+      case 'row_prev':
+        row_prev -= 1;
+        break;
+      case 'row_next':
+        row_next += 1;
+        break;
+      case 'col_prev':
+        col_prev -= 1;
+        break;
+      case 'col_next':
+        col_next += 1;
+        break;
+    }
+    const data1 = panel.getCellData(row_prev, col_prev, false) || '';
+    const data2 = panel.getCellData(row_next, col_next, false) || '';
+    return data1 !== '' && data2 !== '' && data1 === data2;
+  }
+
+  colMergedRange(p, r) {
+    console.log(p);
+    console.log(r);
+    for (let i = r.col; i > 0; i -= 1) {
+      if (this.equals(p, r.row, i, 'col_prev')) {
+        r.col = i - 1;
+      } else {
+        break;
+      }
+    }
+    for (let i = r.col, l = p.columns.length - 1; i < l; i += 1) {
+      if (this.equals(p, r.row, i, 'col_next')) {
+        r.col2 = i + 1;
+      } else {
+        break;
+      }
+    }
+  }
+
+  rowMergedRange(p, r) {
+    for (let i = r.row; i > 0; i -= 1) {
+      let isGroup = true;
+      for (const column of this.groupingColumns) {
+        const ci = this.getColumnIndex(p, column);
+        if (!(isGroup = this.equals(p, i, ci, 'row_prev'))) {
+          break;
+        }
+      }
+      if (isGroup && this.equals(p, i, r.col, 'row_prev')) {
+        r.row = i - 1;
+      } else {
+        break;
+      }
+    }
+    for (let i = r.row, l = p.rows.length - 1; i < l; i += 1) {
+      let isGroup = true;
+      for (const column of this.groupingColumns) {
+        const ci = this.getColumnIndex(p, column);
+        if (!(isGroup = this.equals(p, i, ci, 'row_next'))) {
+          break;
+        }
+      }
+      if (isGroup && this.equals(p, i, r.col, 'row_next')) {
+        r.row2 = i + 1;
+      } else {
+        break;
+      }
+    }
+  }
+
+  getMergedRange(p, r, c) {
+    const rng = new CellRange(r, c);
+    switch (p.cellType) {
+      case CellType.ColumnHeader:
+        for (var i = rng.col; i < p.columns.length - 1; i++) {
+          if (
+            p.getCellData(rng.row, i, true) !=
+            p.getCellData(rng.row, i + 1, true)
+          )
+            break;
+          rng.col2 = i + 1;
+        }
+        for (var i = rng.col; i > 0; i--) {
+          if (
+            p.getCellData(rng.row, i, true) !=
+            p.getCellData(rng.row, i - 1, true)
+          )
+            break;
+          rng.col = i - 1;
+        }
+        for (var i = rng.row; i < p.rows.length - 1; i++) {
+          if (
+            p.getCellData(i, rng.col, true) !=
+            p.getCellData(i + 1, rng.col, true)
+          )
+            break;
+          rng.row2 = i + 1;
+        }
+        for (var i = rng.row; i > 0; i--) {
+          if (
+            p.getCellData(i, rng.col, true) !=
+            p.getCellData(i - 1, rng.col, true)
+          )
+            break;
+          rng.row = i - 1;
+        }
+        break;
+        case CellType.Cell:
+          if (this.isMerged(p, c)) {
+            this.rowMergedRange(p, range);
+        }
+        break;
+    }
+    return rng;
+  }
+}
+
+export { SimMergeManager };

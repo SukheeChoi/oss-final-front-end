@@ -3,47 +3,16 @@
     <div class="item">
       <div class="ow-flex-wrap">
         <div class="item size-fix" style="--gap-item: 6px">
-          <div class="title-field">현황</div>
-        </div>
-        <div class="item">
-          <div class="state">
-            <div class="state-item">
-              전체 : <strong>{{ statusBar.total }}</strong
-              >건
-            </div>
-            <div class="state-item">
-              오스템 : <strong>{{ statusBar.osstem }}</strong
-              >건
-            </div>
-            <div class="state-item">
-              협력사합배송 : <strong>{{ statusBar.vendorShippingPlus }}</strong
-              >건
-            </div>
-            <div class="state-item">
-              협력사직배송 : <strong>{{ statusBar.vendorShippingDir }}</strong
-              >건
-            </div>
-            <div class="state-item" style="color: red">
-              미출고 : <strong class="color-type-1">{{ statusBar.unreleased }}</strong
-              >건
-            </div>
-          </div>
+          <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
         </div>
       </div>
     </div>
     <hr />
-    <!-- 배열을 이용한 동적 헤더  -->
-    <div class="ow-flex-wrap item-size-content" style="--gap: 10px">
-      <ow-filter-checkbox
-        name="checkboxGp1"
-        :items="checkboxGroup1"
-        v-model:modelValue="checkboxGroup4"
-        :label="`회사`"
-      />
-      <ow-filter-checkbox name="checkboxGp2" :items="checkboxGroup2" v-model="checkboxGroup5" :label="`배송구분`" />
-      <ow-filter-checkbox name="checkboxGp3" :items="checkboxGroup3" v-model="checkboxGroup6" :label="`미출고`" />
-      <div class="title-field">지점별 보기</div>
-      <button class="ow-btn type-util">지점선택(전체)</button>
+    <!-- 배열을 이용한 동적 체크박스  -->
+    <div class="ow-flex-wrap item-size-content mt-5" style="--gap: 10px">
+      <ow-filter-checkbox :items="companyCheckbox" v-model:modelValue="selectCompany" label="회사" />
+      <ow-filter-checkbox :items="shippingCheckbox" v-model="selectShipping" label="배송구분" />
+      <ow-filter-checkbox :items="unreleaseCheckbox" v-model="selectUnrelease" label="미출고" />
 
       <div class="item align-to-right" style="--gap-item: 6px">
         <div class="title-field">검색</div>
@@ -63,14 +32,8 @@
   </div>
 
   <!-- 그리드 부분 -->
-  <div class="ow-grid-wrap">
-    <ow-grid
-      :allowMerging="'Cells'"
-      :key="keyData"
-      :read="getData"
-      :visibleRowsCount="15"
-      :initialized="onInitialized"
-    >
+  <b-row>
+    <ow-grid :allowMerging="'Cells'" :key="keyData" :read="getData" :visibleRowsCount="15" :initialized="onInitialized">
       <template #left>&nbsp;</template>
       <wj-flex-grid-column-group header="주문">
         <wj-flex-grid-column-group
@@ -148,9 +111,18 @@
 <script setup>
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import orderApi from '@/api/orderApi';
+import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
-const checkboxGroup1 = ref([
+const orderStatus = ref([
+  { name: '전체 : ', value: '', end: '건', plus: '품목/', plusValue: '1', plusend: '개'},
+  { name: '오스템 : ', value: '', end: '건' },
+  { name: '협력사합배송 : ', value: '', end: '건' },
+  { name: '협력사직배송 : ', value: '', end: '건' },
+  { name: '미출고 : ', value: '', end: '건', color: 'red' },
+]);
+
+const companyCheckbox = ref([
   { name: '오스템제품', value: 'osstemItem' },
   { name: '오스템상품', value: 'osstemProduct' },
   { name: '협력사상품(합배송)', value: 'vendorproductPlus' },
@@ -180,27 +152,19 @@ const searchContent = ref(null);
 
 const dummy = ref(null);
 
-const statusBar = reactive({
-  total: null,
-  osstem: null,
-  vendorShippingPlus: null,
-  vendorShippingDir: null,
-  unreleased: null,
-});
-
 //현황 가져오는 함수
 async function getStatus() {
+  //현황 api 호출
   const result = await orderApi.getStatus().then((data) => {
-    statusBar.total = data.total;
-    statusBar.osstem = data.osstem;
-    statusBar.vendorShippingPlus = data.vendorShippingPlus;
-    statusBar.vendorShippingDir = data.vendorShippingDir;
-    statusBar.unreleased = data.unreleased;
+    orderStatus.value[0].value = data.total;
+    orderStatus.value[1].value = data.osstem;
+    orderStatus.value[2].value = data.vendorShippingPlus;
+    orderStatus.value[3].value = data.vendorShippingDir;
+    orderStatus.value[4].value = data.unreleased;
     console.log(data);
   });
 }
 // getStatus();
-
 
 //그리드에 바인딩 하는 함수
 getData.value = async function (query, pageNo, pageSize) {
@@ -209,20 +173,29 @@ getData.value = async function (query, pageNo, pageSize) {
   //pageSize = "한페이지 몇 행"
   //totalCount = "전체 행 수"
 
-  const lee = await orderApi.getFilterList(checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value, searchSelected.value, searchContent.value, pageNo, pageSize);
+  //그리드 데이터 api 호출
+  const list = await orderApi.getFilterList(
+    selectCompany.value,
+    selectShipping.value,
+    selectUnrelease.value,
+    searchSelected.value,
+    searchContent.value,
+    pageNo,
+    pageSize
+  );
+
+  const page = { pageNo, pageSize: 20 };
 
   const result = {
     ...lee,
     pageNo,
   };
 
-  console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', result);
   return result;
-}
+};
 
 const onInitialized = (grid) => {
-  grid.autoSizeRow(0, true);
-
+  //병합 기준 컬럼과, 병합 컬럼 설정
   const config = {
     groupingColumns: ['orderDate'],
     mergedColumns: ['orderDate', 'orderNo', 'clientName'],
@@ -239,27 +212,29 @@ const onInitialized = (grid) => {
 
 //체크된 데이터 감시해서 api요청
 watch(
-  () => [checkboxGroup4, checkboxGroup5, checkboxGroup6, dummy],
+  () => [selectCompany, selectShipping, selectUnrelease],
   (newGroup, oldGroup) => {
-
     keyData.value++;
-    dummy.value = false;
   },
   { deep: true }
 );
 
 function getSearchList() {
-  dummy.value = true;
+  keyData.value++;
 }
-
-
 </script>
-<style>
+<style lang="scss">
+::v-deep {
 .wj-cell.wj-header {
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: inherit;
+}
+
+.ow-grid .wj-cell.wj-header {
+  color: #333333;
+  background-color: #e9ecef;
 }
 
 .wj-cell.border-left {
@@ -272,5 +247,6 @@ function getSearchList() {
   display: flex;
   align-items: center;
   line-height: inherit;
+}
 }
 </style>
