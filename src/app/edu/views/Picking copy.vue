@@ -647,6 +647,10 @@
     align-items: center;
     justify-content: center;
     line-height: inherit;
+
+    color: #333333;
+    background-color: #E8ECF1;
+    // background-color: #E1E7EE;
   }
 
   .wj-flexgrid .wj-cell.wj-align-center {
