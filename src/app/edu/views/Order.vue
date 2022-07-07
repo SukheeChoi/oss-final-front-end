@@ -8,7 +8,7 @@
       </div>
     </b-col>
     <hr />
-    <!-- 배열을 이용한 동적 체크박스  -->
+    <!-- 배열을 이용한 동적 헤더  -->
     <div class="ow-flex-wrap item-size-content mt-5" style="--gap: 10px">
       <ow-filter-checkbox :items="companyCheckbox" v-model:modelValue="selectCompany" label="회사" />
       <ow-filter-checkbox :items="shippingCheckbox" v-model="selectShipping" label="배송구분" />
@@ -115,11 +115,11 @@ import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
 const orderStatus = ref([
-  { name: '전체 : ', value: '', end: '건', plus: '품목/', plusValue: '1', plusend: '개'},
+  { name: '전체 : ', value: '', end: '건' },
   { name: '오스템 : ', value: '', end: '건' },
   { name: '협력사합배송 : ', value: '', end: '건' },
   { name: '협력사직배송 : ', value: '', end: '건' },
-  { name: '미출고 : ', value: '', end: '건', color: 'red' },
+  { name: '미출고 : ', value: '', end: '건', color: "red" },
 ]);
 
 const companyCheckbox = ref([
@@ -224,30 +224,30 @@ function getSearchList() {
   keyData.value++;
 }
 </script>
-<style lang="scss">
-::v-deep {
-.wj-cell.wj-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: inherit;
-}
+<style scoped lang="scss">
+:deep {
+  .wj-cell.wj-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: inherit;
+  }
 
-.ow-grid .wj-cell.wj-header {
-  color: #333333;
-  background-color: #e9ecef;
-}
+  .ow-grid .wj-cell.wj-header {
+    color: #333333;
+    background-color: #e9ecef;
+  }
 
-.wj-cell.border-left {
-  display: flex;
-  align-items: center;
-  line-height: inherit;
-}
+  .wj-cell.border-left {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
 
-.wj-cell.border-center {
-  display: flex;
-  align-items: center;
-  line-height: inherit;
-}
+  .wj-cell.border-center {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
 }
 </style>

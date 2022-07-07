@@ -3,18 +3,18 @@
     <!-- 현황 화면 -->
     <div class="ow-flex-wrap">
       <div class="item size-fix" style="--gap-item: 6px">
-      <div class="ow-flex-wrap">
-        <div class="item size-fix" style="--gap-item: 6px">
-          <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
+        <div class="ow-flex-wrap">
+          <div class="item size-fix" style="--gap-item: 6px">
+            <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
+          </div>
         </div>
-      </div>
       </div>
       <div class="item size-fix" style="--gap-item: 6px">
-      <div class="ow-flex-wrap">
-        <div class="item size-fix" style="--gap-item: 6px">
-          <ow-status-bar label="검품검수현황" :items="inspectionStatus"></ow-status-bar>
+        <div class="ow-flex-wrap">
+          <div class="item size-fix" style="--gap-item: 6px">
+            <ow-status-bar label="검품검수현황" :items="inspectionStatus"></ow-status-bar>
+          </div>
         </div>
-      </div>
       </div>
     </div>
     <hr />
@@ -115,18 +115,13 @@
         <div class="ow-panel">
           <div class="ow-panel-header">
             <div class="ow-panel-title">
-              ■<span v-if="employeeName">[{{ employeeName }}]</span>검품검수 및 라벨링 내역
+              ■ <span v-if="employeeName">[{{ employeeName }}]</span>검품검수 및 라벨링 내역
             </div>
           </div>
           <div class="ow-panel-body1">
-            <div class="ow-grid-wrap">
+            <b-row>
               <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
-              <ow-grid
-                v-if="employeeName"
-                :read="getGrid"
-                :key="keyData"
-                :initialized="onInitialized"
-              >
+              <ow-grid v-if="employeeName" :read="getGrid" :key="keyData" :initialized="onInitialized">
                 <template #left>&nbsp;</template>
                 <wj-flex-grid-column binding="vendorName" header="업체명" :width="100" align="center" />
                 <wj-flex-grid-column binding="itemName" header="품목명" width="*" align="center" />
@@ -147,7 +142,7 @@
                   align="center"
                 />
               </ow-grid>
-            </div>
+            </b-row>
           </div>
         </div>
       </div>
@@ -183,15 +178,15 @@ const searchSelected = ref(null);
 const searchContent = ref(null);
 
 const orderStatus = ref([
-  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
-  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
-  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
+  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
 ]);
 
 const inspectionStatus = ref([
-  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
-  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
-  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
+  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
 ]);
 
 async function getStatus() {
@@ -286,7 +281,6 @@ const treeInitialized = (grid) => {
       var row = grid.rows[e.row];
 
       if ((e.row < 1 || row.dataItem.childrennn) && col.binding == 'startTime') {
-
         const receiveQuantity = row.dataItem.receiveQuantity; //진행률 전체 작업량
         const currentQuantity = row.dataItem.currentQuantity; //현재 달성률 전체 작업량
 
@@ -304,8 +298,8 @@ const treeInitialized = (grid) => {
         const LWTSixteen = row.dataItem.lwtsixteen;
         const LWTSeventeen = row.dataItem.lwtseventeen;
 
-        const startTime = row.dataItem.scheduledStartTime.slice(0, 2);  //예정 시작 시간
-        const endTime = row.dataItem.scheduledEndTime.slice(0, 2);      //예정 완료 시간
+        const startTime = row.dataItem.scheduledStartTime.slice(0, 2); //예정 시작 시간
+        const endTime = row.dataItem.scheduledEndTime.slice(0, 2); //예정 완료 시간
 
         // 예정시간안에 있는 시간인지 체크하는 메소드(배경색 흰색, 회색 설정)
         function timeCheckFunc(params) {
@@ -363,9 +357,9 @@ const treeInitialized = (grid) => {
           } else if (params == 100) {
             html = html.replace('{paramsColor}', 'done');
           }
-          
+
           //50%이하이면 빨간색 글씨로 바꾸고 progress div태그에 글씨 넣기
-          //50%이상이면 하얀색 글씨로 바꾸고 progress-bar div태그에 글씨 넣기 
+          //50%이상이면 하얀색 글씨로 바꾸고 progress-bar div태그에 글씨 넣기
           if (params < 50) {
             html = html.replace('{params%}', '');
           } else {
@@ -436,6 +430,8 @@ const onInitialized = (grid) => {
   grid.autoSizeRow(0, true);
 
   grid.formatItem.addHandler((flex, e) => {
+    console.log(flex);
+    console.log(e);
     //헤더에 html태그 사용하게 하는 설정
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
@@ -449,15 +445,15 @@ const onInitialized = (grid) => {
 
 <style scoped lang="scss">
 ::v-deep {
-.ow-panel .ow-panel-body1 {
-  display: flex;
-  /* flex-direction: column; */
-  flex: 1;
-  border: 2px solid #6980af;
-  border-top: 0;
-  background-color: #fff;
-  padding: var(--ow-gutter);
-}
+  .ow-panel .ow-panel-body1 {
+    display: flex;
+    /* flex-direction: column; */
+    flex: 1;
+    border: 2px solid #6980af;
+    border-top: 0;
+    background-color: #fff;
+    padding: var(--ow-gutter);
+  }
 
   .wj-cell.wj-header {
     display: flex;
@@ -466,74 +462,79 @@ const onInitialized = (grid) => {
     line-height: inherit;
   }
 
-.progress-bar-success {
-  background-color: #198754;
-}
+  .ow-grid .wj-cell.wj-header {
+    color: #333333;
+    background-color: #e9ecef;
+  }
 
-.progress-bar-warning {
-  background-color: #ffc107;
-}
+  .progress-bar-success {
+    background-color: #198754;
+  }
 
-.progress-bar-done {
-  background-color: #0d6efd;
-}
+  .progress-bar-warning {
+    background-color: #ffc107;
+  }
 
-.progress-bar-normal {
-  background-color: #495057;
-}
+  .progress-bar-done {
+    background-color: #0d6efd;
+  }
 
-.border {
-  border: 1px solid black;
-  background-color: grey;
-  color: white;
-  text-align: center;
-}
+  .progress-bar-normal {
+    background-color: #495057;
+  }
 
-table th,
-table td {
-  border: 1px solid #d7dce3;
-  padding-right: 0;
-  padding-left: 0;
-  height: 0;
-  vertical-align: middle;
-}
+  .border {
+    border: 1px solid black;
+    background-color: grey;
+    color: white;
+    text-align: center;
+  }
 
-.progress {
-  display: flex;
-  height: 1rem;
-  overflow: hidden;
-  font-size: 0.75rem;
-  background-color: #e9ecef;
-  border-radius: 0;
-}
+  table th,
+  table td {
+    border: 1px solid #d7dce3;
+    padding-right: 0;
+    padding-left: 0;
+    height: 0;
+    vertical-align: middle;
+  }
 
-.progress-none {
-  display: flex;
-  height: 1rem;
-  overflow: hidden;
-  font-size: 0.75rem;
-  border-radius: 0;
-}
+  .progress {
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+    font-size: 0.75rem;
+    background-color: #e9ecef;
+    border-radius: 0;
+  }
 
-.progress-bar {
-  display: flex;
-  flex-direction: column;
-  /* justify-content: center; */
-  overflow: hidden;
-  color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  transition: width 0.6s ease;
-}
+  .progress-none {
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+    font-size: 0.75rem;
+    border-radius: 0;
+  }
 
-.normal-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-  color: red;
-  text-align: center;
-  white-space: nowrap;
-}
+  .progress-bar {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    overflow: hidden;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    transition: width 0.6s ease;
+  }
+
+  .normal-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    color: red;
+    text-align: center;
+    white-space: nowrap;
+  }
 }
 </style>
