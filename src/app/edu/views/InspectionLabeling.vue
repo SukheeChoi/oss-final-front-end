@@ -3,48 +3,18 @@
     <!-- 현황 화면 -->
     <div class="ow-flex-wrap">
       <div class="item size-fix" style="--gap-item: 6px">
-        <div class="title-field">현황</div>
-        <div class="item">
-          <div class="state">
-            <div class="state-item">
-              물품수령 : <strong>{{ statusBar.receiveItem }}</strong
-              >품목/ <strong>{{ statusBar.receiveItemQuantity }}</strong
-              >개
-            </div>
-            <div class="state-item">
-              검품검수 : <strong>{{ statusBar.inspectionItem }}</strong
-              >품목/<strong>{{ statusBar.inspectionItemQuantity }}</strong
-              >개
-            </div>
-            <div class="state-item">
-              라벨링 : <strong>{{ statusBar.labelingItem }}</strong
-              >품목/<strong>{{ statusBar.labelingItemQuantity }}</strong
-              >개
-            </div>
-          </div>
+      <div class="ow-flex-wrap">
+        <div class="item size-fix" style="--gap-item: 6px">
+          <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
         </div>
       </div>
+      </div>
       <div class="item size-fix" style="--gap-item: 6px">
-        <div class="title-field">검품검수현황</div>
-        <div class="item">
-          <div class="state">
-            <div class="state-item">
-              양품 : <strong>{{ statusBar.passedItem }}</strong
-              >품목/<strong>{{ statusBar.passedItemQuantity }}</strong
-              >개
-            </div>
-            <div class="state-item">
-              누락 : <strong>{{ statusBar.missingItem }}</strong
-              >품목/<strong>{{ statusBar.missingItemQuantity }}</strong
-              >개
-            </div>
-            <div class="state-item">
-              파손 : <strong>{{ statusBar.damagedItem }}</strong
-              >품목/<strong>{{ statusBar.damagedItemQuantity }}</strong
-              >개
-            </div>
-          </div>
+      <div class="ow-flex-wrap">
+        <div class="item size-fix" style="--gap-item: 6px">
+          <ow-status-bar label="검품검수현황" :items="inspectionStatus"></ow-status-bar>
         </div>
+      </div>
       </div>
     </div>
     <hr />
@@ -53,13 +23,14 @@
       <div class="left h-100">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <button class="ow-btn type-util">예정시간수정</button>
-          <button class="ow-btn type-util" @click="getListByEmployeeName()">추가</button>
+          <button class="ow-btn type-util">추가</button>
         </div>
         <ow-tree-grid
           :read="getTree"
           :childItemsPath="['child', 'childrennn']"
           :selectionChanged="onSelectionChanged"
           :initialized="treeInitialized"
+          :visibleRowsCount="15"
         >
           <wj-flex-grid-column
             header="담당자/업체명"
@@ -87,14 +58,14 @@
           ></wj-flex-grid-column>
           <wj-flex-grid-column
             header="예정시간"
-            binding="scheduledStartTime"
-            :width="50"
+            binding="scheduledTime"
+            :width="150"
             align="center"
           ></wj-flex-grid-column>
           <wj-flex-grid-column header="시작시간" binding="startTime" :width="50" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column header="작업시간" binding="workTime" :width="50" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column header="진행률" binding="progressRate" :width="50" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column header="상태" binding="status" :width="50" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column header="상태" binding="status" :width="70" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column
             header="지연<br>시간"
             binding="lateTime"
@@ -152,7 +123,6 @@
               <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
               <ow-grid
                 v-if="employeeName"
-                :allowMerging="'Cells'"
                 :read="getGrid"
                 :key="keyData"
                 :initialized="onInitialized"
@@ -188,27 +158,23 @@
 <script setup>
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
+import OwStatusBar from '@/app/edu/components/OwStatusBar';
+import { TreeMergeManager, SimpleMergeManager } from '@/utils/wijmo.grid';
 
-//트리 그리드 자식 경로 설정
 const childItemsPath = ['child', 'childrennn'];
 
 const getTree = ref([]);
 const getGrid = ref([]);
 const keyData = ref(0);
 
-//트리 그리드 데이터 바인딩
 getTree.value = async function (query, pageNo, pageSize) {
   const treeList = await inspectionLabelingApi.getTreeList();
-  console.log(treeList);
-  console.log('queryqueryqueryquery', query);
-  console.log('result', result);
 
   const result = {
     totalCount: 1,
     data: treeList,
   };
 
-  console.log('result', result);
   return result;
 };
 
@@ -216,74 +182,55 @@ const employeeName = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
-//현황 Bar
-const statusBar = reactive({
-  receiveItem: null,
-  receiveItemQuantity: null,
+const orderStatus = ref([
+  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
+  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
+  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
+]);
 
-  inspectionItem: null,
-  inspectionItemQuantity: null,
+const inspectionStatus = ref([
+  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
+  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
+  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개'},
+]);
 
-  labelingItem: null,
-  labelingItemQuantity: null,
-
-  passedItem: null,
-  passedItemQuantity: null,
-
-  missingItem: null,
-  missingItemQuantity: null,
-
-  damagedItem: null,
-  damagedItemQuantity: null,
-});
-
-//현황 가져오는 함수
 async function getStatus() {
-  //현황 api 호출
   const result = await inspectionLabelingApi.getStatus().then((data) => {
-    statusBar.receiveItem = data.receiveItem;
-    statusBar.receiveItemQuantity = data.receiveItemQuantity;
+    orderStatus.value[0].value = data.receiveItem;
+    orderStatus.value[0].plusValue = data.receiveItemQuantity;
 
-    statusBar.inspectionItem = data.inspectionItem;
-    statusBar.inspectionItemQuantity = data.inspectionItemQuantity;
+    orderStatus.value[1].value = data.inspectionItem;
+    orderStatus.value[1].plusValue = data.inspectionItemQuantity;
 
-    statusBar.labelingItem = data.labelingItem;
-    statusBar.labelingItemQuantity = data.labelingItemQuantity;
+    orderStatus.value[2].value = data.labelingItem;
+    orderStatus.value[2].plusValue = data.labelingItemQuantity;
 
-    statusBar.passedItem = data.passedItem;
-    statusBar.passedItemQuantity = data.passedItemQuantity;
+    inspectionStatus.value[0].value = data.passedItem;
+    inspectionStatus.value[0].plusValue = data.passedItemQuantity;
 
-    statusBar.missingItem = data.missingItem;
-    statusBar.missingItemQuantity = data.missingItemQuantity;
+    inspectionStatus.value[1].value = data.missingItem;
+    inspectionStatus.value[1].plusValue = data.missingItemQuantity;
 
-    statusBar.damagedItem = data.damagedItem;
-    statusBar.damagedItemQuantity = data.damagedItemQuantity;
-    console.log(data);
+    inspectionStatus.value[2].value = data.damagedItem;
+    inspectionStatus.value[2].plusValue = data.damagedItemQuantity;
   });
 }
 getStatus();
 
 //트리 그리드 셀렉션 핸들러
 const onSelectionChanged = (grid, target) => {
-
   //반응형 변수 세팅(검색 조건 리셋)
   searchSelected.value = '';
   searchContent.value = '';
 
-  console.log(grid);
-  console.log(target);
-
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
-    if (typeof grid.selectedItems[0].childrennn == 'object') {
-      console.log('api통신입니다!');
+    if (grid.selectedItems[0].childrennn != null) {
       employeeName.value = grid.selectedItems[0].employeeName;
 
       getGrid.value = async function (query, pageNo, pageSize) {
-        //pageNo = "페이지번호"
-        //pageSize = "한페이지 몇 행"
-        //totalCount = "전체 행 수"
+        //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
         const lee = await inspectionLabelingApi.getListByEmployeeName(
           employeeName.value,
           searchSelected.value,
@@ -304,20 +251,180 @@ const onSelectionChanged = (grid, target) => {
   }
 };
 
-//검색 클릭 버튼
 function searchData() {
   keyData.value++;
 }
 
 //트리 그리드 설정
 const treeInitialized = (grid) => {
-  console.log(grid);
   grid.autoSizeRow(0, true);
 
-  //헤더에 html태그 사용하게 하는 설정
-  grid.formatItem.addHandler((flex, e) => {
-    if (e.panel == flex.columnHeaders) {
+  const config = {
+    groupingColumns: [],
+    mergedColumns: [
+      'startTime',
+      'workTime',
+      'progressRate',
+      'status',
+      'lateTime',
+      'inspectionQuantity',
+      'passItemQuantity',
+      'labelingItemQuantity',
+    ],
+  };
+
+  grid.mergeManager = new TreeMergeManager(config);
+
+  grid.formatItem.addHandler((grid, e) => {
+    //헤더에 html태그 사용하게 하는 설정
+    if (e.panel == grid.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
+    }
+
+    if (e.panel == grid.cells) {
+      var col = grid.columns[e.col];
+      var row = grid.rows[e.row];
+
+      if ((e.row < 1 || row.dataItem.childrennn) && col.binding == 'startTime') {
+
+        const receiveQuantity = row.dataItem.receiveQuantity; //진행률 전체 작업량
+        const currentQuantity = row.dataItem.currentQuantity; //현재 달성률 전체 작업량
+
+        const progressQuantity = row.dataItem.progressQuantity; //현재 작업량
+
+        const receivePercent = Math.round((progressQuantity / receiveQuantity) * 100); //진행률 퍼센트(계산)
+        const currentPercent = Math.round((progressQuantity / currentQuantity) * 100); //현재 달성률 퍼센트(계산)
+
+        const LWTNine = row.dataItem.lwtnine;
+        const LWTTen = row.dataItem.lwtten;
+        const LWTEleven = row.dataItem.lwteleven;
+        const LWTThirteen = row.dataItem.lwtthirteen;
+        const LWTFourteen = row.dataItem.lwtfourteen;
+        const LWTFifteen = row.dataItem.lwtfifteen;
+        const LWTSixteen = row.dataItem.lwtsixteen;
+        const LWTSeventeen = row.dataItem.lwtseventeen;
+
+        const startTime = row.dataItem.scheduledStartTime.slice(0, 2);  //예정 시작 시간
+        const endTime = row.dataItem.scheduledEndTime.slice(0, 2);      //예정 완료 시간
+
+        // 예정시간안에 있는 시간인지 체크하는 메소드(배경색 흰색, 회색 설정)
+        function timeCheckFunc(params) {
+          let timeCheck = false;
+          let paramTime = 0;
+          switch (params) {
+            case LWTNine:
+              paramTime = 9;
+              break;
+            case LWTTen:
+              paramTime = 10;
+              break;
+            case LWTEleven:
+              paramTime = 11;
+              break;
+            case LWTThirteen:
+              paramTime = 13;
+              break;
+            case LWTFourteen:
+              paramTime = 14;
+              break;
+            case LWTFifteen:
+              paramTime = 15;
+              break;
+            case LWTSixteen:
+              paramTime = 16;
+              break;
+            case LWTSeventeen:
+              paramTime = 17;
+              break;
+          }
+          if (paramTime >= startTime && paramTime <= endTime) {
+            timeCheck = true;
+          }
+          return timeCheck;
+        }
+
+        //진행률 progress bar html 생성하는 메소드
+        function createTag(params) {
+          const timeCheck = timeCheckFunc(params);
+          let html =
+            '<td>' +
+            '<div class="{progress}">' +
+            '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{paramsColor}" style="width: {params}%"/>' +
+            '{params%}</div>' +
+            '<div class="normal-text">{params}%</div></td>';
+
+          //진행률 수치에 따라서 색 넣기
+          if (params < 50) {
+            html = html.replace('{paramsColor}', 'normal');
+          } else if (params >= 50 && params < 80) {
+            html = html.replace('{paramsColor}', 'warning');
+          } else if (params >= 80 && params < 100) {
+            html = html.replace('{paramsColor}', 'success');
+          } else if (params == 100) {
+            html = html.replace('{paramsColor}', 'done');
+          }
+          
+          //50%이하이면 빨간색 글씨로 바꾸고 progress div태그에 글씨 넣기
+          //50%이상이면 하얀색 글씨로 바꾸고 progress-bar div태그에 글씨 넣기 
+          if (params < 50) {
+            html = html.replace('{params%}', '');
+          } else {
+            html = html.replace('{params%}', params + '%');
+            html = html.replace('<div class="normal-text">{params}%</div>', '');
+          }
+          html = html.replaceAll('{params}', params);
+
+          //시간 체크해서 true이면 회색 배경 false이면 하얀색 배경
+          if (timeCheck) {
+            html = html.replace('{progress}', 'progress');
+          } else {
+            html = html.replace('{progress}', 'progress-none');
+          }
+          return html;
+        }
+
+        //최종 html 산출물
+        let html =
+          '<div class="lee">' +
+          '<div class="leeStatus">' +
+          '<div class="item">' +
+          '<div class="state">' +
+          '<div class="state-item">' +
+          '진행률 : <strong>{receiveItemQuantity}</strong> /' +
+          '<strong>{progressQuantity}</strong> /' +
+          '<strong>{receivePercent}%</strong>' +
+          '</div>' +
+          '<div class="state-item">' +
+          '현재달성률 : <strong>{currentQuantity}</strong> /' +
+          '<strong>{progressQuantity}</strong> /' +
+          '<strong>{currentPercent}%</strong>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '<table>' +
+          '<tr>' +
+          createTag(LWTNine) +
+          createTag(LWTTen) +
+          createTag(LWTEleven) +
+          createTag(LWTThirteen) +
+          createTag(LWTFourteen) +
+          createTag(LWTFifteen) +
+          createTag(LWTSixteen) +
+          createTag(LWTSeventeen) +
+          '</tr>' +
+          '</table>' +
+          '</div>';
+
+        html = html.replace('{receiveItemQuantity}', receiveQuantity);
+        html = html.replace('{currentQuantity}', currentQuantity);
+        html = html.replaceAll('{progressQuantity}', progressQuantity);
+        html = html.replace('{receivePercent}', receivePercent);
+        html = html.replace('{currentPercent}', currentPercent);
+
+        html = html.replaceAll('null%', '');
+        e.cell.innerHTML = html;
+      }
     }
   });
   //그리드 셀렉션모드 설정(Row)
@@ -326,11 +433,10 @@ const treeInitialized = (grid) => {
 
 //그리드 설정
 const onInitialized = (grid) => {
-  console.log(grid);
   grid.autoSizeRow(0, true);
 
-  //헤더에 html태그 사용하게 하는 설정
   grid.formatItem.addHandler((flex, e) => {
+    //헤더에 html태그 사용하게 하는 설정
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
     }
@@ -341,7 +447,8 @@ const onInitialized = (grid) => {
 };
 </script>
 
-<style>
+<style scoped lang="scss">
+::v-deep {
 .ow-panel .ow-panel-body1 {
   display: flex;
   /* flex-direction: column; */
@@ -351,10 +458,82 @@ const onInitialized = (grid) => {
   background-color: #fff;
   padding: var(--ow-gutter);
 }
-.wj-cell.wj-header {
+
+  .wj-cell.wj-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: inherit;
+  }
+
+.progress-bar-success {
+  background-color: #198754;
+}
+
+.progress-bar-warning {
+  background-color: #ffc107;
+}
+
+.progress-bar-done {
+  background-color: #0d6efd;
+}
+
+.progress-bar-normal {
+  background-color: #495057;
+}
+
+.border {
+  border: 1px solid black;
+  background-color: grey;
+  color: white;
+  text-align: center;
+}
+
+table th,
+table td {
+  border: 1px solid #d7dce3;
+  padding-right: 0;
+  padding-left: 0;
+  height: 0;
+  vertical-align: middle;
+}
+
+.progress {
   display: flex;
-  align-items: center;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  background-color: #e9ecef;
+  border-radius: 0;
+}
+
+.progress-none {
+  display: flex;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  border-radius: 0;
+}
+
+.progress-bar {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  overflow: hidden;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  transition: width 0.6s ease;
+}
+
+.normal-text {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  line-height: inherit;
+  overflow: hidden;
+  color: red;
+  text-align: center;
+  white-space: nowrap;
+}
 }
 </style>

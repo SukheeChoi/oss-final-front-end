@@ -22,10 +22,16 @@ async function getFilterList(filterList) {
     let params = new URLSearchParams();
     params.append('shippingCategory',filterList.shippingCategory);
     params.append('status',filterList.status);
-    params.append('unreleased',filterList.unreleased);
-    // params.append('orderNo',filterList.orderNo);
-    // params.append('clientName',filterList.clientName);
-    const response = await axios.get(`/client/getFilterList`, params);
+    params.append('orderUnrelease',filterList.unrelease);
+    params.append('orderNo',filterList.orderNo);
+    params.append('clientName',filterList.clientName);
+
+    console.log("api - filterList.shippingCategory : " + filterList.shippingCategory);
+    console.log("api - filterList.status : " + filterList.status);
+    console.log("api - filterList.unrelease : " + filterList.unrelease);
+    console.log("api - filterList.orderNo : " + filterList.orderNo);
+    console.log("api - filterList.clientName : " + filterList.clientName);
+    const response = await axios.post(`/client/getFilterList`, filterList);
     receiptList = response.data.list;
   } catch (error) {
     console.log(error);
