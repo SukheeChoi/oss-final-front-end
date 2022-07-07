@@ -33,7 +33,7 @@ async function getFilterList(newGroup){
 async function releaseInspectionQtyUpdate(releaseCode){
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/RIQtyUpdate`, releaseCode);
+    response = await axios.get(`/releaseInspection/RIQtyUpdate?releaseCode=${releaseCode}`);
     console.log("releaseInspectionQtyUpdate >> 일단 통신은 됐다.");
     console.log(response);
   }catch(error){
@@ -108,6 +108,18 @@ async function packingDone(packingDoneInfo) {
   return response;
 }
 
+//박스품목별정보 (releaseInspectionView에서 조회)
+async function getBoxInfo(releaseCode) {
+  let response = null;
+  try{
+    response = await axios.get(`/releaseInspection/selectByReleaseCode?releaseCode=${releaseCode}`);
+  }catch(error){
+    console.log("#######/releaseInspection/getBoxInfo 통신 실패######")
+    console.log(error);
+  }
+  return response.data;
+}
+
 
 export default{
   getReleaseInspectionList,
@@ -117,5 +129,6 @@ export default{
   scan,
   getTotal,
   packing,
-  packingDone
+  packingDone,
+  getBoxInfo
 };

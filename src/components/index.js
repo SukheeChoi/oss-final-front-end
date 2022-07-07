@@ -34,11 +34,16 @@ import OwSwitch from '@/components/common/OwSwitch';
 import OwTab from '@/components/common/OwTab';
 
 import OwGrid from '@/components/grid/new/OwGrid';
+import OwGrid2 from '@/components/grid/new/OwGrid2';
 import OwNGrid from '@/components/grid/new/OwNGrid';
 import OwFlexGrid from '@/components/grid/new/OwFlexGrid';
+import OwFlexGrid2 from '@/components/grid/OwFlexGrid';
 import OwTreeGrid from '@/components/grid/new/OwTreeGrid';
 
 import OwOrgTreeView from '@/components/tree/OwOrgTreeView';
+
+
+
 
 export function registerWijmo(app) {
   registerCore(app);
@@ -63,6 +68,7 @@ let COMMON_COMPONENTS = {
   OwFlexItem,
   OwGrid,
   OwNGrid,
+  OwGrid2,
   OwInput,
   OwInputDate,
   OwInputTime,
@@ -80,6 +86,7 @@ let COMMON_COMPONENTS = {
   OwSwitch,
   OwTab,
   OwFlexGrid,
+  OwFlexGrid2,
   OwTreeGrid,
   OwOrgTreeView,
 };
