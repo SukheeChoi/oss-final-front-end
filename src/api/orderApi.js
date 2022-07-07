@@ -32,7 +32,7 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
   let unreleasedURI = encodeURI(unreleased);
   if (company.length != 0 || shippingway.length != 0) {
     try {
-      response = await axios.get('/order/orderfilter', {
+      response = await axios.get('/order/orderFilter', {
         params: {
           company: companyURI,
           shippingway: shippingwayURI,
