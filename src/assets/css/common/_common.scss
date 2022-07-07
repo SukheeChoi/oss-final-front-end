@@ -64,7 +64,7 @@ h4 { font-size: 12px; font-weight: 700; }
   display: flex;
   position: relative;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   color: nth($clrs-achromatic, 2);
   letter-spacing: -1px;
   align-items: center;
@@ -74,7 +74,8 @@ h4 { font-size: 12px; font-weight: 700; }
     width: 4px;
     height: 4px;
     margin-right: 4px;
-    background-color: nth($clrs-achromatic, 2);
+    // background-color: nth($clrs-achromatic, 2);
+    background-color: #b9bdc2;
   }
   &.gray:before{
     background-color: #b9bdc2;
