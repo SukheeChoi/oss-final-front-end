@@ -1,10 +1,7 @@
 <template>
   <div>
     <template v-if="isNotBlank">
-      <div
-        ref="header"
-        class="d-flex justify-content-between align-items-end mt-10"
-      >
+      <div ref="header" class="d-flex justify-content-between align-items-end mt-10">
         <div>
           <slot name="left">
             <h1 class="h1">그리드</h1>
@@ -12,45 +9,25 @@
         </div>
         <div>
           <template v-if="editable">
-            <button
-              v-if="insert"
-              type="button"
-              class="ow-btn type-state"
-              @click="addNew"
-            >
-              추가
-            </button>
+            <button v-if="insert" type="button" class="ow-btn type-state" @click="addNew">추가</button>
           </template>
           <slot name="right"> </slot>
         </div>
       </div>
     </template>
     <div class="ow-grid-wrap mt-8 mb-8">
-      <template
-        v-for="i in n"
-        :key="i"
-      >
-        <ow-flex-grid
-          :initialized="initialize.bind(null, i)"
-          v-bind="$attrs"
-        >
+      <template v-for="i in n" :key="i">
+        <ow-flex-grid :initialized="initialize.bind(null, i)" v-bind="$attrs">
           <slot></slot>
         </ow-flex-grid>
       </template>
     </div>
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <button
-          type="button"
-          class="ow-button type-icon mr-5"
-        >
+        <button type="button" class="ow-button type-icon mr-5">
           <i class="fas fa-cog fa-fw" />
         </button>
-        <ow-select
-          v-model="pageSize"
-          :items="pageSizeList"
-          style="--width: 80px"
-        ></ow-select>
+        <ow-select v-model="pageSize" :items="pageSizeList" style="--width: 80px"></ow-select>
       </div>
       <div>
         <b-pagination
@@ -124,7 +101,7 @@ export default {
       type: Object,
       default: () => ({
         pageNo: 1,
-        pageSize: 10,
+        pageSize: 16,
       }),
     },
     read: { type: Function, required: true },

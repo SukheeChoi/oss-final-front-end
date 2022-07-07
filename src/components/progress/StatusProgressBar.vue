@@ -11,19 +11,27 @@
       <progress class="high" v-else :value="percentOrd" :max="100"></progress>
     </div>
   </div>
+
+  <div>
+    
+  </div>
 </template>
 
 <script setup></script>
 
 <style>
-.low {
+.low,
+.mid,
+.high {
   display: block;
   border: 0 none;
   border-radius: 2px;
   background: gainsboro;
 }
 
-.low::-webkit-progress-bar {
+.low::-webkit-progress-bar,
+.mid::-webkit-progress-bar,
+.high::-webkit-progress-bar {
   background: transparent;
 }
 
@@ -32,35 +40,27 @@
   background: rgb(246, 193, 68);
 }
 
-.mid {
-  display: block;
-  border: 0 none;
-  border-radius: 2px;
-  background: gainsboro;
-}
-
-.mid::-webkit-progress-bar {
-  background: transparent;
-}
-
 .mid::-webkit-progress-value {
   border-radius: 2px;
   background: rgb(63, 132, 88);
 }
 
-.high {
-  display: block;
-  border: 0 none;
-  border-radius: 2px;
-  background: gainsboro;
-}
-
-.high::-webkit-progress-bar {
-  background: transparent;
-}
-
 .high::-webkit-progress-value {
   border-radius: 2px;
   background: rgb(44, 112, 244);
+}
+
+.progress-bar {
+  position: relative;
+  background-color: white;
+  width: 50%;
+  height: 100%;
+}
+
+.progress-bar span {
+  position: absolute;
+  display: inline-block;
+  color: white;
+  text-align: center;
 }
 </style>
