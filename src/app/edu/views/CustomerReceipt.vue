@@ -8,7 +8,7 @@
         </div>
         <div class="ow-panel-body">
           <div class="ow-flex-wrap">
-            <div class="item">계획 대비 실적 달성률</div>
+            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <!-- 컴포넌트화 하기-->
               <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
@@ -21,13 +21,13 @@
           </div>
           <hr />
           <div class="ow-flex-wrap">
-            <div class="item">계획</div>
+            <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">
-              200건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 200 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 6건</strong>)
+              200건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 200 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
             </div>
           </div>
           <div class="ow-flex-wrap">
-            <div class="item">실적</div>
+            <div class="item txt-dot-square">실적</div>
             <div class="align-to-right">{{ statusOrd }}건</div>
           </div>
         </div>
@@ -38,7 +38,7 @@
         </div>
         <div class="ow-panel-body">
           <div class="ow-flex-wrap">
-            <div class="item">계획 대비 실적 달성률</div>
+            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <span :data-value="percentPick" :style="`width: ${percentPick}%`">{{ percentPick }}%</span>
               <progress class="low" v-if="percentPick < 80" :value="percentPick" max="100"></progress>
@@ -48,11 +48,11 @@
           </div>
           <hr />
           <div class="ow-flex-wrap">
-            <div class="item">계획</div>
+            <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">{{ statusOrd }}건</div>
           </div>
           <div class="ow-flex-wrap">
-            <div class="item">실적</div>
+            <div class="item txt-dot-square">실적</div>
             <div class="align-to-right">{{ statusPick }}건</div>
           </div>
         </div>
@@ -63,7 +63,7 @@
         </div>
         <div class="ow-panel-body">
           <div class="ow-flex-wrap">
-            <div class="item">계획 대비 실적 달성률</div>
+            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <span :data-value="percentPack" :style="`width: ${percentPack}%`">{{ percentPack }}%</span>
               <progress class="low" v-if="percentPack < 80" :value="percentPack" max="100"></progress>
@@ -73,11 +73,11 @@
           </div>
           <hr />
           <div class="ow-flex-wrap">
-            <div class="item">계획</div>
+            <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">{{ statusPick }}건</div>
           </div>
           <div class="ow-flex-wrap">
-            <div class="item">실적</div>
+            <div class="item txt-dot-square">실적</div>
             <div class="align-to-right">{{ statusPack }}건</div>
           </div>
         </div>
@@ -88,7 +88,7 @@
         </div>
         <div class="ow-panel-body">
           <div class="ow-flex-wrap">
-            <div class="item">계획 대비 실적 달성률</div>
+            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <span :data-value="percentRls" :style="`width: ${percentRls}%`">{{ percentRls }}%</span>
               <progress class="low" v-if="percentRls < 80" :value="percentRls" max="100"></progress>
@@ -98,11 +98,11 @@
           </div>
           <hr />
           <div class="ow-flex-wrap">
-            <div class="item">계획</div>
+            <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">{{ statusPack }}건</div>
           </div>
           <div class="ow-flex-wrap">
-            <div class="item">실적</div>
+            <div class="item txt-dot-square">실적</div>
             <div class="align-to-right">{{ statusRls }}건</div>
           </div>
         </div>
@@ -113,7 +113,7 @@
         </div>
         <div class="ow-panel-body">
           <div class="ow-flex-wrap">
-            <div class="item">계획 대비 실적 달성률</div>
+            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <span :data-value="percentTrf" :style="`width: ${percentTrf}%`">{{ percentTrf }}%</span>
               <progress class="low" v-if="percentTrf < 80" :value="percentTrf" max="100"></progress>
@@ -123,11 +123,11 @@
           </div>
           <hr />
           <div class="ow-flex-wrap">
-            <div class="item">계획</div>
+            <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">{{ statusRls }}건</div>
           </div>
           <div class="ow-flex-wrap">
-            <div class="item">실적</div>
+            <div class="item txt-dot-square">실적</div>
             <div class="align-to-right">{{ statusTrf }}건</div>
           </div>
         </div>
@@ -141,7 +141,7 @@
         <!-- 주문 단계(주문확인/피킹/출고검수/출고/택배사 인계)로 필터링 : 하나의 단계만 선택 가능하기 때문에 radio -->
         <ow-filter-radio v-bind:items="checkboxGroup3" v-model="checkboxGroup4" :label="`단계`" />
         <!-- 미출고 필터링 : true, false -->
-        <div class="item" style="--gap-item: 6px">
+        <div class="item radiobtn">
           <div class="ow-checkbox">
             <input type="checkbox" id="ow-chk" v-model="checkbox1" />
             <label for="ow-chk">미출고만 보기</label>
@@ -193,7 +193,7 @@
           </div>
           <div class="ow-input type-button" style="--width: 200px">
             <input type="text" v-model="searchCategoryContent" placeholder="검색어를 입력하세요." />
-            <input type="submit" class="btn-search" @click="search"/>
+            <input type="submit" class="btn-search" @click="search" />
           </div>
         </div>
       </div>
@@ -213,11 +213,8 @@
             </span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
-
         <!-- <wj-flex-grid-column v-if="!unrelease" binding="client" header="거래처" width="*">
         </wj-flex-grid-column> -->
-
-
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 주문 단계에 따라 아이콘 적용 -->
@@ -249,6 +246,7 @@ const percentPick = ref(null);
 const percentPack = ref(null);
 const percentRls = ref(null);
 const percentTrf = ref(null);
+const unreleaseCnt = ref(null);
 
 const receiptList = ref([]);
 
@@ -276,7 +274,7 @@ const retrieve = (param) => {
     }
   }
   if (param.pageNo) {
-    filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
+    filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 16, param.pageSize ?? 16);
   }
 
   return Promise.resolve({
@@ -299,7 +297,7 @@ async function read(query, pageNo, pageSize) {
 
 //보여지는 행 수
 const state = reactive({
-  visibleRowsCount: 15,
+  visibleRowsCount: 16,
 });
 
 //초기화
@@ -415,13 +413,13 @@ async function getFilterList(afterFilterList) {
 }
 
 //주문 단계 별 건수 요청
-async function getCnt() {
-  const cnt = await clientApi.getStatusCnt();
-  statusOrd.value = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4];
-  statusPick.value = cnt[1] + cnt[2] + cnt[3] + cnt[4];
-  statusPack.value = cnt[2] + cnt[3] + cnt[4];
-  statusRls.value = cnt[3] + cnt[4];
-  statusTrf.value = cnt[4];
+async function getStsCnt() {
+  const stsCnt = await clientApi.getStatusCnt();
+  statusOrd.value = stsCnt[0] + stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4];
+  statusPick.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4];
+  statusPack.value = stsCnt[2] + stsCnt[3] + stsCnt[4];
+  statusRls.value = stsCnt[3] + stsCnt[4];
+  statusTrf.value = stsCnt[4];
   //주문 단계마다 완료 퍼센트
   percentOrd.value = parseInt((statusOrd.value / 200) * 100);
   percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
@@ -429,20 +427,36 @@ async function getCnt() {
   percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
   percentTrf.value = parseInt((statusTrf.value / statusRls.value) * 100);
 
-  return cnt;
+  // return stsCnt;
 }
-getCnt();
+getStsCnt();
+
+async function getunrlsCnt() {
+  const unrlsCnt = await clientApi.getUnreleaseCnt();
+  unreleaseCnt.value = unrlsCnt;
+  console.log('unreleaseCnt : ' + unreleaseCnt.value);
+}
+getunrlsCnt();
 </script>
 
 <style>
-.low {
+.ow-panel .ow-panel-header .ow-panel-title {
+  justify-content: center;
+  font-weight: 800;
+}
+
+.low,
+.mid,
+.high {
   display: block;
   border: 0 none;
   border-radius: 2px;
   background: gainsboro;
 }
 
-.low::-webkit-progress-bar {
+.low::-webkit-progress-bar,
+.mid::-webkit-progress-bar,
+.high::-webkit-progress-bar {
   background: transparent;
 }
 
@@ -451,31 +465,9 @@ getCnt();
   background: rgb(246, 193, 68);
 }
 
-.mid {
-  display: block;
-  border: 0 none;
-  border-radius: 2px;
-  background: gainsboro;
-}
-
-.mid::-webkit-progress-bar {
-  background: transparent;
-}
-
 .mid::-webkit-progress-value {
   border-radius: 2px;
   background: rgb(63, 132, 88);
-}
-
-.high {
-  display: block;
-  border: 0 none;
-  border-radius: 2px;
-  background: gainsboro;
-}
-
-.high::-webkit-progress-bar {
-  background: transparent;
 }
 
 .high::-webkit-progress-value {
@@ -495,6 +487,18 @@ getCnt();
   display: inline-block;
   color: white;
   text-align: center;
+  font-weight: 600;
+}
+
+.ow-flex-wrap .filter-checkbox-label,.filter-radio-label {
+  margin-left: 5px;
+  margin-right: 0;
+}
+
+.ow-flex-wrap .item .radiobtn {
+  background-color: #e1e6ea;
+  padding: 3px;
+  border-radius: 2px;
 }
 
 .arrow_down {
@@ -518,6 +522,14 @@ getCnt();
 .arrow_down:hover + .explain {
   opacity: 1;
 }
+
+.ow-grid .wj-cell.wj-header {
+  background-color: rgb(231, 234, 241);
+}
+
+.ow-grid .wj-cell.wj-alt {
+  background-color: #fff;
+}
 </style>
 
 <style lang="scss">
@@ -529,15 +541,4 @@ getCnt();
     }
   }
 }
-
-// .ow-tag-background::before {
-//   content: '';
-//   position: absolute;
-//   width: 100%;
-//   height: 100%;
-//   top: 0;
-//   left: 0;
-//   background-color: rgba(248, 229, 227, 0.5);
-//   // z-index: -1;
-// }
 </style>

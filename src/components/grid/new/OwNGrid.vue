@@ -21,7 +21,10 @@
     </div>
     <div class="d-flex justify-content-between align-items-center">
       <div>
-
+        <button type="button" class="ow-button type-icon mr-5">
+          <i class="fas fa-cog fa-fw" />
+        </button>
+        <ow-select v-model="pageSize" :items="pageSizeList" style="--width: 80px"></ow-select>
       </div>
       <!-- <div>
         <button type="button" class="ow-button type-icon mr-5"><i class="fas fa-cog fa-fw" /></button>

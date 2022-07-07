@@ -39,7 +39,6 @@ async function getFilterList(filterList) {
   return receiptList;
 }
 
-
 //주문 단계 별 건수 요청
 async function getStatusCnt() {
   let status = [];
@@ -53,7 +52,20 @@ async function getStatusCnt() {
   return status;
 }
 
+async function getUnreleaseCnt() {
+  let unreleaseCnt = [];
+  try{
+    const response = await axios.get(`/client/unreleaseCnt`);
+    unreleaseCnt = response.data;
+    console.log('unreleaseCnt : ' + unreleaseCnt);
+  } catch (error) {
+    console.log(error);
+  }
+  return unreleaseCnt;
+}
+
 export default {
   getFilterList,
-  getStatusCnt
+  getStatusCnt,
+  getUnreleaseCnt
 };
