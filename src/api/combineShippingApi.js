@@ -59,7 +59,7 @@ async function getReceiptList(toDo=1, selectedVendor='전체', dateList=Array.fr
     params.append('toDo', toDo);
     params.append('vendorName', selectedVendor);
     params.append('dateList', Array.from(dateList));
-    const response = await axios.post(`/combineShipping/getReceiptList`, params);
+    const response = await axios.post(`/combineShipping/receiptList`, params);
     receiptList = response.data;
   } catch(error) {
     console.log(error);
