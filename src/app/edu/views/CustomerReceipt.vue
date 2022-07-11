@@ -23,7 +23,7 @@
           <div class="ow-flex-wrap">
             <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">
-              200건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 200 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
+              300건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 300 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
             </div>
           </div>
           <div class="ow-flex-wrap">
@@ -199,7 +199,13 @@
       </div>
     </div>
     <div>
-      <ow-n-grid :n="9" :initialized="initialize" :key="keyData" :read="read" :autoRowHeights="true" :visible-rows-count="state.visibleRowsCount">
+      <ow-n-grid :n="9"
+                :pageSize="state.parPage"
+                :visible-rows-count="state.visibleRowsCount"
+                :initialized="initialize"
+                :key="keyData"
+                :read="read"
+                :autoRowHeights="true">
         <template #left>&nbsp;</template>
         <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
@@ -295,9 +301,13 @@ async function read(query, pageNo, pageSize) {
   return result;
 }
 
+// //불러오는 행 수
+// const perPage = ref(16);
+
 //보여지는 행 수
 const state = reactive({
   visibleRowsCount: 16,
+  perPage: 16
 });
 
 //초기화
@@ -415,13 +425,13 @@ async function getFilterList(afterFilterList) {
 //주문 단계 별 건수 요청
 async function getStsCnt() {
   const stsCnt = await clientApi.getStatusCnt();
-  statusOrd.value = stsCnt[0] + stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4];
-  statusPick.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4];
-  statusPack.value = stsCnt[2] + stsCnt[3] + stsCnt[4];
-  statusRls.value = stsCnt[3] + stsCnt[4];
-  statusTrf.value = stsCnt[4];
+  statusOrd.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4]+stsCnt[5] + stsCnt[6];
+  statusPick.value = stsCnt[3] + stsCnt[4] + stsCnt[5] + stsCnt[6];
+  statusPack.value = stsCnt[4] + stsCnt[5] + stsCnt[6];
+  statusRls.value = stsCnt[5] + stsCnt[6];
+  statusTrf.value = stsCnt[6];
   //주문 단계마다 완료 퍼센트
-  percentOrd.value = parseInt((statusOrd.value / 200) * 100);
+  percentOrd.value = parseInt((statusOrd.value / 300) * 100);
   percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
   percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
   percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
@@ -490,7 +500,8 @@ getunrlsCnt();
   font-weight: 600;
 }
 
-.ow-flex-wrap .filter-checkbox-label,.filter-radio-label {
+.ow-flex-wrap .filter-checkbox-label,
+.filter-radio-label {
   margin-left: 5px;
   margin-right: 0;
 }
