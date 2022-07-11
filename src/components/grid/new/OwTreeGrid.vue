@@ -12,19 +12,19 @@
         </slot>
       </div>
     </template> -->
-    <div class="ow-grid-wrap mt-8 mb-8">
+    <div class="ow-grid-wrap mt-8">
       <ow-flex-grid :initialized="initialize" v-bind="$attrs">
         <slot></slot>
       </ow-flex-grid>
     </div>
-    <div class="d-flex justify-content-end align-items-center">
+    <!-- <div class="d-flex justify-content-end align-items-center">
       <div>전체 {{ totalCount }} 건</div>
     </div>
     <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
       <template #default="item">
         <slot name="editor" :item="item.data"> </slot>
       </template>
-    </ow-flex-grid-editor>
+    </ow-flex-grid-editor> -->
   </div>
 </template>
 

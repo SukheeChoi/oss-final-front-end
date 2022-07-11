@@ -46,7 +46,7 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
       
       response.data.data.map((i) => {
         //오스템 제품 & 오스템 상품 (협력사 => 하이픈 처리)
-        if (i.vendorName === '오스템제품' || i.vendorName === '오스템상품') {
+        if (i.itemOSS) {
           i.orderCheckDate = '-';
           i.releaseQuantity = '-';
           i.releaseScheduleDate = '-';
@@ -54,7 +54,7 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
         }
 
         //협력사 상품 합배송 & 직배송 (피킹 => 하이픈 처리)
-        if (i.vendorName !== '오스템제품' && i.vendorName !== '오스템상품') {
+        if (!i.itemOSS) {
           i.pickingDate = '-';
           i.pickingEmployee = '-';
           i.pickingQuantity = '-';
@@ -62,7 +62,7 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
         }
 
         //협력사 상품 직배송 (출고검수/패킹, 출고, 인계 => 하이픈 처리)
-        if (i.vendorName !== '오스템제품' && i.vendorName !== '오스템상품' && i.orderShippingWay === '직배송') {
+        if (!i.itemOSS && i.orderShippingWay === '직배송') {
           i.packingInspectionEmployee = '-';
           i.inspectionDate = '-';
           i.releaseEmployee = '-';
