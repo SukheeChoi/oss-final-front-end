@@ -3,46 +3,16 @@
     <!-- 현황 화면 -->
     <div class="ow-flex-wrap">
       <div class="item size-fix" style="--gap-item: 6px">
-        <div class="title-field">현황</div>
-        <div class="item">
-          <div class="state">
-            <div class="state-item">
-              물품수령 : <strong>{{ statusBar.receiveItem }}</strong
-              >품목/ <strong>{{ statusBar.receiveItemQuantity }}</strong
-              >개
-            </div>
-            <div class="state-item">
-              검품검수 : <strong>{{ statusBar.inspectionItem }}</strong
-              >품목/<strong>{{ statusBar.inspectionItemQuantity }}</strong
-              >개
-            </div>
-            <div class="state-item">
-              라벨링 : <strong>{{ statusBar.labelingItem }}</strong
-              >품목/<strong>{{ statusBar.labelingItemQuantity }}</strong
-              >개
-            </div>
+        <div class="ow-flex-wrap">
+          <div class="item size-fix" style="--gap-item: 6px">
+            <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
           </div>
         </div>
       </div>
       <div class="item size-fix" style="--gap-item: 6px">
-        <div class="title-field">검품검수현황</div>
-        <div class="item">
-          <div class="state">
-            <div class="state-item">
-              양품 : <strong>{{ statusBar.passedItem }}</strong
-              >품목/<strong>{{ statusBar.passedItemQuantity }}</strong
-              >개
-            </div>
-            <div class="state-item">
-              누락 : <strong>{{ statusBar.missingItem }}</strong
-              >품목/<strong>{{ statusBar.missingItemQuantity }}</strong
-              >개
-            </div>
-            <div class="state-item">
-              파손 : <strong>{{ statusBar.damagedItem }}</strong
-              >품목/<strong>{{ statusBar.damagedItemQuantity }}</strong
-              >개
-            </div>
+        <div class="ow-flex-wrap">
+          <div class="item size-fix" style="--gap-item: 6px">
+            <ow-status-bar label="검품검수현황" :items="inspectionStatus"></ow-status-bar>
           </div>
         </div>
       </div>
@@ -50,16 +20,17 @@
     <hr />
     <div class="d-flex">
       <!-- 왼쪽 화면 -->
-      <div class="left h-100">
+      <div class="left">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <button class="ow-btn type-util">예정시간수정</button>
-          <button class="ow-btn type-util" @click="getListByEmployeeName()">추가</button>
+          <button class="ow-btn type-util">추가</button>
         </div>
         <ow-tree-grid
           :read="getTree"
           :childItemsPath="['child', 'childrennn']"
           :selectionChanged="onSelectionChanged"
           :initialized="treeInitialized"
+          :visibleRowsCount="20"
         >
           <wj-flex-grid-column
             header="담당자/업체명"
@@ -94,7 +65,7 @@
           <wj-flex-grid-column header="시작시간" binding="startTime" :width="50" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column header="작업시간" binding="workTime" :width="50" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column header="진행률" binding="progressRate" :width="50" align="center"></wj-flex-grid-column>
-          <wj-flex-grid-column header="상태" binding="status" :width="50" align="center"></wj-flex-grid-column>
+          <wj-flex-grid-column header="상태" binding="status" :width="70" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column
             header="지연<br>시간"
             binding="lateTime"
@@ -120,29 +91,9 @@
             align="center"
           ></wj-flex-grid-column>
         </ow-tree-grid>
-        <div class="lee">
-          <div class="container">
-            <div class="leeStatus">
-              <div class="item">
-                <div class="state">
-                  <div class="state-item">
-                    진행률 : <strong>{{ statusBar.receiveItemQuantity }}</strong> /
-                    <strong>{{ statusBar.passedItemQuantity }}</strong> /
-                    <strong>20%</strong>
-                  </div>
-                  <div class="state-item">
-                    현재달성률 : <strong>{{ statusBar.receiveItemQuantity }}</strong> /
-                    <strong>{{ statusBar.passedItemQuantity }}</strong> /
-                    <strong>30%</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <!-- 오른쪽 화면 -->
-      <div class="right flex-fill">
+      <div class="right">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <div class="item align-to-right" style="--gap-item: 6px">
             <div class="title-field">검색</div>
@@ -164,21 +115,13 @@
         <div class="ow-panel">
           <div class="ow-panel-header">
             <div class="ow-panel-title">
-              ■<span v-if="employeeName">[{{ employeeName }}]</span>검품검수 및 라벨링 내역
+              ■ <span v-if="employeeName">[{{ employeeName }}]</span>검품검수 및 라벨링 내역
             </div>
           </div>
-          <div class="ow-panel-body1">
-            <div class="ow-grid-wrap">
+          <div class="ow-panel-body">
+            <b-row>
               <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
-              <ow-grid
-                v-if="employeeName"
-                headersVisibility="Column"
-                :allowMerging="'Cells'"
-                selectionMode="None"
-                :read="getGrid"
-                :key="keyData"
-                :initialized="onInitialized"
-              >
+              <ow-grid v-if="employeeName" :read="getGrid" :key="keyData" :initialized="onInitialized" :visibleRowsCount="15">
                 <template #left>&nbsp;</template>
                 <wj-flex-grid-column binding="vendorName" header="업체명" :width="100" align="center" />
                 <wj-flex-grid-column binding="itemName" header="품목명" width="*" align="center" />
@@ -199,7 +142,7 @@
                   align="center"
                 />
               </ow-grid>
-            </div>
+            </b-row>
           </div>
         </div>
       </div>
@@ -210,6 +153,7 @@
 <script setup>
 import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
+import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { TreeMergeManager, SimpleMergeManager } from '@/utils/wijmo.grid';
 
 const childItemsPath = ['child', 'childrennn'];
@@ -233,45 +177,37 @@ const employeeName = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
-const statusBar = reactive({
-  receiveItem: null,
-  receiveItemQuantity: null,
+const orderStatus = ref([
+  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+]);
 
-  inspectionItem: null,
-  inspectionItemQuantity: null,
-
-  labelingItem: null,
-  labelingItemQuantity: null,
-
-  passedItem: null,
-  passedItemQuantity: null,
-
-  missingItem: null,
-  missingItemQuantity: null,
-
-  damagedItem: null,
-  damagedItemQuantity: null,
-});
+const inspectionStatus = ref([
+  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+]);
 
 async function getStatus() {
   const result = await inspectionLabelingApi.getStatus().then((data) => {
-    statusBar.receiveItem = data.receiveItem;
-    statusBar.receiveItemQuantity = data.receiveItemQuantity;
+    orderStatus.value[0].value = data.receiveItem;
+    orderStatus.value[0].plusValue = data.receiveItemQuantity;
 
-    statusBar.inspectionItem = data.inspectionItem;
-    statusBar.inspectionItemQuantity = data.inspectionItemQuantity;
+    orderStatus.value[1].value = data.inspectionItem;
+    orderStatus.value[1].plusValue = data.inspectionItemQuantity;
 
-    statusBar.labelingItem = data.labelingItem;
-    statusBar.labelingItemQuantity = data.labelingItemQuantity;
+    orderStatus.value[2].value = data.labelingItem;
+    orderStatus.value[2].plusValue = data.labelingItemQuantity;
 
-    statusBar.passedItem = data.passedItem;
-    statusBar.passedItemQuantity = data.passedItemQuantity;
+    inspectionStatus.value[0].value = data.passedItem;
+    inspectionStatus.value[0].plusValue = data.passedItemQuantity;
 
-    statusBar.missingItem = data.missingItem;
-    statusBar.missingItemQuantity = data.missingItemQuantity;
+    inspectionStatus.value[1].value = data.missingItem;
+    inspectionStatus.value[1].plusValue = data.missingItemQuantity;
 
-    statusBar.damagedItem = data.damagedItem;
-    statusBar.damagedItemQuantity = data.damagedItemQuantity;
+    inspectionStatus.value[2].value = data.damagedItem;
+    inspectionStatus.value[2].plusValue = data.damagedItemQuantity;
   });
 }
 getStatus();
@@ -285,13 +221,11 @@ const onSelectionChanged = (grid, target) => {
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
-    if (typeof grid.selectedItems[0].childrennn == 'object') {
+    if (grid.selectedItems[0].childrennn != null) {
       employeeName.value = grid.selectedItems[0].employeeName;
 
       getGrid.value = async function (query, pageNo, pageSize) {
-        //pageNo = "페이지번호"
-        //pageSize = "한페이지 몇 행"
-        //totalCount = "전체 행 수"
+        //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
         const lee = await inspectionLabelingApi.getListByEmployeeName(
           employeeName.value,
           searchSelected.value,
@@ -333,9 +267,6 @@ const treeInitialized = (grid) => {
       'labelingItemQuantity',
     ],
   };
-  console.log(grid);
-  console.log(grid.cells);
-  console.log(grid.cells._rng);
 
   grid.mergeManager = new TreeMergeManager(config);
 
@@ -344,21 +275,12 @@ const treeInitialized = (grid) => {
     if (e.panel == grid.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
     }
-    // console.log(grid);
-    // console.log(e);
-
-    const gridItem = grid.itemsSource.items;
 
     if (e.panel == grid.cells) {
       var col = grid.columns[e.col];
       var row = grid.rows[e.row];
-      // console.log(row.dataItem);
-      // console.log(row.dataItem.child);
-      // console.log(e.row);
-      // console.log(col);
+
       if ((e.row < 1 || row.dataItem.childrennn) && col.binding == 'startTime') {
-        var vnow = grid.getCellData(e.row, e.col - 1);
-        console.log('grid', grid);
         const receiveQuantity = row.dataItem.receiveQuantity; //진행률 전체 작업량
         const currentQuantity = row.dataItem.currentQuantity; //현재 달성률 전체 작업량
 
@@ -367,23 +289,19 @@ const treeInitialized = (grid) => {
         const receivePercent = Math.round((progressQuantity / receiveQuantity) * 100); //진행률 퍼센트(계산)
         const currentPercent = Math.round((progressQuantity / currentQuantity) * 100); //현재 달성률 퍼센트(계산)
 
-        const LWTNine = row.dataItem.LWTNine;
-        const LWTTen = row.dataItem.LWTTen;
-        const LWTEleven = row.dataItem.LWTEleven;
-        const LWTThirteen = row.dataItem.LWTThirteen;
-        const LWTFourteen = row.dataItem.LWTFourteen;
-        const LWTFifteen = row.dataItem.LWTFifteen;
-        const LWTSixteen = row.dataItem.LWTSixteen;
-        const LWTSeventeen = row.dataItem.LWTSeventeen;
+        const LWTNine = row.dataItem.lwtnine;
+        const LWTTen = row.dataItem.lwtten;
+        const LWTEleven = row.dataItem.lwteleven;
+        const LWTThirteen = row.dataItem.lwtthirteen;
+        const LWTFourteen = row.dataItem.lwtfourteen;
+        const LWTFifteen = row.dataItem.lwtfifteen;
+        const LWTSixteen = row.dataItem.lwtsixteen;
+        const LWTSeventeen = row.dataItem.lwtseventeen;
 
-        const startTime = row.dataItem.scheduledStartTime.slice(0, 2);
-        const endTime = row.dataItem.scheduledEndTime.slice(0, 2);
+        const startTime = row.dataItem.scheduledStartTime.slice(0, 2); //예정 시작 시간
+        const endTime = row.dataItem.scheduledEndTime.slice(0, 2); //예정 완료 시간
 
-        console.log('e', gridItem);
-        console.log('row', e.row);
-        console.log('col', e.col);
-        console.log('vnow', row);
-
+        // 예정시간안에 있는 시간인지 체크하는 메소드(배경색 흰색, 회색 설정)
         function timeCheckFunc(params) {
           let timeCheck = false;
           let paramTime = 0;
@@ -413,12 +331,13 @@ const treeInitialized = (grid) => {
               paramTime = 17;
               break;
           }
-          if (paramTime > startTime && paramTime < endTime) {
+          if (paramTime >= startTime && paramTime <= endTime) {
             timeCheck = true;
           }
           return timeCheck;
         }
 
+        //진행률 progress bar html 생성하는 메소드
         function createTag(params) {
           const timeCheck = timeCheckFunc(params);
           let html =
@@ -427,6 +346,8 @@ const treeInitialized = (grid) => {
             '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{paramsColor}" style="width: {params}%"/>' +
             '{params%}</div>' +
             '<div class="normal-text">{params}%</div></td>';
+
+          //진행률 수치에 따라서 색 넣기
           if (params < 50) {
             html = html.replace('{paramsColor}', 'normal');
           } else if (params >= 50 && params < 80) {
@@ -436,6 +357,9 @@ const treeInitialized = (grid) => {
           } else if (params == 100) {
             html = html.replace('{paramsColor}', 'done');
           }
+
+          //50%이하이면 빨간색 글씨로 바꾸고 progress div태그에 글씨 넣기
+          //50%이상이면 하얀색 글씨로 바꾸고 progress-bar div태그에 글씨 넣기
           if (params < 50) {
             html = html.replace('{params%}', '');
           } else {
@@ -444,14 +368,16 @@ const treeInitialized = (grid) => {
           }
           html = html.replaceAll('{params}', params);
 
+          //시간 체크해서 true이면 회색 배경 false이면 하얀색 배경
           if (timeCheck) {
-            html = html.replaceAll('{progress}', 'progress');
+            html = html.replace('{progress}', 'progress');
           } else {
-            html = html.replaceAll('{progress}', 'progress-none');
+            html = html.replace('{progress}', 'progress-none');
           }
           return html;
         }
 
+        //최종 html 산출물
         let html =
           '<div class="lee">' +
           '<div class="leeStatus">' +
@@ -490,7 +416,7 @@ const treeInitialized = (grid) => {
         html = html.replace('{receivePercent}', receivePercent);
         html = html.replace('{currentPercent}', currentPercent);
 
-        html = html.replaceAll('undefined%', '');
+        html = html.replaceAll('null%', '');
         e.cell.innerHTML = html;
       }
     }
@@ -501,113 +427,114 @@ const treeInitialized = (grid) => {
 
 //그리드 설정
 const onInitialized = (grid) => {
-  console.log(grid);
   grid.autoSizeRow(0, true);
 
   grid.formatItem.addHandler((flex, e) => {
+    console.log(flex);
+    console.log(e);
     //헤더에 html태그 사용하게 하는 설정
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
     }
   });
 
-  //-----------------------------------------------------
-  const config = {
-    groupingColumns: ['vendorName'],
-    mergedColumns: ['vendorName', 'inspectionQuantity', 'passItemQuantity', 'labelingItemQuantity'],
-  };
-  grid.mergeManager = new SimpleMergeManager(config);
-  //-----------------------------------------------------
-
   //그리드 셀렉션모드 설정(None)
   grid.selectionMode = 0;
 };
 </script>
 
-<style>
-.ow-panel .ow-panel-body1 {
-  display: flex;
-  /* flex-direction: column; */
-  flex: 1;
-  border: 2px solid #6980af;
-  border-top: 0;
-  background-color: #fff;
-  padding: var(--ow-gutter);
-}
-.wj-cell.wj-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: inherit;
-}
+<style scoped lang="scss">
+::v-deep {
+  // .ow-panel .ow-panel-body1 {
+  //   display: flex;
+  //   /* flex-direction: column; */
+  //   flex: 1;
+  //   border: 2px solid #6980af;
+  //   border-top: 0;
+  //   background-color: #fff;
+  //   padding: var(--ow-gutter);
+  // }
 
-.progress-bar-success {
-  background-color: #198754;
-}
+  .wj-cell.wj-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: inherit;
+  }
 
-.progress-bar-warning {
-  background-color: #ffc107;
-}
+  .ow-grid .wj-cell.wj-header {
+    color: #333333;
+    background-color: #e9ecef;
+  }
 
-.progress-bar-done {
-  background-color: #0d6efd;
-}
+  .progress-bar-success {
+    background-color: #198754;
+  }
 
-.progress-bar-normal {
-  background-color: #495057;
-}
+  .progress-bar-warning {
+    background-color: #ffc107;
+  }
 
-.border {
-  border: 1px solid black;
-  background-color: grey;
-  color: white;
-  text-align: center;
-}
+  .progress-bar-done {
+    background-color: #0d6efd;
+  }
 
-table th,
-table td {
-  border: 1px solid #d7dce3;
-  padding-right: 0;
-  padding-left: 0;
-  height: 0;
-  vertical-align: middle;
-}
+  .progress-bar-normal {
+    background-color: #495057;
+  }
 
-.progress {
-  display: flex;
-  height: 1rem;
-  overflow: hidden;
-  font-size: 0.75rem;
-  background-color: #e9ecef;
-  border-radius: 0;
-}
+  .border {
+    border: 1px solid black;
+    background-color: grey;
+    color: white;
+    text-align: center;
+  }
 
-.progress-none {
-  display: flex;
-  height: 1rem;
-  overflow: hidden;
-  font-size: 0.75rem;
-  border-radius: 0;
-}
+  table th,
+  table td {
+    border: 1px solid #d7dce3;
+    padding-right: 0;
+    padding-left: 0;
+    height: 0;
+    vertical-align: middle;
+  }
 
-.progress-bar {
-  display: flex;
-  flex-direction: column;
-  /* justify-content: center; */
-  overflow: hidden;
-  color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  transition: width 0.6s ease;
-}
+  .progress {
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+    font-size: 0.75rem;
+    background-color: #e9ecef;
+    border-radius: 0;
+  }
 
-.normal-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-  color: red;
-  text-align: center;
-  white-space: nowrap;
+  .progress-none {
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+    font-size: 0.75rem;
+    border-radius: 0;
+  }
+
+  .progress-bar {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    overflow: hidden;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    transition: width 0.6s ease;
+  }
+
+  .normal-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    color: red;
+    text-align: center;
+    white-space: nowrap;
+  }
 }
 </style>
