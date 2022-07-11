@@ -7,6 +7,7 @@ async function getStatus() {
   let response = null;
   try {
     response = await axios.get('/label/getStatus');
+    console.log(response);
   } catch (error) {
     console.log(error);
   }
@@ -58,11 +59,11 @@ async function getTreeList() {
 }
 
 //담당자 이름 기준으로 작업 세부사항 api 요청
-async function getListByEmployeeName(employeeName, searchSelected, searchContent, pageNo, pageSize) {
+async function getListByLWTNo(labelingWorkTimeNo, searchSelected, searchContent, pageNo, pageSize) {
   let response = null;
   try {
-    response = await axios.get('/label/getListByEmployeeName', {
-      params: { employeeName, searchSelected, searchContent, pageNo, pageSize },
+    response = await axios.get('/label/getListByLWTNo', {
+      params: { labelingWorkTimeNo, searchSelected, searchContent, pageNo, pageSize },
     });
     console.log(response);
     response.data.data.map((data) => {
@@ -81,5 +82,5 @@ async function getListByEmployeeName(employeeName, searchSelected, searchContent
 export default {
   getStatus,
   getTreeList,
-  getListByEmployeeName,
+  getListByLWTNo,
 };

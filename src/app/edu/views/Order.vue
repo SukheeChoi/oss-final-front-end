@@ -8,7 +8,7 @@
       </div>
     </div>
     <hr />
-    <!-- 배열을 이용한 동적 체크박스  -->
+    <!-- 배열을 이용한 동적 헤더  -->
     <div class="ow-flex-wrap item-size-content mt-5" style="--gap: 10px">
       <ow-filter-checkbox :items="companyCheckbox" v-model:modelValue="selectCompany" label="회사" />
       <ow-filter-checkbox :items="shippingCheckbox" v-model="selectShipping" label="배송구분" />
@@ -63,7 +63,7 @@
         <wj-flex-grid-column-group
           binding="itemName"
           header="품목명"
-          :width="130"
+          :width="150"
           :wordWrap="true"
           :multiLine="true"
           cssClassAll="border-left"
@@ -115,11 +115,11 @@ import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
 const orderStatus = ref([
-  { name: '전체 : ', value: '', end: '건', plus: '품목/', plusValue: '1', plusend: '개'},
+  { name: '전체 : ', value: '', end: '건' },
   { name: '오스템 : ', value: '', end: '건' },
   { name: '협력사합배송 : ', value: '', end: '건' },
   { name: '협력사직배송 : ', value: '', end: '건' },
-  { name: '미출고 : ', value: '', end: '건', color: 'red' },
+  { name: '미출고 : ', value: '', end: '건', color: "red" },
 ]);
 
 const companyCheckbox = ref([
@@ -129,19 +129,19 @@ const companyCheckbox = ref([
   { name: '협력사상품(직배송)', value: 'vendorproductDir' },
 ]);
 
-const checkboxGroup2 = ref([
+const shippingCheckbox = ref([
   { name: '긴급', value: 'emergency' },
   { name: '일반', value: 'normal' },
 ]);
 
-const checkboxGroup3 = ref([
+const unreleaseCheckbox = ref([
   { name: '출고', value: 'released' },
   { name: '미출고', value: 'unreleased' },
 ]);
 
-const checkboxGroup4 = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
-const checkboxGroup5 = ref(['emergency', 'normal']);
-const checkboxGroup6 = ref(['released', 'unreleased']);
+const selectCompany = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
+const selectShipping = ref(['emergency', 'normal']);
+const selectUnrelease = ref(['released', 'unreleased']);
 
 const getData = ref([]);
 const keyData = ref(0);
@@ -164,11 +164,11 @@ async function getStatus() {
     console.log(data);
   });
 }
-// getStatus();
+getStatus();
 
 //그리드에 바인딩 하는 함수
 getData.value = async function (query, pageNo, pageSize) {
-  console.log(pageNo, pageSize, checkboxGroup4.value, checkboxGroup5.value, checkboxGroup6.value);
+  console.log(pageNo, pageSize, selectCompany.value, selectShipping.value, selectUnrelease.value);
   //pageNo = "페이지번호"
   //pageSize = "한페이지 몇 행"
   //totalCount = "전체 행 수"
@@ -187,7 +187,7 @@ getData.value = async function (query, pageNo, pageSize) {
   const page = { pageNo, pageSize: 20 };
 
   const result = {
-    ...lee,
+    ...list,
     pageNo,
   };
 
@@ -197,7 +197,7 @@ getData.value = async function (query, pageNo, pageSize) {
 const onInitialized = (grid) => {
   //병합 기준 컬럼과, 병합 컬럼 설정
   const config = {
-    groupingColumns: ['orderDate'],
+    groupingColumns: ['orderNo'],
     mergedColumns: ['orderDate', 'orderNo', 'clientName'],
   };
 
@@ -223,30 +223,30 @@ function getSearchList() {
   keyData.value++;
 }
 </script>
-<style lang="scss">
-::v-deep {
-.wj-cell.wj-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: inherit;
-}
+<style scoped lang="scss">
+:deep {
+  .wj-cell.wj-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: inherit;
+  }
 
-.ow-grid .wj-cell.wj-header {
-  color: #333333;
-  background-color: #e9ecef;
-}
+  .ow-grid .wj-cell.wj-header {
+    color: #333333;
+    background-color: #e9ecef;
+  }
 
-.wj-cell.border-left {
-  display: flex;
-  align-items: center;
-  line-height: inherit;
-}
+  .wj-cell.border-left {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
 
-.wj-cell.border-center {
-  display: flex;
-  align-items: center;
-  line-height: inherit;
-}
+  .wj-cell.border-center {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
 }
 </style>
