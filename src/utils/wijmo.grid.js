@@ -635,8 +635,8 @@ class SimMergeManager extends MergeManager {
   }
 
   colMergedRange(p, r) {
-    console.log(p);
-    console.log(r);
+    // console.log(p);
+    // console.log(r);
     for (let i = r.col; i > 0; i -= 1) {
       if (this.equals(p, r.row, i, 'col_prev')) {
         r.col = i - 1;

@@ -42,9 +42,6 @@ import OwTreeGrid from '@/components/grid/new/OwTreeGrid';
 
 import OwOrgTreeView from '@/components/tree/OwOrgTreeView';
 
-
-
-
 export function registerWijmo(app) {
   registerCore(app);
   registerInput(app);
