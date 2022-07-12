@@ -3,12 +3,12 @@
     <b-col>
       <div class="ow-flex-wrap">
         <div class="item size-fix" style="--gap-item: 6px">
-          <ow-status-bar label="현황" :items="orderStatus" :status="statusBar"></ow-status-bar>
+          <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
         </div>
       </div>
     </b-col>
     <hr />
-    <!-- 배열을 이용한 동적 헤더  -->
+    <!-- 배열을 이용한 동적 체크박스  -->
     <div class="ow-flex-wrap item-size-content mt-5" style="--gap: 10px">
       <ow-filter-checkbox :items="companyCheckbox" v-model:modelValue="selectCompany" label="회사" />
       <ow-filter-checkbox :items="shippingCheckbox" v-model="selectShipping" label="배송구분" />
@@ -87,7 +87,7 @@
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="협력사">
         <wj-flex-grid-column-group binding="orderShippingWay" header="배송방식" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="orderCheckDate" header="주문확인<br>일시" :width="100" align="center" />
+        <wj-flex-grid-column-group binding="orderCheckDate" header="주문확인<br>일시" :width="150" align="center" />
         <wj-flex-grid-column-group binding="releaseQuantity" header="출고수량" :width="50" align="center" />
         <wj-flex-grid-column-group binding="releaseScheduleDate" header="출고예정<br>일자" :width="60" align="center" />
         <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="100" align="center" />
@@ -115,11 +115,11 @@ import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
 const orderStatus = ref([
-  { name: '전체 : ', value: '', end: '건' },
+  { name: '전체 : ', value: '', end: '건'},
   { name: '오스템 : ', value: '', end: '건' },
   { name: '협력사합배송 : ', value: '', end: '건' },
   { name: '협력사직배송 : ', value: '', end: '건' },
-  { name: '미출고 : ', value: '', end: '건' },
+  { name: '미출고 : ', value: '', end: '건', color: 'red' },
 ]);
 
 const companyCheckbox = ref([
@@ -210,50 +210,48 @@ const onInitialized = (grid) => {
   });
 };
 
-watch(keyData, (newUserId, oldUserId) => {
-  console.group('userId 변경 감시');
-  console.log('newUserId:', newUserId);
-  console.log('oldUserId:', oldUserId);
-  console.groupEnd();
-});
-
 //체크박스, 검색버튼 감시해서 read 재호출
 watch(
-  () => [selectCompany, selectShipping, selectUnrelease, selectButton],
+  () => [selectCompany, selectShipping, selectUnrelease],
   (newGroup, oldGroup) => {
-    console.log('aaaaaaaaaaaaaaaaaaaaaaaa');
     keyData.value++;
-    selectButton.value = false;
   },
   { deep: true }
 );
 
 //검색 클릭 버튼
 function getSearchList() {
-  selectButton.value = true;
+  keyData.value++;
 }
 </script>
-<style>
+<style lang="scss">
+:deep {
 .wj-cell.wj-header {
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: inherit;
 }
-
+}
+:deep {
 .ow-grid .wj-cell.wj-header {
   color: #333333;
   background-color: #e9ecef;
 }
+}
+:deep {
 .wj-cell.border-left {
   display: flex;
   align-items: center;
   line-height: inherit;
 }
-
+}
+:deep {
 .wj-cell.border-center {
   display: flex;
   align-items: center;
   line-height: inherit;
 }
+}
+
 </style>
