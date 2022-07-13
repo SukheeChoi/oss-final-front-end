@@ -79,7 +79,7 @@ export default {
     const one = ref(null);
 
     const state = reactive({
-      show: false,
+      show: true,
       control: null,
       data: {},
       unique: expando('ow-modal-once'),
