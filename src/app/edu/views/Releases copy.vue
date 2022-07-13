@@ -111,7 +111,7 @@
       <!-- 출고검수/패킹 탭 -->
       <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm border-center">
         <wj-flex-grid-column-group
-          binding="RLS_NO"
+          binding="release.releaseCode"
           header="출고번호"
           align="center"
           :width="80"
@@ -119,28 +119,28 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="ITM_NAME"
+          binding="item.itemName"
           header="품목명"
           align="left"
           width="*"
           cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
-          binding="ITM_CODE"
+          binding="orderItem.itemCode"
           header="품목코드"
           align="left"
           :width="110"
           cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
-          binding="PIC_QTY"
+          binding="picking.pickingQuantity"
           header="피킹수량"
           align="right"
           :width="50"
           cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
-          binding="RI_QTY"
+          binding="releaseInspection.releaseInspectionQuantity"
           header="검수수량"
           align="right"
           :width="50"
@@ -148,14 +148,14 @@
         />
         <!-- 합산 불필요(로직변경) -->
         <wj-flex-grid-column-group
-          binding="RI_URLS"
+          binding="orderItem.orderItemUnreleaseQuantity"
           header="미출고수량"
           align="right"
           :width="55"
           cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
-          binding="CLT_NAME"
+          binding="client.clientName"
           header="거래처"
           align="left"
           :width="100"
@@ -163,7 +163,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="ORD_SHP_DEST"
+          binding="order.shippingDestination"
           header="배송지"
           align="left"
           :width="100"
@@ -171,7 +171,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="ORD_SHP_CAT"
+          binding="order.shippingCategory"
           header="배송구분"
           align="center"
           :width="70"
@@ -179,7 +179,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="ORD_SHP_WAY"
+          binding="order.shippingWay"
           header="배송방식"
           align="center"
           :width="70"
@@ -187,7 +187,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="RI_EMP_NAME"
+          binding="releaseInspectionEmployeeName"
           header="담당자"
           align="center"
           :width="60"
@@ -195,7 +195,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="RI_RLS_PRT_DT"
+          binding="strReleasePrintDate"
           header="출고요청서
           출력일시          "
           align="center"
@@ -205,7 +205,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="RI_RCPT_PRT_DT"
+          binding="strReceiptPrintDate"
           header="거래명세서
           출력일시          "
           align="center"
@@ -215,7 +215,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="RI_DT"
+          binding="strReleaseInspectionDate"
           header="검수일시"
           align="center"
           :width="90"
@@ -223,7 +223,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="PAC_BX_QTY"
+          binding="release.boxQuantity"
           header="Box수량"
           align="right"
           :width="60"
@@ -234,7 +234,7 @@
       <!-- 출고 탭 -->
       <wj-flex-grid-column-group header="출고" align="center">
         <wj-flex-grid-column-group
-          binding="RLS_EMP_NAME"
+          binding="releaseEmployeeName"
           header="담당자"
           align="center"
           :width="60"
@@ -242,7 +242,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="RLS_SHP_CPN"
+          binding="release.shippingCompany"
           header="택배사"
           align="center"
           :width="70"
@@ -250,7 +250,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="RLS_RLS_IVC_CODE"
+          binding="release.invoiceCode"
           header="송장번호"
           align="left"
           :width="100"
@@ -259,7 +259,7 @@
         />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group
-        binding="PAC_NT"
+        binding="orderItem.orderItemNote"
         header="비고"
         align="center"
         :width="100"
@@ -267,7 +267,7 @@
         :allowMerging="true"
       >
       <wj-flex-grid-column-group
-        binding="PAC_NT"
+        binding="orderItem.orderItemNote"
         header="비고"
         align="center"
         :width="100"

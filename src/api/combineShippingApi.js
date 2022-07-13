@@ -9,7 +9,7 @@ async function getVendorList(toDo=1, dateList=Array.from([])) {
     let params = new URLSearchParams();
     params.append('toDo', toDo);
     params.append('dateList', Array.from(dateList));
-    const response = await axios.post(`/combineShipping/getVendorList`, params);
+    const response = await axios.post(`/combineShipping/vendorList`, params);
     vendorList = response.data;
     console.log('## vendorList : ', vendorList);
   } catch(error) {
@@ -19,18 +19,16 @@ async function getVendorList(toDo=1, dateList=Array.from([])) {
 }
 
 // 날짜 필터링을 통한 수령 목록 조회.
-async function getReceiptListByDate(dateList) {
-  let receiptList = null;
-  try {
-    const response = await axios.post(`/combineShipping/getReceiptListByDate`, dateList);
-    receiptList = response.data;
-  } catch(error) {
-    console.log(error);
-  }
-  return receiptList;
-}
-
-// 선택된 날짜에 해당하는 목록 조회.
+// async function getReceiptListByDate(dateList) {
+//   let receiptList = null;
+//   try {
+//     const response = await axios.post(`/combineShipping/getReceiptListByDate`, dateList);
+//     receiptList = response.data;
+//   } catch(error) {
+//     console.log(error);
+//   }
+//   return receiptList;
+// }
 
 // 담당자 띄우기. 이름과 코드 필요.
 async function getAssigneeList(toDo=1, dateList=Array.from([])) {
@@ -39,7 +37,7 @@ async function getAssigneeList(toDo=1, dateList=Array.from([])) {
     let params = new URLSearchParams();
     params.append('toDo', toDo);
     params.append('dateList', Array.from(dateList));
-;    const response = await axios.post(`/combineShipping/getAssignee`, params);
+;    const response = await axios.post(`/combineShipping/assigneeList`, params);
     assigneeList = response.data;
     console.log('## assigneeList : ', assigneeList);
   } catch(error) {
@@ -76,7 +74,7 @@ async function getDeliveryList(toDo=1, selectedAssignee='전체', dateList=Array
     params.append('toDo', toDo);
     params.append('employeeName', selectedAssignee);
     params.append('dateList', Array.from(dateList));
-    const response = await axios.post(`/combineShipping/getDeliveryList`, params);
+    const response = await axios.post(`/combineShipping/deliveryList`, params);
     deliveryList = response.data;
   } catch(error) {
     console.log(error);
