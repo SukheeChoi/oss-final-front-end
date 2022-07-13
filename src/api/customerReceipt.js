@@ -33,6 +33,7 @@ async function getFilterList(filterList) {
     console.log("api - filterList.clientName : " + filterList.clientName);
     const response = await axios.post(`/client/getFilterList`, filterList);
     receiptList = response.data.list;
+    console.log("api - receiptList : " + receiptList[0]['unrelease']);
   } catch (error) {
     console.log(error);
   }
