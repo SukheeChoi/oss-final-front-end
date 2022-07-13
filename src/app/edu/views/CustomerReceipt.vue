@@ -11,7 +11,6 @@
           <div class="ow-flex-wrap">
             <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
-              <!-- 컴포넌트화 하기-->
               <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
               <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
               <!-- 퍼센트마다 progress바 다르게 적용 -->
@@ -200,12 +199,7 @@
       </div>
     </div>
     <div>
-      <ow-n-grid :n="10"
-                :visible-rows-count="state.visibleRowsCount"
-                :initialized="initialize"
-                :key="keyData"
-                :read="read"
-                :autoRowHeights="true">
+      <ow-n-grid :n="10" :visible-rows-count="state.visibleRowsCount" :initialized="initialize" :key="keyData" :read="read" :autoRowHeights="true">
         <template #left>&nbsp;</template>
         <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
@@ -238,6 +232,7 @@
 
 <script setup>
 import OwNGrid from '@/components/grid/new/OwNGrid';
+import StatusProgressBar from '@/components/progress/StatusProgressBar';
 import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
 
@@ -268,65 +263,6 @@ const filterList = ref({
   orderNo: '',
   clientName: '',
 });
-
-//보여지는 행 수
-const state = reactive({
-  visibleRowsCount: 16,
-});
-
-//ngrid 페이지 설정
-const retrieve = (param) => {
-  let filteredItems = _.cloneDeep(receiptList.value); //cloneDeep : 객체 복사
-  const totalCount = filteredItems.length;
-  if (param.sort) {
-    filteredItems = _.sortBy(filteredItems, param.sort);
-    if (['desc', 'DESC'].includes(param.direction)) {
-      filteredItems = filteredItems.reverse();
-    }
-  }
-  if (param.pageNo) {
-    filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 16, param.pageSize ?? 16);
-  }
-
-  return Promise.resolve({
-    data: filteredItems,
-    status: 200,
-    code: 'OK',
-    message: 'Success',
-    totalCount,
-  });
-};
-
-async function read(query, pageNo, pageSize) {
-  const result = await retrieve({
-    ...query,
-    pageNo,
-    pageSize: 16,
-  });
-  return result;
-}
-
-//초기화
-const initialize = (s) => {
-  //flexGrid 선택 모드 설정 => 선택 안되도록
-  s.selectionMode = 'None';
-
-  //미출고일 때 cssClass 적용
-  s.itemFormatter = (panel, r) => {
-    //r번째 행 선언
-    let row = panel.rows[r];
-    //헤더가 아닌 경우
-    if (row._idxData !== -1) {
-      //미출고 값이 true인 경우
-      if (row._data.unrelease >= 1) {
-        //적용되어 있는 cssClass가 없을 때
-        if (row.cssClass === null) {
-          panel.rows[r].cssClass = 'ifUnrelease';
-        }
-      }
-    }
-  };
-};
 
 //배송구분
 const checkboxGroup1 = ref([
@@ -418,10 +354,69 @@ async function getFilterList(afterFilterList) {
   });
 }
 
+//보여지는 행 수
+const state = reactive({
+  visibleRowsCount: 16,
+});
+
+//ngrid 페이지 설정
+const retrieve = (param) => {
+  let filteredItems = _.cloneDeep(receiptList.value); //cloneDeep : 객체 복사
+  const totalCount = filteredItems.length;
+  if (param.sort) {
+    filteredItems = _.sortBy(filteredItems, param.sort);
+    if (['desc', 'DESC'].includes(param.direction)) {
+      filteredItems = filteredItems.reverse();
+    }
+  }
+  if (param.pageNo) {
+    filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 16, param.pageSize ?? 16);
+  }
+
+  return Promise.resolve({
+    data: filteredItems,
+    status: 200,
+    code: 'OK',
+    message: 'Success',
+    totalCount,
+  });
+};
+
+async function read(query, pageNo, pageSize) {
+  const result = await retrieve({
+    ...query,
+    pageNo,
+    pageSize: 16,
+  });
+  return result;
+}
+
+//초기화
+const initialize = (s) => {
+  //flexGrid 선택 모드 설정 => 선택 안되도록
+  s.selectionMode = 'None';
+
+  //미출고일 때 cssClass 적용
+  s.itemFormatter = (panel, r) => {
+    //r번째 행 선언
+    let row = panel.rows[r];
+    //헤더가 아닌 경우
+    if (row._idxData !== -1) {
+      //미출고 값이 true인 경우
+      if (row._data.unrelease >= 1) {
+        //적용되어 있는 cssClass가 없을 때
+        if (row.cssClass === null) {
+          panel.rows[r].cssClass = 'ifUnrelease';
+        }
+      }
+    }
+  };
+};
+
 //주문 단계 별 건수 요청
 async function getStsCnt() {
   const stsCnt = await clientApi.getStatusCnt();
-  statusOrd.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4]+stsCnt[5] + stsCnt[6];
+  statusOrd.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4] + stsCnt[5] + stsCnt[6];
   statusPick.value = stsCnt[2] + stsCnt[3] + stsCnt[4] + stsCnt[5] + stsCnt[6];
   statusPack.value = stsCnt[4] + stsCnt[5] + stsCnt[6];
   statusRls.value = stsCnt[5] + stsCnt[6];
