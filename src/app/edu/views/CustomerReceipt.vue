@@ -14,8 +14,8 @@
               <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
               <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
               <!-- 퍼센트마다 progress바 다르게 적용 -->
-              <progress class="low" v-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
-              <progress class="mid" v-else-if="percentOrd < 100" :value="percentOrd" :max="100"></progress>
+              <progress class="low" v-if="percentOrd < 60" :value="percentOrd" :max="100"></progress>
+              <progress class="mid" v-else-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
               <progress class="high" v-else :value="percentOrd" :max="100"></progress>
             </div>
           </div>
@@ -23,7 +23,7 @@
           <div class="ow-flex-wrap">
             <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">
-              200건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 200 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
+              300건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 300 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
             </div>
           </div>
           <div class="ow-flex-wrap">
@@ -41,8 +41,8 @@
             <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <span :data-value="percentPick" :style="`width: ${percentPick}%`">{{ percentPick }}%</span>
-              <progress class="low" v-if="percentPick < 80" :value="percentPick" max="100"></progress>
-              <progress class="mid" v-else-if="percentPick < 100" :value="percentPick" max="100"></progress>
+              <progress class="low" v-if="percentPick < 60" :value="percentPick" max="100"></progress>
+              <progress class="mid" v-else-if="percentPick < 80" :value="percentPick" max="100"></progress>
               <progress class="high" v-else :value="percentPick" max="100"></progress>
             </div>
           </div>
@@ -66,8 +66,8 @@
             <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <span :data-value="percentPack" :style="`width: ${percentPack}%`">{{ percentPack }}%</span>
-              <progress class="low" v-if="percentPack < 80" :value="percentPack" max="100"></progress>
-              <progress class="mid" v-else-if="percentPack < 100" :value="percentPack" max="100"></progress>
+              <progress class="low" v-if="percentPack < 60" :value="percentPack" max="100"></progress>
+              <progress class="mid" v-else-if="percentPack < 80" :value="percentPack" max="100"></progress>
               <progress class="high" v-else :value="percentPack" max="100"></progress>
             </div>
           </div>
@@ -91,8 +91,8 @@
             <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <span :data-value="percentRls" :style="`width: ${percentRls}%`">{{ percentRls }}%</span>
-              <progress class="low" v-if="percentRls < 80" :value="percentRls" max="100"></progress>
-              <progress class="mid" v-else-if="percentRls < 100" :value="percentRls" max="100"></progress>
+              <progress class="low" v-if="percentRls < 60" :value="percentRls" max="100"></progress>
+              <progress class="mid" v-else-if="percentRls < 80" :value="percentRls" max="100"></progress>
               <progress class="high" v-else :value="percentRls" max="100"></progress>
             </div>
           </div>
@@ -116,8 +116,8 @@
             <div class="item txt-dot-square">계획 대비 실적 달성률</div>
             <div class="progress-bar">
               <span :data-value="percentTrf" :style="`width: ${percentTrf}%`">{{ percentTrf }}%</span>
-              <progress class="low" v-if="percentTrf < 80" :value="percentTrf" max="100"></progress>
-              <progress class="mid" v-else-if="percentTrf < 100" :value="percentTrf" max="100"></progress>
+              <progress class="low" v-if="percentTrf < 60" :value="percentTrf" max="100"></progress>
+              <progress class="mid" v-else-if="percentTrf < 80" :value="percentTrf" max="100"></progress>
               <progress class="high" v-else :value="percentTrf" max="100"></progress>
             </div>
           </div>
@@ -199,13 +199,19 @@
       </div>
     </div>
     <div>
-      <ow-n-grid :n="9" :initialized="initialize" :key="keyData" :read="read" :autoRowHeights="true" :visible-rows-count="state.visibleRowsCount">
+      <ow-n-grid :n="9"
+                :pageSize="state.parPage"
+                :visible-rows-count="state.visibleRowsCount"
+                :initialized="initialize"
+                :key="keyData"
+                :read="read"
+                :autoRowHeights="true">
         <template #left>&nbsp;</template>
         <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 행 스타일을 미출고 값에 따라 다르게 적용 -->
-            <p v-if="cell.item.unrelease" class="ow-tag type-category">
+            <p v-if="cell.item.unrelease >= 1" class="ow-tag type-category">
               <i class="u">미</i>
             </p>
             <span :style="cell.item.unrelease ? 'color: rgb(210, 57, 46)' : ''">
@@ -220,9 +226,9 @@
             <!-- 주문 단계에 따라 아이콘 적용 -->
             <span class="ow-tag type-category"><i class="o">주</i></span>
             <span class="ow-tag type-category"><i :class="cell.item.level >= 2 ? 'p' : 'n'">피</i></span>
-            <span class="ow-tag type-category"><i :class="cell.item.level >= 3 ? 'i' : 'n'">검</i></span>
-            <span class="ow-tag type-category"><i :class="cell.item.level >= 4 ? 'r' : 'n'">출</i></span>
-            <span class="ow-tag type-category"><i :class="cell.item.level >= 5 ? 't' : 'n'">인</i></span>
+            <span class="ow-tag type-category"><i :class="cell.item.level >= 4 ? 'i' : 'n'">검</i></span>
+            <span class="ow-tag type-category"><i :class="cell.item.level >= 5 ? 'r' : 'n'">출</i></span>
+            <span class="ow-tag type-category"><i :class="cell.item.level >= 6 ? 't' : 'n'">인</i></span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
       </ow-n-grid>
@@ -295,9 +301,13 @@ async function read(query, pageNo, pageSize) {
   return result;
 }
 
+// //불러오는 행 수
+// const perPage = ref(16);
+
 //보여지는 행 수
 const state = reactive({
   visibleRowsCount: 16,
+  perPage: 16
 });
 
 //초기화
@@ -312,7 +322,7 @@ const initialize = (s) => {
     //헤더가 아닌 경우
     if (row._idxData !== -1) {
       //미출고 값이 true인 경우
-      if (row._data.unrelease === true) {
+      if (row._data.unrelease >= 1) {
         //적용되어 있는 cssClass가 없을 때
         if (row.cssClass === null) {
           panel.rows[r].cssClass = 'ifUnrelease';
@@ -330,12 +340,12 @@ const checkboxGroup1 = ref([
 
 //주문 단계
 const checkboxGroup3 = ref([
-  { name: '전체', value: '0' },
+  { name: '전체', value: '-1' },
   { name: '주문확인', value: '1' },
   { name: '피킹', value: '2' },
-  { name: '출고검수', value: '3' },
-  { name: '출고', value: '4' },
-  { name: '택배사 인계', value: '5' },
+  { name: '출고검수', value: '4' },
+  { name: '출고', value: '5' },
+  { name: '택배사 인계', value: '6' },
 ]);
 
 const searchCategoryList = [
@@ -345,7 +355,7 @@ const searchCategoryList = [
 
 // filter 초기값 : 배송구분 : '긴급', '일반', 주문 단계 : '0', 미출고만 보기 : 'false'
 const checkboxGroup2 = ref(['긴급', '일반']);
-const checkboxGroup4 = ref('0');
+const checkboxGroup4 = ref('-1');
 const checkbox1 = ref(false);
 
 const keyData = ref(0);
@@ -406,7 +416,7 @@ async function getFilterList(afterFilterList) {
       receiptList.value.push({
         client: data[i]['client']['clientName'],
         level: data[i]['status'],
-        unrelease: data[i]['orderUnrelease'],
+        unrelease: data[i]['orderItem']['unreleaseQuantity'],
       });
     }
   });
@@ -415,13 +425,13 @@ async function getFilterList(afterFilterList) {
 //주문 단계 별 건수 요청
 async function getStsCnt() {
   const stsCnt = await clientApi.getStatusCnt();
-  statusOrd.value = stsCnt[0] + stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4];
-  statusPick.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4];
-  statusPack.value = stsCnt[2] + stsCnt[3] + stsCnt[4];
-  statusRls.value = stsCnt[3] + stsCnt[4];
-  statusTrf.value = stsCnt[4];
+  statusOrd.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4]+stsCnt[5] + stsCnt[6];
+  statusPick.value = stsCnt[2] + stsCnt[3] + stsCnt[4] + stsCnt[5] + stsCnt[6];
+  statusPack.value = stsCnt[4] + stsCnt[5] + stsCnt[6];
+  statusRls.value = stsCnt[5] + stsCnt[6];
+  statusTrf.value = stsCnt[6];
   //주문 단계마다 완료 퍼센트
-  percentOrd.value = parseInt((statusOrd.value / 200) * 100);
+  percentOrd.value = parseInt((statusOrd.value / 300) * 100);
   percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
   percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
   percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
@@ -490,7 +500,8 @@ getunrlsCnt();
   font-weight: 600;
 }
 
-.ow-flex-wrap .filter-checkbox-label,.filter-radio-label {
+.ow-flex-wrap .filter-checkbox-label,
+.filter-radio-label {
   margin-left: 5px;
   margin-right: 0;
 }
