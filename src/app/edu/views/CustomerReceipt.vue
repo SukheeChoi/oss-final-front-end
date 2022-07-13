@@ -1,3 +1,4 @@
+<!-- 김예원 -->
 <template>
   <div>
     <div class="row mb-4">
@@ -199,8 +200,7 @@
       </div>
     </div>
     <div>
-      <ow-n-grid :n="9"
-                :pageSize="state.parPage"
+      <ow-n-grid :n="10"
                 :visible-rows-count="state.visibleRowsCount"
                 :initialized="initialize"
                 :key="keyData"
@@ -269,6 +269,11 @@ const filterList = ref({
   clientName: '',
 });
 
+//보여지는 행 수
+const state = reactive({
+  visibleRowsCount: 16,
+});
+
 //ngrid 페이지 설정
 const retrieve = (param) => {
   let filteredItems = _.cloneDeep(receiptList.value); //cloneDeep : 객체 복사
@@ -296,19 +301,10 @@ async function read(query, pageNo, pageSize) {
   const result = await retrieve({
     ...query,
     pageNo,
-    pageSize,
+    pageSize: 16,
   });
   return result;
 }
-
-// //불러오는 행 수
-// const perPage = ref(16);
-
-//보여지는 행 수
-const state = reactive({
-  visibleRowsCount: 16,
-  perPage: 16
-});
 
 //초기화
 const initialize = (s) => {
