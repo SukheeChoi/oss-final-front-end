@@ -1,20 +1,34 @@
 <template>
-  <div class="ow-flex-wrap">
-    <div class="item">계획 대비 실적 달성률</div>
-    <div class="progress-bar">
-      <!-- 컴포넌트화 하기-->
-      <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
-      <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
-      <!-- 퍼센트마다 progress바 다르게 적용 -->
-      <progress class="low" v-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
-      <progress class="mid" v-else-if="percentOrd < 100" :value="percentOrd" :max="100"></progress>
-      <progress class="high" v-else :value="percentOrd" :max="100"></progress>
-    </div>
-  </div>
-
-  <div>
-    
-  </div>
+  <div class="ow-panel">
+        <div class="ow-panel-header">
+          <!-- 주문 단계를 누르면 해당 단계 관리 페이지로 이동 -->
+          <div class="ow-panel-title" onclick="location.href='/edu/Order'">주문</div>
+        </div>
+        <div class="ow-panel-body">
+          <div class="ow-flex-wrap">
+            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
+            <div class="progress-bar">
+              <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
+              <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
+              <!-- 퍼센트마다 progress바 다르게 적용 -->
+              <progress class="low" v-if="percentOrd < 60" :value="percentOrd" :max="100"></progress>
+              <progress class="mid" v-else-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
+              <progress class="high" v-else :value="percentOrd" :max="100"></progress>
+            </div>
+          </div>
+          <hr />
+          <div class="ow-flex-wrap">
+            <div class="item txt-dot-square">계획</div>
+            <div class="align-to-right">
+              300건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 300 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
+            </div>
+          </div>
+          <div class="ow-flex-wrap">
+            <div class="item txt-dot-square">실적</div>
+            <div class="align-to-right">{{ statusOrd }}건</div>
+          </div>
+        </div>
+      </div>
 </template>
 
 <script setup></script>
@@ -62,5 +76,6 @@
   display: inline-block;
   color: white;
   text-align: center;
+  font-weight: 600;
 }
 </style>
