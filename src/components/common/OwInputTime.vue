@@ -47,6 +47,7 @@ export default {
   },
   setup(props, { emit }) {
     const root = ref(null);
+    console.log(props);
 
     const state = reactive({
       control: {
@@ -59,6 +60,7 @@ export default {
     });
 
     const initialized = (timer) => {
+      console.log(timer);
       timer.text = state.control.text || state.min;
       state.control = timer;
     };
