@@ -555,7 +555,8 @@ export class NGridRestCollectionView extends GridRestCollectionView {
     }
     const fn = this._getItems.bind(this);
     const pageNo = this.pageIndex * this.n + this.i;
-    const result = await fn(this.query, +pageNo, this.pageSize);
+    const result = await fn(this.query, +pageNo, this.pageSize, this.pageIndex);
+    // const result = await fn(this.query, +pageNo, this.pageSize);
     const { totalCount: totalItemCount, data: items } = result;
     this._totalItemCount = totalItemCount;
     return items;

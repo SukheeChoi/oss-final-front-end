@@ -58,7 +58,6 @@
   >
     <!-- :pageSize="30" -->
     <!-- v-model="pager.pageNo"
-    :read="read"
     :totalCount="53"
     :total-rows="pager.totalRows"
     :per-page="pager.perPage" -->
@@ -136,8 +135,10 @@
   const selectedAssignee = ref('전체');
   const dateList = ref([startDate.value, endDate.value]);
   const pager = reactive({
+    // 페이지 인덱스
+    pageIndex: 0
     // 페이지 번호
-    pageNo: 1
+    , pageNo: 1
     // 전체 행 수
     , totalCount: 0
     // 페이지 당 행 수
@@ -213,7 +214,7 @@
   };
 
   const retrieve = (param) => {
-    console.log('@@ retrieve - param : ', param);
+    console.log('param', param);
     console.log('param.items.length : ' + param.items.length);
     console.log('param.label : ' + param.label);
     let items = _.cloneDeep(param.items);
@@ -261,44 +262,35 @@
     // const totalCount = filteredItems.length;
     const totalCount = pager.totalCount;
     const perPage = pager.perPage;
-
-    // if (param.sort) {
-    //   filteredItems = _.sortBy(filteredItems, param.sort);
-    //   if (['desc', 'DESC'].includes(param.direction)) {
-    //     filteredItems = filteredItems.reverse();
-    //   }
-    // }
-    // if (param.pageNo) {
-    //   filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
-    // }
-    if (param.pageNo) {
-      if(filteredItems.length < param.pageSize) {
-
-      } else {
-        filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
+    // const pageNo = pager.pageNo;
+    // const pageSize = 20;
+    if (param.sort) {
+      filteredItems = _.sortBy(filteredItems, param.sort);
+      if (['desc', 'DESC'].includes(param.direction)) {
+        filteredItems = filteredItems.reverse();
       }
     }
-    // console.log('@@ filteredItems.length : ', filteredItems.length);
-    // if(items != null && filteredItems.length < param.pageSize) {
-    //   console.log('@@ if(filteredItems.length < param.pageSize)');
-    //   if(param.pageNo) {
-    //     console.log('@@ retrieve - if(filteredItems.length < param.pageSize) - if(param.pageNo)');
-    //   } else {
-    //   }
-    // } else {
-    //   filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
-    // }
+    if (param.pageNo) {
+      filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
+    }
 
     return Promise.resolve({
       data: filteredItems
-      // , status: 200
-      // , code: 'OK'
-      // , message: 'Success'
+      , status: 200
+      , code: 'OK'
+      , message: 'Success'
       , totalCount: 400
+      // , perPage
+      // , pageNo
+      // , pageSize: 20
     });
   };
 
   async function read(query, pageNo, pageSize) {
+    console.log('@@ async function read - query : ', query);
+    console.log('@@ async function read - pageNo : ', pageNo);
+    console.log('@@ async function read - Math.ceil(pageNo/2) : ', Math.ceil(pageNo/2));
+    console.log('@@ async function read - pageSize : ', pageSize);
     let label = '';
     let items = [];
     if(showReceipt.value === true) {
@@ -310,79 +302,77 @@
     }
     const result = await retrieve({
       ...query,
+      // pageNo: pager.pageNo,
       pageNo,
+      // pageSize: pager.pageSize,
       pageSize: 20,
-      // label: label,
+      label: label,
       items: items,
     });
-    console.log('@@ async function read(query, pageNo, pageSize) - result :', result);
+    console.log('result', result);
     return result;
   }
 
   // '수령'탭에 바인딩할 데이터를 불러옴.
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
-  const getReceiptList = async (query, pageNo, pageSize=20, pageIndex=0) => {
+  const pn = ref(0);
+  const getReceiptList = async (query, pageNo, pageSize) => {
+    console.log('@@ getReceiptList 실행');
     console.log('@@ pager.pageNo : ', pager.pageNo);
-    console.log('@@ pager.perPage : ', pager.perPage);
+    console.log('@@ query : ', query);
     console.log('@@ pageNo : ', pageNo);
     console.log('@@ pageSize : ', pageSize);
-    console.log('@@ pageIndex : ', pageIndex);
-    const result = await combineShippingApi.getReceiptList(
-          toDo.value, selectedVendor.value, Array.from(dateList.value)
-          // , pager.pageNo
-          // , pageNo
-          , pageIndex+1
-          , pager.perPage
-          );
-        // .then((result) => {
-        //   // let result2 = null;
-
-        // });
-      if(result != null && result.receiptList != null) {
-        receiptList.value = result.receiptList;
-        pager.pageNo = result.pager.pageNo;
-        pager.totalCount = result.pager.totalRows;
-        pager.perPage = result.pager.rowsPerPage;
-        read();
-        // receiptKey.value++;
-        // result2 = read(query, pageNo, pageSize);
-        // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-        // receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
-      } else {
-        receiptList.value = [];
-        // result2 = read(query, pageNo, pageSize);
-        // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-        // receiptKey.value++;
+    pn.value = pageNo;
+    watch(
+      () => pn,
+      (newPN, oldPN) => {
+        console.log('@@ watch - newPN : ', newPN);
       }
-      getVendorList();
+    );
 
-      // return result2;
-      const receiptResult = read(query, pageNo, pageSize);
-      // const receiptResult = {
-      //   data: receiptList.value
-      //   , status: 200
-      //   , code: 'OK'
-      //   , message: 'Success'
-      //   , totalCount: pager.totalCount
-      //   // , perPage
-      //   // , pageNo
-      //   // , pageSize: 20
-      // }
-      // return ({
-      //   data: receiptList.value
-      //   , status: 200
-      //   , code: 'OK'
-      //   , message: 'Success'
-      //   , totalCount: pager.totalCount
-      //   // , perPage
-      //   // , pageNo
-      //   // , pageSize: 20
-      // });
-      return receiptResult;
-      // return result;
+    // const result = await combineShippingApi.getReceiptList(
+    let result = await combineShippingApi.getReceiptList(
+          toDo.value, selectedVendor.value, Array.from(dateList.value)
+          , Math.ceil(pageNo/2)
+          // , pager.pageNo
+          // , pager.totalCount
+          , pager.perPage
+          , 
+    );
+    console.log('@@ getReceiptList - const result = await combineShippingApi.getReceiptList - result : ', result);
+        // .then((result) => {
+        //   });
+    if(result.receiptList != null) {
+      receiptList.value = result.receiptList;
+      pager.pageNo = result.pager.pageNo;
+      pager.totalCount = result.pager.totalRows;
+      pager.perPage = result.pager.rowsPerPage;
+      // read();
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      // receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
+    } else {
+      receiptList.value = [];
+      // read();
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      // receiptKey.value++;
+    }
+    getVendorList();
+
+    const result2 = await retrieve({
+      ...query,
+      // pageNo: pager.pageNo,
+      pageNo,
+      // pageSize: pager.pageSize,
+      pageSize: 20,
+      // label: label,
+      items: receiptList.value,
+      // items: items,
+    });
+    console.log('@@ result2 : ', result2);
+    return result2;
   };
-  getReceiptList();
+  // getReceiptList();
 
   // 수령 Update.
   console.log('before updateReceiptList');

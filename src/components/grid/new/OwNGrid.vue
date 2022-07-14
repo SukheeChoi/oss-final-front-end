@@ -117,6 +117,7 @@ export default {
     editorSize: { type: String, default: 'L' },
 
     pageSize: { type: Number, default: 20 }
+    , pageIndex: { type: Number, default: 0 }
   },
   setup(props) {
 
@@ -137,6 +138,7 @@ export default {
       isNotBlank: true,
       // 보여지는 페이지의 수
       perPage: computed(() => state.pageSize * props.n),
+      pageIndex: 0
     });
     // console.log('@@ ngrid - pageNo', pageNo);
 
@@ -149,7 +151,9 @@ export default {
     const setPage = (c) => {
       console.log('@@ c', c);
       if (c.first) {
-        const { pageNo, pageSize, totalItemCount, pageSizeList } = c;
+        const { pageNo, pageSize, totalItemCount, pageSizeList, pageIndex } = c;
+        console.log('@@ setPage - NGridRestCollectionView - pageIndex : ', pageIndex)
+        state.pageIndex = pageIndex;
         // const { pageNo, pageSize, totalCount, pageSizeList } = c;
         // const { pageNo, pageSize, totalItemCount, pageSizeList, itemCount } = c;
         state.pageNo = pageNo;
@@ -201,7 +205,10 @@ export default {
         addItem: props.insert,
         patchItem: props.update,
         deleteItem: props.remove,
+
+        pageIndex: state.pageIndex
       });
+      console.log('@@ const collection = new NGridRestCollectionView : ', collection);
 
       // 아이템 설정//
       grid.itemsSource = collection;
