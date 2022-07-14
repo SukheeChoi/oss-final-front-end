@@ -30,10 +30,10 @@ async function getFilterList(newGroup){
 
 // codes 내용: {"releaseCode":xxx, "scannedBarcode":xxx}
 // 검수처리
-async function releaseInspectionQtyUpdate(releaseCode){
+async function releaseInspectionQtyUpdate(releaseCode, barCode){
   let response = null;
   try{
-    response = await axios.get(`/releaseInspection/RIQtyUpdate?releaseCode=${releaseCode}`);
+    response = await axios.get(`/releaseInspection/RIQtyUpdate?releaseCode=${releaseCode}&barCode=${barCode}`);
     console.log("releaseInspectionQtyUpdate >> 일단 통신은 됐다.");
     console.log(response);
   }catch(error){
@@ -45,10 +45,10 @@ async function releaseInspectionQtyUpdate(releaseCode){
 
 // codes 내용: {"releaseCode":xxx, "scannedBarcode":xxx}
 // 미출고처리
-async function unReleaseQtyUpdate(releaseCode) {
+async function unReleaseQtyUpdate(releaseCode, barCode) {
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/unRleaseQtyUpdate`, releaseCode);
+    response = await axios.get(`/releaseInspection/unRleaseQtyUpdate?releaseCode=${releaseCode}&barCode=${barCode}`);
     console.log("unRleaseQtyUpdate >> 일단 통신은 됐다.");
     console.log(response);
   }catch(error){
@@ -66,6 +66,7 @@ async function scan(code, kind) {
   try{
     response = await axios.get(`/releaseInspection/scanBtnClick?code=${code}&&kind=${kind}`);
     console.log("scanBtnClick >> 일단 통신은 됐다.");
+    console.log(response.data);
   }catch(error){
     console.log("#######/releaseInspection/scanBtnClick 통신 실패######")
     console.log(error);
@@ -109,16 +110,30 @@ async function packingDone(packingDoneInfo) {
 }
 
 //박스품목별정보 (releaseInspectionView에서 조회)
-async function getBoxInfo(releaseCode) {
+// async function getBoxInfo(releaseCode) {
+//   let response = null;
+//   try{
+//     response = await axios.get(`/releaseInspection/selectByReleaseCode?releaseCode=${releaseCode}`);
+//   }catch(error){
+//     console.log("#######/releaseInspection/getBoxInfo 통신 실패######")
+//     console.log(error);
+//   }
+//   return response.data;
+// }
+
+//ord_sts가 5,6일 때 박스별 품목정보 가져오기
+async function getBoxInfo(orderNo) {
   let response = null;
   try{
-    response = await axios.get(`/releaseInspection/selectByReleaseCode?releaseCode=${releaseCode}`);
+    response = await axios.get(`/releaseInspection/getBoxInfobyOrdNo?orderNo=${orderNo}`);
   }catch(error){
-    console.log("#######/releaseInspection/getBoxInfo 통신 실패######")
+    console.log("#######/releaseInspection/getBoxInfobyOrdNo 통신 실패######")
     console.log(error);
   }
   return response.data;
 }
+
+
 
 
 export default{

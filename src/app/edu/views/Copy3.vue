@@ -259,7 +259,7 @@
         <div class="item align-y-start">
           <div class="ow-flex-wrap">
             <div class="title-field">박스별품목정보</div>
-            <button class="ow-btn type-state" v-on:click="addBox()">박스추가+</button>
+            <button class="ow-btn type-state" v-on:click="addBox()" v-if="orderStatus">박스추가+</button>
           </div>
         </div>
         <div>
@@ -290,10 +290,10 @@
             </wj-flex-grid>
           </div>
           <div class="container">
-            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="packingDone()" v-if="boxArrays.length > 0">
+            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="packingDone()" v-if="(boxArrays.length > 0 && orderStatus==false)">
               패킹최종완료
             </button>
-            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="oneBoxPacking(index)" v-if="boxArrays.length > 0">
+            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="oneBoxPacking(index)" v-if="(boxArrays.length > 0 && orderStatus==false)">
               박스{{index+1}} 패킹완료
             </button>
           </div>
@@ -310,6 +310,10 @@ import releaseInspectionApi from '@/api/releaseInspectionApi';
 export default {
 
   setup() {
+
+    //스캔버튼 눌렀을 때, orderStatus:false => 4, orderStatus:true => 5,6
+    const orderStatus = ref(true);
+
     //grid 병합 처리 >> custom merge
     const onInitialized = (grid) => {
       grid.autoSizeRow(0, true);
@@ -321,7 +325,6 @@ export default {
       grid.selectionMode = 4 //RowRange
     };
 
-    //
     const pageValue = ref(1);
 
     //현황
@@ -375,7 +378,7 @@ export default {
     let boxArrays = ref([]);
 
     //ow-tab의 model에 넘겨줄 index
-    var index = ref(0);
+    var index = ref(null);
 
     //박스 추가 버튼 -> boxArrays에 추가
     function addBox() {
@@ -468,7 +471,7 @@ export default {
     //박스들(list)의 정보를 포함하는 list
     const boxItemDataList = [];
 
-    //박스 하나의 정보 
+    //박스 하나의 정보 -> ref에서 reactive로 변경
     const boxItemData = ref(null);
 
     // 스캔 버튼 이벤트 함수
@@ -483,7 +486,7 @@ export default {
       tally.totalInspectionQty = 0;
       tally.totalUnRelease = 0;
 
-      // tally의 총합 
+      // 총검수수량(tally)
       for(let i=0; i<result.length; i++){
         console.log(i + ">>>", result[i]);
         tally.totalPickingQty += result[i].pickingQty;
@@ -492,10 +495,21 @@ export default {
       }
 
       tally.clientName = result[0].clientName;
-      //tally.orderNo = result[0].orderNo;
       tally.category = result[0].category;
-      //tally.barCode = result[0].releaseBarCode;  //바코드
       tally.releaseCode = result[0].releaseCode; //출고번호
+
+      console.log(orderStatus.value);
+
+      if(result[0].status === 4){
+        orderStatus.value = false;
+      }else{
+        orderStatus.value = true;
+        for(let i=1; i<=result[0].releaseBoxQty; i++){
+          boxArrays.value.push('박스'+i)
+        }
+      }
+
+      console.log(orderStatus.value);
 
       console.log("-------------------scan----------------------");
       console.log("boxItemDataList >> ", boxItemDataList);
@@ -508,20 +522,8 @@ export default {
         }
       }
 
-      boxItemData.value = boxItemDataList[0];
+      //boxItemData.value = boxItemDataList[0];
       
-      //boxItemData.value = result;
-
-      // console.log("rIData.value>>", rIData.value);
-      // console.log("result>>", result);
-
-      // for (let i = 0; i < rIData.value.length; i++) {
-      //   if (rIData.value[i].orderNo === tally.orderNo) {
-      //     boxItemData.value.push(rIData.value[i]);
-      //   }
-      // }
-
-      // console.log('boxItemData', boxItemData.value);
       return result;
     }
 
@@ -576,16 +578,14 @@ export default {
     //ow-tab의 index 감시 (몇 번째 탭 클릭)
     watch(index, (newIndex, oldIndex)=>{
 
-      //cell.item.boxItemQuantity = 0;
-
       console.log("===========watch===========");
-      console.log("boxItemDataList>>", boxItemDataList);
+      console.log("boxItemDataList >> ", boxItemDataList);
 
       //뷰 재로딩
       boxKey.value ++; 
       console.log("현재 index >> ", index.value);
 
-      console.log("boxItemDataList[index] >>", boxItemDataList[index.value]);
+      console.log("boxItemDataList[index] >> ", boxItemDataList[index.value]);
       boxItemData.value = boxItemDataList[index.value];
 
     },{deep: true});
@@ -669,7 +669,8 @@ export default {
       boxItemData,
       oneBoxPacking,
       test111,
-      test222
+      test222,
+      orderStatus
     };
   },
 };
