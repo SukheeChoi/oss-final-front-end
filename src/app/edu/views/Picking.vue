@@ -53,25 +53,36 @@
     :n="2"
     :read="read"
     :key="receiptKey"
+    :visibleRowsCount="20"
+    :totalCount="pager.totalCount"
   >
+    <!-- :pageSize="30" -->
+    <!-- v-model="pager.pageNo"
+    :totalCount="53"
+    :total-rows="pager.totalRows"
+    :per-page="pager.perPage" -->
+    <!-- :pageNo="pager.pageNo" -->
     <!-- :initialized="initialize" -->
   <template #left>&nbsp;</template>
     <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
-    <wj-flex-grid-column header="품목명" binding="itemName" align="left" width="3*"></wj-flex-grid-column>
-    <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="releaseQuantity" align="right" :width="70"></wj-flex-grid-column>
+    <wj-flex-grid-column header="품목명" binding="item.itemName" align="left" width="3*"></wj-flex-grid-column>
+    <wj-flex-grid-column header="품목코드" binding="item.itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
+    <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="informationPartner.releaseQuantity" align="right" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="showReceipt==true && toDo==0" header="수령수량" binding="receiveQuantity" align="right" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==1" header="미출고" binding="unreleased" :width="60">
+    <wj-flex-grid-column v-if="toDo==1" header="미출고" binding="receiveUnreleaseQuantity" :width="60">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <div class="ow-input">
-          <input id="receiptUnreleaseInput" type="text" v-model="cell.item.unreleased"/>
+          <input id="receiptUnreleaseInput" type="text"
+            v-model="cell.item.receiveUnreleaseQuantity"
+            @change="changeReceiptUnrelease($event, cell.item.orderItem.orderItemNo, cell.item.receiveUnreleaseQuantity)"
+          />
         </div>
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==0" header="미출고" binding="unreleased" :width="60" />
-    <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
+    <wj-flex-grid-column v-if="toDo==0" header="미출고" binding="receiveUnreleaseQuantity" :width="60" />
+    <wj-flex-grid-column v-if="toDo==1" header="수령여부" binding="orderItem.orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
-        <button class="ow-btn type-icon check-state" @click="checkReceiptCheckBtn($event, cell.item.orderItemNo)"></button>
+        <button id="receipt-check-btn" class="ow-btn type-icon check-state" @click="checkReceiptCheckBtn($event, cell.item.orderItem.orderItemNo)"></button>
         <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
@@ -123,6 +134,18 @@
   }]);
   const selectedAssignee = ref('전체');
   const dateList = ref([startDate.value, endDate.value]);
+  const pager = reactive({
+    // 페이지 인덱스
+    pageIndex: 0
+    // 페이지 번호
+    , pageNo: 1
+    // 전체 행 수
+    , totalCount: 0
+    // 페이지 당 행 수
+    , perPage: 40
+  });
+  // const totalRows = ref(0);
+  // const perPage = ref(0);
   const receiptList = ref([]);
   const receiptedList = ref([]);
   const deliveryList = ref([]);
@@ -195,48 +218,52 @@
     console.log('param.items.length : ' + param.items.length);
     console.log('param.label : ' + param.label);
     let items = _.cloneDeep(param.items);
-    let filteredItems = [];
+    // let filteredItems = [];
+    let filteredItems = items;
     // back-end : 데이터 정제해서 보낼 것.
-    if(param.label === 'receipt') {
-      for(let i=0; i<items.length; i++) {
-        filteredItems.push({
-          'rownum': receiptList.value[i]["rownum"]
-          // 'No': i+1  //pagination할 때 rowNum 함께 받아서 이용할 것.
-          , 'itemName': receiptList.value[i]["item"]["itemName"]
-          , 'itemCode': receiptList.value[i]["item"]["itemCode"]
-          , 'releaseQuantity': receiptList.value[i]["releaseQuantity"]
-          , 'receiveQuantity': receiptList.value[i]["receiveQuantity"]
-          , 'unreleased': receiptList.value[i]["receiveUnrelease"]
-          , 'receipted': receiptList.value[i]["receiveCheck"]
+    // if(param.label === 'receipt') {
+    //   for(let i=0; i<items.length; i++) {
+    //     filteredItems.push({
+    //       'rownum': receiptList.value[i]["rownum"]
+    //       , 'itemName': receiptList.value[i]["item"]["itemName"]
+    //       , 'itemCode': receiptList.value[i]["item"]["itemCode"]
+    //       , 'releaseQuantity': receiptList.value[i]["releaseQuantity"]
+    //       , 'receiveQuantity': receiptList.value[i]["receiveQuantity"]
+    //       , 'unreleased': receiptList.value[i]["receiveUnrelease"]
+    //       , 'receipted': receiptList.value[i]["receiveCheck"]
 
-          , 'orderItemNo': receiptList.value[i]["orderItemNo"]
-        });
-      }
-    } else {
-      console.log('#### deliveryList.value', deliveryList.value);
-      console.log('#### deliveryList.value.length', deliveryList.value.length);
-      for(let i=0; i<items.length; i++) {
-        filteredItems.push({
-          // ROWNUM 사용할 것.
-          'rownum': deliveryList.value[i]["rownum"]
-          // 주문번호/출고번호
-          , 'order_release_no': deliveryList.value[i]["orderItem"]["orderNo"] + '/' + deliveryList.value[i]["release"]["releaseNo"]
-          // 품목명
-          , 'itemName': deliveryList.value[i]["item"]["itemName"]
-          // 품목코드
-          , 'itemCode': deliveryList.value[i]["item"]["itemCode"]
-          // 수령수량
-          , 'receiveQuantity': deliveryList.value[i]["receiveQuantity"]
-          // 전달수량
-          , 'deliveryQuantity': deliveryList.value[i]["deliveryQuantity"]
-          // 미출고
-          , 'unreleased': deliveryList.value[i]["deliveryUnrelease"]
-          // PK용 orderItemNo
-          , 'orderItemNo': deliveryList.value[i]["orderItemNo"]
-        });
-      }
-    }
-    const totalCount = filteredItems.length;
+    //       , 'orderItemNo': receiptList.value[i]["orderItemNo"]
+    //     });
+    //   }
+    // } else {
+    //   console.log('#### deliveryList.value', deliveryList.value);
+    //   console.log('#### deliveryList.value.length', deliveryList.value.length);
+    //   for(let i=0; i<items.length; i++) {
+    //     filteredItems.push({
+    //       // ROWNUM 사용할 것.
+    //       'rownum': deliveryList.value[i]["rownum"]
+    //       // 주문번호/출고번호
+    //       , 'order_release_no': deliveryList.value[i]["orderItem"]["orderNo"] + '/' + deliveryList.value[i]["release"]["releaseNo"]
+    //       // 품목명
+    //       , 'itemName': deliveryList.value[i]["item"]["itemName"]
+    //       // 품목코드
+    //       , 'itemCode': deliveryList.value[i]["item"]["itemCode"]
+    //       // 수령수량
+    //       , 'receiveQuantity': deliveryList.value[i]["receiveQuantity"]
+    //       // 전달수량
+    //       , 'deliveryQuantity': deliveryList.value[i]["deliveryQuantity"]
+    //       // 미출고
+    //       , 'unreleased': deliveryList.value[i]["deliveryUnrelease"]
+    //       // PK용 orderItemNo
+    //       , 'orderItemNo': deliveryList.value[i]["orderItemNo"]
+    //     });
+    //   }
+    // }
+    // const totalCount = filteredItems.length;
+    const totalCount = pager.totalCount;
+    const perPage = pager.perPage;
+    // const pageNo = pager.pageNo;
+    // const pageSize = 20;
     if (param.sort) {
       filteredItems = _.sortBy(filteredItems, param.sort);
       if (['desc', 'DESC'].includes(param.direction)) {
@@ -248,15 +275,22 @@
     }
 
     return Promise.resolve({
-      data: filteredItems,
-      status: 200,
-      code: 'OK',
-      message: 'Success',
-      totalCount,
+      data: filteredItems
+      , status: 200
+      , code: 'OK'
+      , message: 'Success'
+      , totalCount: 400
+      // , perPage
+      // , pageNo
+      // , pageSize: 20
     });
   };
 
   async function read(query, pageNo, pageSize) {
+    console.log('@@ async function read - query : ', query);
+    console.log('@@ async function read - pageNo : ', pageNo);
+    console.log('@@ async function read - Math.ceil(pageNo/2) : ', Math.ceil(pageNo/2));
+    console.log('@@ async function read - pageSize : ', pageSize);
     let label = '';
     let items = [];
     if(showReceipt.value === true) {
@@ -268,14 +302,14 @@
     }
     const result = await retrieve({
       ...query,
+      // pageNo: pager.pageNo,
       pageNo,
-      pageSize,
+      // pageSize: pager.pageSize,
+      pageSize: 20,
       label: label,
       items: items,
-      visibleRowsCount: 20
     });
     console.log('result', result);
-    // initialize();
     return result;
   }
 
@@ -283,10 +317,20 @@
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
   const getReceiptList = async () => {
-    const result = await combineShippingApi.getReceiptList(toDo.value, selectedVendor.value, Array.from(dateList.value))
+    console.log('@@ pager.pageNo', pager.pageNo);
+    const result = await combineShippingApi.getReceiptList(
+          toDo.value, selectedVendor.value, Array.from(dateList.value)
+          , pager.pageNo
+          // , pager.totalCount
+          , pager.perPage
+          , 
+          )
         .then((result) => {
           if(result.receiptList != null) {
             receiptList.value = result.receiptList;
+            pager.pageNo = result.pager.pageNo;
+            pager.totalCount = result.pager.totalRows;
+            pager.perPage = result.pager.rowsPerPage;
             read();
             // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
             receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
@@ -298,13 +342,13 @@
           }
           getVendorList();
         });
-    // return result;
   };
   getReceiptList();
 
   // 수령 Update.
   console.log('before updateReceiptList');
   const updateReceiptList = async () => {
+    console.log('++ receiptedList.value : ', receiptedList.value);
     const result = await combineShippingApi.updateReceiptList(Array.from(receiptedList.value))
       .then((result) => {
         console.log('updateReceiptList - result : ' + result);
@@ -312,7 +356,6 @@
         // 수령 update한 결과를 보여주기.
         getReceiptList();
       });
-    // return result;
   };
 
   // '전달' 탭에서 바인딩할 데이터를 불러옴.
@@ -559,6 +602,31 @@
     clickSearch.value = true;
   }
 
+  // ReceiptList의 unreleased update에 대한 handler.
+  function changeReceiptUnrelease(event, orderItemNo, unreleased) {
+    console.log('++ event : ', event);
+    console.log('++ event.target : ', event.target);
+    console.log('++ event.target.parentNode.parentNode.parentNode.parentNode.parentNode : ', event.target.parentNode.parentNode.parentNode.parentNode.parentNode);
+    console.log('++ event.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("#receipt-check-btn") : ', event.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('#receipt-check-btn'));
+    let btnTag = event.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('#receipt-check-btn');
+    console.log('++ btnTag.classList.contains("active") : ', btnTag.classList.contains('active'));
+    console.log('++ orderItemNo : ', orderItemNo);
+    console.log('++ unreleased : ', unreleased);
+    if(btnTag.classList.contains('active')) { // 수령여부 체크된 상태. -> 수정.
+      for(let i=0; i<receiptedList.value.length; i++) {
+        console.log('++ receiptedList.value[i] : ', receiptedList.value[i]);
+        console.log('++ receiptedList.value[i]["orderItemNo"] : ', receiptedList.value[i]['orderItemNo']);
+        if(receiptedList.value[i]['orderItemNo'] === orderItemNo) {
+          console.log('++ inside if(receiptedList.value[i]["orderItemNo"] === orderItemNo) : ', receiptedList.value[i]['orderItemNo']);
+          receiptedList.value[i]['receiveUnrelease'] = parseInt(unreleased);
+          console.log('++ inside if(receiptedList.value[i]["orderItemNo"] === orderItemNo) : ', receiptedList.value[i]['receiveUnrelease']);
+          
+          break;
+        }
+      }
+    }
+  }
+
   // 수령여부 체크 버튼 클릭시.
   function checkReceiptCheckBtn(event, orderItemNo) {
     console.log('## event.target.parentElement: ', event.target.parentElement);
@@ -584,6 +652,7 @@
       checkedReceiptCount.value++;
       // 수령객체에 update할 객체 추가.
       receiptedList.value.push(targetObject);
+      console.log('++ receiptedList.value : ', receiptedList.value);
     }
     // 활성화 클래스 toggle.
     event.target.classList.toggle('active');
@@ -621,16 +690,16 @@
     align-items: center;
     justify-content: center;
     line-height: inherit;
+
+    color: #333333;
+    background-color: #E8ECF1;
+    // background-color: #E1E7EE;
   }
-}
-  
-:deep {
+
   .wj-flexgrid .wj-cell.wj-align-center {
     justify-content: center;
   }
-}
 
-:deep {
   .wj-cell.border-center {
     display: flex;
     align-items: center;
