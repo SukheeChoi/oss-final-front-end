@@ -2,7 +2,7 @@
 <template>
   <div>
     <div class="row mb-4">
-      <status-progress-bar :title="'주문'"/>
+      <!-- <status-progress-bar :title="'주문'"/> -->
       <div class="ow-panel">
         <div class="ow-panel-header">
           <!-- 주문 단계를 누르면 해당 단계 관리 페이지로 이동 -->
@@ -152,7 +152,10 @@
           <div>
             <!-- hover 했을 때 범례 띄워줌 -->
             <button type="button" class="ow-btn type-icon arrow_down">
-              <img src="@/assets/images/icon/ico_list.svg" style="border: 0.8px solid gray; width: 20px; padding: 2px" />
+              <img
+                src="@/assets/images/icon/ico_list.svg"
+                style="border: 0.8px solid gray; width: 20px; padding: 2px"
+              />
             </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
@@ -200,7 +203,14 @@
       </div>
     </div>
     <div>
-      <ow-n-grid :n="10" :visible-rows-count="state.visibleRowsCount" :initialized="initialize" :key="keyData" :read="read" :autoRowHeights="true">
+      <ow-n-grid
+        :n="10"
+        :visible-rows-count="state.visibleRowsCount"
+        :initialized="initialize"
+        :key="keyData"
+        :read="read"
+        :autoRowHeights="true"
+      >
         <template #left>&nbsp;</template>
         <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">

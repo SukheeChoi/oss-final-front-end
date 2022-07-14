@@ -68,20 +68,5 @@ const props = defineProps({
     border-radius: 2px;
     background: rgb(44, 112, 244);
   }
-
-  .progress-bar {
-    position: relative;
-    background-color: white;
-    width: 50%;
-    height: 100%;
-  }
-
-  .progress-bar span {
-    position: absolute;
-    display: inline-block;
-    color: white;
-    text-align: center;
-    font-weight: 600;
-  }
 }
 </style>

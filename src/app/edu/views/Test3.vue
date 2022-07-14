@@ -18,11 +18,20 @@
       </div>
     </div>
     <hr />
+    <!-- 모달모달 -->
+    <ow-modal type="XS" :title="'[' + modalData.title + '] 예정시간 수정'" ref="childRef" v-if="modalData" :cancelButton="true">
+      <div>사원명 - {{modalData.employeeName}}</div>
+      <div>업체명 - {{modalData.title}}</div>
+       <span class="mt-5">
+        <ow-input-time v-model="modalData.scheduledStartTime" style="width: 100px" ></ow-input-time>
+        <ow-input-time v-model="modalData.scheduledEndTime" style="width: 100px" ></ow-input-time>
+       </span> 
+    </ow-modal>
     <div class="d-flex">
       <!-- 왼쪽 화면 -->
-      <div class="left">
+      <div class="left h-100">
         <div class="d-flex justify-content-end mt-5 mb-5">
-          <button class="ow-btn type-util">예정시간수정</button>
+          <button class="ow-btn type-util" @click="openModal" :disabled="!updateDate" >예정시간수정</button>
           <button class="ow-btn type-util">추가</button>
         </div>
         <ow-tree-grid
@@ -34,27 +43,22 @@
         >
           <wj-flex-grid-column
             header="담당자/업체명"
-            binding="employeeName"
+            binding="title"
             :width="130"
-            align="center"
+            align="left"
           ></wj-flex-grid-column>
-          <wj-flex-grid-column
-            header="수령일"
-            binding="receiveHourMinute"
-            :width="100"
-            align="center"
-          ></wj-flex-grid-column>
+          <wj-flex-grid-column header="수령일" binding="receiveDate" :width="100" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column
             header="수령<br>품목"
             binding="receiveItem"
-            :width="60"
-            align="center"
+            :width="40"
+            align="right"
           ></wj-flex-grid-column>
           <wj-flex-grid-column
             header="수령<br>수량"
             binding="receiveQuantity"
             :width="50"
-            align="center"
+            align="right"
           ></wj-flex-grid-column>
           <wj-flex-grid-column
             header="예정시간"
@@ -93,7 +97,7 @@
         </ow-tree-grid>
       </div>
       <!-- 오른쪽 화면 -->
-      <div class="right">
+      <div class="right flex-fill">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <div class="item align-to-right" style="--gap-item: 6px">
             <div class="title-field">검색</div>
@@ -115,17 +119,23 @@
         <div class="ow-panel">
           <div class="ow-panel-header">
             <div class="ow-panel-title">
-              ■ <span v-if="employeeName">[{{ employeeName }}]</span>검품검수 및 라벨링 내역
+              ■ <span v-if="title">[{{ title }}]</span>검품검수 및 라벨링 내역
             </div>
           </div>
-          <div class="ow-panel-body">
+          <div class="ow-panel-body1">
             <b-row>
-              <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
-              <ow-grid v-if="employeeName" :read="getGrid" :key="keyData" :initialized="onInitialized" :visibleRowsCount="15">
+              <div v-if="!title" style="font-size: 20px">담당자를 선택해주세요!</div>
+              <ow-grid
+                v-if="title"
+                :read="getGrid"
+                :key="keyData"
+                :initialized="onInitialized"
+                :visibleRowsCount="15"
+              >
                 <template #left>&nbsp;</template>
-                <wj-flex-grid-column binding="vendorName" header="업체명" :width="100" align="center" />
-                <wj-flex-grid-column binding="itemName" header="품목명" width="*" align="center" />
-                <wj-flex-grid-column binding="itemCode" header="품목코드" :width="100" align="center" />
+                <wj-flex-grid-column binding="vendorName" header="업체명" :width="100" align="left" />
+                <wj-flex-grid-column binding="itemName" header="품목명" width="*" align="left" />
+                <wj-flex-grid-column binding="itemCode" header="품목코드" :width="100" align="left" />
                 <wj-flex-grid-column binding="placingOrderNo" header="발주번호" :width="100" align="center" />
                 <wj-flex-grid-column binding="lotCode" header="LOT번호" :width="100" align="center" />
                 <wj-flex-grid-column binding="recievedQuantity" header="수령<br>수량" :width="50" align="center" />
@@ -151,10 +161,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
+import { ref, reactive, toRefs, watch, computed, toRaw, onMounted } from 'vue';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
 import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { TreeMergeManager, SimpleMergeManager } from '@/utils/wijmo.grid';
+import OwModal from '../../../components/common/OwModal.vue';
 
 const childItemsPath = ['child', 'childrennn'];
 
@@ -173,9 +184,16 @@ getTree.value = async function (query, pageNo, pageSize) {
   return result;
 };
 
-const employeeName = ref(null);
+const title = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
+let modalData = reactive({
+  title : '',
+  employeeName: '',
+  scheduledStartTime : '',
+  scheduledEndTime : '',
+});
+const updateDate = ref(false);
 
 const orderStatus = ref([
   { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
@@ -184,9 +202,9 @@ const orderStatus = ref([
 ]);
 
 const inspectionStatus = ref([
-  { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
-  { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
-  { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '양품 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '누락 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
+  { name: '파손 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
 ]);
 
 async function getStatus() {
@@ -217,17 +235,18 @@ const onSelectionChanged = (grid, target) => {
   //반응형 변수 세팅(검색 조건 리셋)
   searchSelected.value = '';
   searchContent.value = '';
-
+  updateDate.value = false;
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
-    //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
+    //childrenn이라는 key가 null이 아니면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
     if (grid.selectedItems[0].childrennn != null) {
-      employeeName.value = grid.selectedItems[0].employeeName;
+      title.value = grid.selectedItems[0].title;
 
+      const labelingWorkTimeNo = grid.selectedItems[0].labelingWorkTimeNo;
       getGrid.value = async function (query, pageNo, pageSize) {
         //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
-        const lee = await inspectionLabelingApi.getListByEmployeeName(
-          employeeName.value,
+        const lee = await inspectionLabelingApi.getListByLWTNo(
+          labelingWorkTimeNo,
           searchSelected.value,
           searchContent.value,
           pageNo,
@@ -242,6 +261,17 @@ const onSelectionChanged = (grid, target) => {
         return result;
       };
       keyData.value++;
+
+    }
+    //child와 childrenn이라는 key가 없으면 업체명이므로 예정시간 수정 api 호출
+    if (!grid.selectedItems[0].childrennn && !grid.selectedItems[0].child && !grid.selectedItems[0].startTime) {
+      modalData.title = grid.selectedItems[0].title;
+      modalData.employeeName = grid.selectedItems[0].employeeName;
+      modalData.scheduledStartTime = grid.selectedItems[0].scheduledStartTime;
+      modalData.scheduledEndTime = grid.selectedItems[0].scheduledEndTime;
+      updateDate.value = true;
+      console.log('예정시간 수정');
+      console.log(grid.selectedItems[0]);
     }
   }
 };
@@ -302,35 +332,9 @@ const treeInitialized = (grid) => {
         const endTime = row.dataItem.scheduledEndTime.slice(0, 2); //예정 완료 시간
 
         // 예정시간안에 있는 시간인지 체크하는 메소드(배경색 흰색, 회색 설정)
-        function timeCheckFunc(params) {
+        function timeCheckFunc(paramTime) {
           let timeCheck = false;
-          let paramTime = 0;
-          switch (params) {
-            case LWTNine:
-              paramTime = 9;
-              break;
-            case LWTTen:
-              paramTime = 10;
-              break;
-            case LWTEleven:
-              paramTime = 11;
-              break;
-            case LWTThirteen:
-              paramTime = 13;
-              break;
-            case LWTFourteen:
-              paramTime = 14;
-              break;
-            case LWTFifteen:
-              paramTime = 15;
-              break;
-            case LWTSixteen:
-              paramTime = 16;
-              break;
-            case LWTSeventeen:
-              paramTime = 17;
-              break;
-          }
+
           if (paramTime >= startTime && paramTime <= endTime) {
             timeCheck = true;
           }
@@ -338,8 +342,8 @@ const treeInitialized = (grid) => {
         }
 
         //진행률 progress bar html 생성하는 메소드
-        function createTag(params) {
-          const timeCheck = timeCheckFunc(params);
+        function createTag(params, paramTime) {
+          const timeCheck = timeCheckFunc(paramTime);
           let html =
             '<td>' +
             '<div class="{progress}">' +
@@ -348,9 +352,9 @@ const treeInitialized = (grid) => {
             '<div class="normal-text">{params}%</div></td>';
 
           //진행률 수치에 따라서 색 넣기
-          if (params < 50) {
+          if (params <= 50) {
             html = html.replace('{paramsColor}', 'normal');
-          } else if (params >= 50 && params < 80) {
+          } else if (params > 50 && params < 80) {
             html = html.replace('{paramsColor}', 'warning');
           } else if (params >= 80 && params < 100) {
             html = html.replace('{paramsColor}', 'success');
@@ -398,14 +402,14 @@ const treeInitialized = (grid) => {
           '</div>' +
           '<table>' +
           '<tr>' +
-          createTag(LWTNine) +
-          createTag(LWTTen) +
-          createTag(LWTEleven) +
-          createTag(LWTThirteen) +
-          createTag(LWTFourteen) +
-          createTag(LWTFifteen) +
-          createTag(LWTSixteen) +
-          createTag(LWTSeventeen) +
+          createTag(LWTNine, 9) +
+          createTag(LWTTen, 10) +
+          createTag(LWTEleven, 11) +
+          createTag(LWTThirteen, 13) +
+          createTag(LWTFourteen, 14) +
+          createTag(LWTFifteen, 15) +
+          createTag(LWTSixteen, 16) +
+          createTag(LWTSeventeen, 17) +
           '</tr>' +
           '</table>' +
           '</div>';
@@ -422,7 +426,7 @@ const treeInitialized = (grid) => {
     }
   });
   //그리드 셀렉션모드 설정(Row)
-  grid.selectionMode = 3;
+  grid.selectionMode = 4;
 };
 
 //그리드 설정
@@ -430,8 +434,6 @@ const onInitialized = (grid) => {
   grid.autoSizeRow(0, true);
 
   grid.formatItem.addHandler((flex, e) => {
-    console.log(flex);
-    console.log(e);
     //헤더에 html태그 사용하게 하는 설정
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
@@ -441,19 +443,33 @@ const onInitialized = (grid) => {
   //그리드 셀렉션모드 설정(None)
   grid.selectionMode = 0;
 };
+const childRef = ref(null);
+
+const openModal = async function () {
+  const config = {
+    data: {},
+    cancelButtonText: '확인',
+  }
+  console.log(childRef);
+  const ok = await childRef.value.open("accept", config);
+  console.log('modal ok', ok);
+  console.log(modalData);
+};
+
 </script>
 
 <style scoped lang="scss">
 ::v-deep {
-  // .ow-panel .ow-panel-body1 {
-  //   display: flex;
-  //   /* flex-direction: column; */
-  //   flex: 1;
-  //   border: 2px solid #6980af;
-  //   border-top: 0;
-  //   background-color: #fff;
-  //   padding: var(--ow-gutter);
-  // }
+  .ow-panel .ow-panel-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border: 2px solid #6980af;
+    border-top: 0;
+    background-color: #fff;
+    padding: var(--ow-gutter);
+    margin-bottom: 10%;
+  }
 
   .wj-cell.wj-header {
     display: flex;
@@ -536,5 +552,10 @@ const onInitialized = (grid) => {
     text-align: center;
     white-space: nowrap;
   }
+
+  .ow-flex-wrap.dir-col {
+    flex-direction: column;
+    align-items: center;
+}
 }
 </style>

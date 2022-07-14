@@ -34,7 +34,7 @@
         >
           <wj-flex-grid-column
             header="담당자/업체명"
-            binding="employeeName"
+            binding="title"
             :width="130"
             align="left"
           ></wj-flex-grid-column>
@@ -115,13 +115,13 @@
         <div class="ow-panel">
           <div class="ow-panel-header">
             <div class="ow-panel-title">
-              ■ <span v-if="employeeName">[{{ employeeName }}]</span>검품검수 및 라벨링 내역
+              ■ <span v-if="title">[{{ title }}]</span>검품검수 및 라벨링 내역
             </div>
           </div>
           <div class="ow-panel-body1">
             <b-row>
-              <div v-if="!employeeName" style="font-size: 20px">담당자를 선택해주세요!</div>
-              <ow-grid v-if="employeeName" :read="getGrid" :key="keyData" :initialized="onInitialized" :visibleRowsCount="15">
+              <div v-if="!title" style="font-size: 20px">담당자를 선택해주세요!</div>
+              <ow-grid v-if="title" :read="getGrid" :key="keyData" :initialized="onInitialized" :visibleRowsCount="15">
                 <template #left>&nbsp;</template>
                 <wj-flex-grid-column binding="vendorName" header="업체명" :width="100" align="left" />
                 <wj-flex-grid-column binding="itemName" header="품목명" width="*" align="left" />
@@ -173,7 +173,7 @@ getTree.value = async function (query, pageNo, pageSize) {
   return result;
 };
 
-const employeeName = ref(null);
+const title = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
@@ -217,12 +217,12 @@ const onSelectionChanged = (grid, target) => {
   //반응형 변수 세팅(검색 조건 리셋)
   searchSelected.value = '';
   searchContent.value = '';
-
+  console.log("왜 안돼?")
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
     if (grid.selectedItems[0].childrennn != null) {
-      employeeName.value = grid.selectedItems[0].employeeName;
+      title.value = grid.selectedItems[0].title;
       const labelingWorkTimeNo = grid.selectedItems[0].labelingWorkTimeNo;
       getGrid.value = async function (query, pageNo, pageSize) {
         //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
