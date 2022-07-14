@@ -2,6 +2,7 @@
 <template>
   <div>
     <div class="row mb-4">
+      <status-progress-bar :title="'주문'"/>
       <div class="ow-panel">
         <div class="ow-panel-header">
           <!-- 주문 단계를 누르면 해당 단계 관리 페이지로 이동 -->
@@ -23,12 +24,12 @@
           <div class="ow-flex-wrap">
             <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">
-              300건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 300 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
+              {{ orderPlan }}건(<strong style="color: rgb(103, 146, 226)">잔여 {{ orderPlan - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
             </div>
           </div>
           <div class="ow-flex-wrap">
             <div class="item txt-dot-square">실적</div>
-            <div class="align-to-right">{{ statusOrd }}건</div>
+            <div class="align-to-right">{{ statusOrd - unreleaseCnt }}건</div>
           </div>
         </div>
       </div>
@@ -237,6 +238,7 @@ import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
 
 // const items = ref([]);
+const orderPlan = ref(300);
 const statusOrd = ref(null);
 const statusPick = ref(null);
 const statusRls = ref(null);
@@ -262,7 +264,46 @@ const filterList = ref({
   unrelease: '',
   orderNo: '',
   clientName: '',
+  // pageSize: 320,
+  // startRowIndex:0
 });
+
+//보여지는 행 수
+const state = reactive({
+  visibleRowsCount: 16,
+});
+
+//ngrid 페이지 설정
+const retrieve = (param) => {
+  let filteredItems = _.cloneDeep(receiptList.value); //cloneDeep : 객체 복사
+  const totalCount = filteredItems.length;
+  if (param.sort) {
+    filteredItems = _.sortBy(filteredItems, param.sort);
+    if (['desc', 'DESC'].includes(param.direction)) {
+      filteredItems = filteredItems.reverse();
+    }
+  }
+  if (param.pageNo) {
+    filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 16, param.pageSize ?? 16);
+  }
+
+  return Promise.resolve({
+    data: filteredItems,
+    status: 200,
+    code: 'OK',
+    message: 'Success',
+    totalCount,
+  });
+};
+
+async function read(query, pageNo, pageSize) {
+  const result = await retrieve({
+    ...query,
+    pageNo,
+    pageSize: 16,
+  });
+  return result;
+}
 
 //배송구분
 const checkboxGroup1 = ref([
@@ -342,6 +383,7 @@ async function getFilterList(afterFilterList) {
     console.log('getFilterList - JSON.stringify(result) : ' + JSON.stringify(data));
     // receiptList.value = result.list;
     console.log('result.length : ' + data.length);
+    console.log('result : ', data);
     console.log('Array.isArray(result) : ' + Array.isArray(data));
     receiptList.value = [];
     for (let i = 0; i < data.length; i++) {
@@ -352,43 +394,6 @@ async function getFilterList(afterFilterList) {
       });
     }
   });
-}
-
-//보여지는 행 수
-const state = reactive({
-  visibleRowsCount: 16,
-});
-
-//ngrid 페이지 설정
-const retrieve = (param) => {
-  let filteredItems = _.cloneDeep(receiptList.value); //cloneDeep : 객체 복사
-  const totalCount = filteredItems.length;
-  if (param.sort) {
-    filteredItems = _.sortBy(filteredItems, param.sort);
-    if (['desc', 'DESC'].includes(param.direction)) {
-      filteredItems = filteredItems.reverse();
-    }
-  }
-  if (param.pageNo) {
-    filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 16, param.pageSize ?? 16);
-  }
-
-  return Promise.resolve({
-    data: filteredItems,
-    status: 200,
-    code: 'OK',
-    message: 'Success',
-    totalCount,
-  });
-};
-
-async function read(query, pageNo, pageSize) {
-  const result = await retrieve({
-    ...query,
-    pageNo,
-    pageSize: 16,
-  });
-  return result;
 }
 
 //초기화
@@ -413,6 +418,13 @@ const initialize = (s) => {
   };
 };
 
+async function getunrlsCnt() {
+  const unrlsCnt = await clientApi.getUnreleaseCnt();
+  unreleaseCnt.value = unrlsCnt;
+  console.log('unreleaseCnt : ' + unreleaseCnt.value);
+}
+getunrlsCnt();
+
 //주문 단계 별 건수 요청
 async function getStsCnt() {
   const stsCnt = await clientApi.getStatusCnt();
@@ -422,7 +434,7 @@ async function getStsCnt() {
   statusRls.value = stsCnt[5] + stsCnt[6];
   statusTrf.value = stsCnt[6];
   //주문 단계마다 완료 퍼센트
-  percentOrd.value = parseInt((statusOrd.value / 300) * 100);
+  percentOrd.value = parseInt((statusOrd.value / orderPlan.value) * 100);
   percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
   percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
   percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
@@ -431,115 +443,108 @@ async function getStsCnt() {
   // return stsCnt;
 }
 getStsCnt();
-
-async function getunrlsCnt() {
-  const unrlsCnt = await clientApi.getUnreleaseCnt();
-  unreleaseCnt.value = unrlsCnt;
-  console.log('unreleaseCnt : ' + unreleaseCnt.value);
-}
-getunrlsCnt();
 </script>
 
-<style>
-.ow-panel .ow-panel-header .ow-panel-title {
-  justify-content: center;
-  font-weight: 800;
-}
+<style scoped lang="scss">
+::v-deep {
+  .ow-panel .ow-panel-header .ow-panel-title {
+    justify-content: center;
+    font-weight: 800;
+  }
 
-.low,
-.mid,
-.high {
-  display: block;
-  border: 0 none;
-  border-radius: 2px;
-  background: gainsboro;
-}
+  .low,
+  .mid,
+  .high {
+    display: block;
+    border: 0 none;
+    border-radius: 2px;
+    background: gainsboro;
+  }
 
-.low::-webkit-progress-bar,
-.mid::-webkit-progress-bar,
-.high::-webkit-progress-bar {
-  background: transparent;
-}
+  .low::-webkit-progress-bar,
+  .mid::-webkit-progress-bar,
+  .high::-webkit-progress-bar {
+    background: transparent;
+  }
 
-.low::-webkit-progress-value {
-  border-radius: 2px;
-  background: rgb(246, 193, 68);
-}
+  .low::-webkit-progress-value {
+    border-radius: 2px;
+    background: rgb(246, 193, 68);
+  }
 
-.mid::-webkit-progress-value {
-  border-radius: 2px;
-  background: rgb(63, 132, 88);
-}
+  .mid::-webkit-progress-value {
+    border-radius: 2px;
+    background: rgb(63, 132, 88);
+  }
 
-.high::-webkit-progress-value {
-  border-radius: 2px;
-  background: rgb(44, 112, 244);
-}
+  .high::-webkit-progress-value {
+    border-radius: 2px;
+    background: rgb(44, 112, 244);
+  }
 
-.progress-bar {
-  position: relative;
-  background-color: white;
-  width: 50%;
-  height: 100%;
-}
+  .progress-bar {
+    position: relative;
+    background-color: white;
+    width: 50%;
+    height: 100%;
+  }
 
-.progress-bar span {
-  position: absolute;
-  display: inline-block;
-  color: white;
-  text-align: center;
-  font-weight: 600;
-}
+  .progress-bar span {
+    position: absolute;
+    display: inline-block;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+  }
 
-.ow-flex-wrap .filter-checkbox-label,
-.filter-radio-label {
-  margin-left: 5px;
-  margin-right: 0;
-}
+  .ow-flex-wrap .filter-checkbox-label,
+  .filter-radio-label {
+    margin-left: 5px;
+    margin-right: 0;
+  }
 
-.ow-flex-wrap .item .radiobtn {
-  background-color: #e1e6ea;
-  padding: 3px;
-  border-radius: 2px;
-}
+  .ow-flex-wrap .item .radiobtn {
+    background-color: #e1e6ea;
+    padding: 3px;
+    border-radius: 2px;
+  }
 
-.arrow_down {
-  opacity: 1; /* 불투명도 */
-  display: block; /* 줄바꿈 */
-  height: auto;
-  transition: 0.5s ease; /* 속도 조절 */
-  backface-visibility: hidden; /* 요소의 뒷면이 사용자를 향할 때 보이면 안됨 */
-}
+  .arrow_down {
+    opacity: 1; /* 불투명도 */
+    display: block; /* 줄바꿈 */
+    height: auto;
+    transition: 0.5s ease; /* 속도 조절 */
+    backface-visibility: hidden; /* 요소의 뒷면이 사용자를 향할 때 보이면 안됨 */
+  }
 
-.explain {
-  z-index: 100;
-  transition: 0.5s ease;
-  opacity: 0;
-  position: absolute;
-  background-color: white;
-  padding: 1em;
-  border: 1px solid black;
-}
+  .explain {
+    z-index: 100;
+    transition: 0.5s ease;
+    opacity: 0;
+    position: absolute;
+    background-color: white;
+    padding: 1em;
+    border: 1px solid black;
+  }
 
-.arrow_down:hover + .explain {
-  opacity: 1;
-}
+  .arrow_down:hover + .explain {
+    opacity: 1;
+  }
 
-.ow-grid .wj-cell.wj-header {
-  background-color: rgb(231, 234, 241);
-}
+  .ow-grid .wj-cell.wj-header {
+    background-color: rgb(231, 234, 241);
+  }
 
-.ow-grid .wj-cell.wj-alt {
-  background-color: #fff;
-}
-</style>
+  .ow-grid .wj-cell.wj-alt {
+    background-color: #fff;
+  }
 
-<style lang="scss">
-.ow-grid {
-  .wj-cell {
-    &.ifUnrelease {
-      background-color: rgb(248, 229, 227);
-      color: rgb(210, 57, 46);
+  .ow-grid {
+    .wj-cell {
+      &.ifUnrelease {
+        background-color: rgb(248, 229, 227);
+        color: rgb(210, 57, 46);
+      }
     }
   }
 }
