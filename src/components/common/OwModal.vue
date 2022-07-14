@@ -15,10 +15,10 @@
       <div class="layer-foot">
         <div class="actions">
           <slot name="action">
-            <button type="button" class="ow-btn type-base color-gray" @click.prevent="onCancel">
+            <button type="button" v-show="cancelButton" class="ow-btn type-base color-gray" @click.prevent="onCancel">
               {{ cancelButtonText }}
             </button>
-            <button type="button" class="ow-btn type-base color-dark" @click.prevent="onAccept">
+            <button type="button" v-show="acceptButton" class="ow-btn type-base color-dark" @click.prevent="onAccept">
               {{ acceptButtonText }}
             </button>
           </slot>
@@ -69,6 +69,14 @@ export default {
       default: '',
     },
     once: {
+      type: Boolean,
+      default: false,
+    },
+    cancelButton: {
+      type: Boolean,
+      default: false,
+    },
+    acceptButton: {
       type: Boolean,
       default: false,
     },

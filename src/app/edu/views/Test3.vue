@@ -19,7 +19,7 @@
     </div>
     <hr />
     <!-- 모달모달 -->
-    <ow-modal type="XS" :title="'[' + modalData.title + '] 예정시간 수정'" ref="childRef" v-if="modalData">
+    <ow-modal type="XS" :title="'[' + modalData.title + '] 예정시간 수정'" ref="childRef" v-if="modalData" :cancelButton="true">
       <div>사원명 - {{modalData.employeeName}}</div>
       <div>업체명 - {{modalData.title}}</div>
        <span class="mt-5">
@@ -31,7 +31,7 @@
       <!-- 왼쪽 화면 -->
       <div class="left h-100">
         <div class="d-flex justify-content-end mt-5 mb-5">
-          <button class="ow-btn type-util" @click="openModal" v-if="updateDate" >예정시간수정</button>
+          <button class="ow-btn type-util" @click="openModal" :disabled="!updateDate" >예정시간수정</button>
           <button class="ow-btn type-util">추가</button>
         </div>
         <ow-tree-grid
@@ -446,10 +446,14 @@ const onInitialized = (grid) => {
 const childRef = ref(null);
 
 const openModal = async function () {
-  const ok = await childRef.value.open();
+  const config = {
+    data: {},
+    cancelButtonText: '확인',
+  }
+  console.log(childRef);
+  const ok = await childRef.value.open("accept", config);
   console.log('modal ok', ok);
   console.log(modalData);
-  console.log(modalData.value);
 };
 
 </script>

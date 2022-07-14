@@ -23,7 +23,8 @@
           <div class="ow-flex-wrap">
             <div class="item txt-dot-square">계획</div>
             <div class="align-to-right">
-              300건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 300 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
+              300건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 300 - statusOrd }}건</strong> /
+              <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
             </div>
           </div>
           <div class="ow-flex-wrap">
@@ -151,7 +152,10 @@
           <div>
             <!-- hover 했을 때 범례 띄워줌 -->
             <button type="button" class="ow-btn type-icon arrow_down">
-              <img src="@/assets/images/icon/ico_list.svg" style="border: 0.8px solid gray; width: 20px; padding: 2px" />
+              <img
+                src="@/assets/images/icon/ico_list.svg"
+                style="border: 0.8px solid gray; width: 20px; padding: 2px"
+              />
             </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
@@ -199,7 +203,14 @@
       </div>
     </div>
     <div>
-      <ow-n-grid :n="10" :visible-rows-count="state.visibleRowsCount" :initialized="initialize" :key="keyData" :read="read" :autoRowHeights="true">
+      <ow-n-grid
+        :n="10"
+        :visible-rows-count="state.visibleRowsCount"
+        :initialized="initialize"
+        :key="keyData"
+        :read="read"
+        :autoRowHeights="true"
+      >
         <template #left>&nbsp;</template>
         <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
@@ -440,106 +451,106 @@ async function getunrlsCnt() {
 getunrlsCnt();
 </script>
 
-<style>
-.ow-panel .ow-panel-header .ow-panel-title {
-  justify-content: center;
-  font-weight: 800;
-}
+<style scoped lang="scss">
+::v-deep {
+  .ow-panel .ow-panel-header .ow-panel-title {
+    justify-content: center;
+    font-weight: 800;
+  }
 
-.low,
-.mid,
-.high {
-  display: block;
-  border: 0 none;
-  border-radius: 2px;
-  background: gainsboro;
-}
+  .low,
+  .mid,
+  .high {
+    display: block;
+    border: 0 none;
+    border-radius: 2px;
+    background: gainsboro;
+  }
 
-.low::-webkit-progress-bar,
-.mid::-webkit-progress-bar,
-.high::-webkit-progress-bar {
-  background: transparent;
-}
+  .low::-webkit-progress-bar,
+  .mid::-webkit-progress-bar,
+  .high::-webkit-progress-bar {
+    background: transparent;
+  }
 
-.low::-webkit-progress-value {
-  border-radius: 2px;
-  background: rgb(246, 193, 68);
-}
+  .low::-webkit-progress-value {
+    border-radius: 2px;
+    background: rgb(246, 193, 68);
+  }
 
-.mid::-webkit-progress-value {
-  border-radius: 2px;
-  background: rgb(63, 132, 88);
-}
+  .mid::-webkit-progress-value {
+    border-radius: 2px;
+    background: rgb(63, 132, 88);
+  }
 
-.high::-webkit-progress-value {
-  border-radius: 2px;
-  background: rgb(44, 112, 244);
-}
+  .high::-webkit-progress-value {
+    border-radius: 2px;
+    background: rgb(44, 112, 244);
+  }
 
-.progress-bar {
-  position: relative;
-  background-color: white;
-  width: 50%;
-  height: 100%;
-}
+  .progress-bar {
+    position: relative;
+    background-color: white;
+    width: 50%;
+    height: 100%;
+  }
 
-.progress-bar span {
-  position: absolute;
-  display: inline-block;
-  color: white;
-  text-align: center;
-  font-weight: 600;
-}
+  .progress-bar span {
+    position: absolute;
+    display: inline-block;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+  }
 
-.ow-flex-wrap .filter-checkbox-label,
-.filter-radio-label {
-  margin-left: 5px;
-  margin-right: 0;
-}
+  .ow-flex-wrap .filter-checkbox-label,
+  .filter-radio-label {
+    margin-left: 5px;
+    margin-right: 0;
+  }
 
-.ow-flex-wrap .item .radiobtn {
-  background-color: #e1e6ea;
-  padding: 3px;
-  border-radius: 2px;
-}
+  .ow-flex-wrap .item .radiobtn {
+    background-color: #e1e6ea;
+    padding: 3px;
+    border-radius: 2px;
+  }
 
-.arrow_down {
-  opacity: 1; /* 불투명도 */
-  display: block; /* 줄바꿈 */
-  height: auto;
-  transition: 0.5s ease; /* 속도 조절 */
-  backface-visibility: hidden; /* 요소의 뒷면이 사용자를 향할 때 보이면 안됨 */
-}
+  .arrow_down {
+    opacity: 1; /* 불투명도 */
+    display: block; /* 줄바꿈 */
+    height: auto;
+    transition: 0.5s ease; /* 속도 조절 */
+    backface-visibility: hidden; /* 요소의 뒷면이 사용자를 향할 때 보이면 안됨 */
+  }
 
-.explain {
-  z-index: 100;
-  transition: 0.5s ease;
-  opacity: 0;
-  position: absolute;
-  background-color: white;
-  padding: 1em;
-  border: 1px solid black;
-}
+  .explain {
+    z-index: 100;
+    transition: 0.5s ease;
+    opacity: 0;
+    position: absolute;
+    background-color: white;
+    padding: 1em;
+    border: 1px solid black;
+  }
 
-.arrow_down:hover + .explain {
-  opacity: 1;
-}
+  .arrow_down:hover + .explain {
+    opacity: 1;
+  }
 
-.ow-grid .wj-cell.wj-header {
-  background-color: rgb(231, 234, 241);
-}
+  .ow-grid .wj-cell.wj-header {
+    background-color: rgb(231, 234, 241);
+  }
 
-.ow-grid .wj-cell.wj-alt {
-  background-color: #fff;
-}
-</style>
+  .ow-grid .wj-cell.wj-alt {
+    background-color: #fff;
+  }
 
-<style lang="scss">
-.ow-grid {
-  .wj-cell {
-    &.ifUnrelease {
-      background-color: rgb(248, 229, 227);
-      color: rgb(210, 57, 46);
+  .ow-grid {
+    .wj-cell {
+      &.ifUnrelease {
+        background-color: rgb(248, 229, 227);
+        color: rgb(210, 57, 46);
+      }
     }
   }
 }
