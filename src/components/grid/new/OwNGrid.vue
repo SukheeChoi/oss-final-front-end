@@ -41,7 +41,7 @@
         ></b-pagination>
       </div>
       <div></div>
-      <!-- <div>전체 {{ totalCount }} 건</div> -->
+      <div>전체 {{ totalCount }} 건</div>
     </div>
     <ow-flex-grid-editor v-if="editable" :src="[...grids]" :type="editorSize">
       <template #default="item">
@@ -115,8 +115,12 @@ export default {
     remove: Function,
     editable: Boolean,
     editorSize: { type: String, default: 'L' },
+
+    pageSize: { type: Number, default: 20 }
+    , pageIndex: { type: Number, default: 0 }
   },
   setup(props) {
+
     const header = ref(null);
 
     const state = reactive({
@@ -134,7 +138,9 @@ export default {
       isNotBlank: true,
       // 보여지는 페이지의 수
       perPage: computed(() => state.pageSize * props.n),
+      pageIndex: 0
     });
+    // console.log('@@ ngrid - pageNo', pageNo);
 
     /**
      * 페이지 정보 설정
@@ -143,14 +149,24 @@ export default {
      * @param {EventArgs} e
      */
     const setPage = (c) => {
+      console.log('@@ c', c);
       if (c.first) {
-        const { pageNo, pageSize, totalItemCount, pageSizeList } = c;
+        const { pageNo, pageSize, totalItemCount, pageSizeList, pageIndex } = c;
+        console.log('@@ setPage - NGridRestCollectionView - pageIndex : ', pageIndex)
+        state.pageIndex = pageIndex;
+        // const { pageNo, pageSize, totalCount, pageSizeList } = c;
+        // const { pageNo, pageSize, totalItemCount, pageSizeList, itemCount } = c;
         state.pageNo = pageNo;
+        // state.pageSize = 20;
+        // state.pageSize = itemCount / props.n;
+        // state.pageSize = props.pageSize;
         state.pageSize = pageSize;
+        // state.totalCount = totalCount;
         state.totalCount = totalItemCount;
         state.pageSizeList = pageSizeList;
       }
     };
+    console.log('@@ state.pageSize : ', state.pageSize);
 
     /**
      * 이벤트 설정
@@ -161,6 +177,7 @@ export default {
     const setDefaultEvents = (s, c) => {
       // 데이터 로드시 페이지 정보 설정
       c.loaded.addHandler(setPage);
+      console.log('@@ after setPage - props.pageSize : ', props.pageSize);
     };
 
     /**
@@ -170,6 +187,7 @@ export default {
      * @param {FlexGrid} s
      */
     const initialize = (i, s) => {
+      console.log('@@ FlexGrid 초기화 : ', i);
       // 그리드
       const grid = s;
 
@@ -181,12 +199,16 @@ export default {
         n: props.n,
         i,
         pageNo: state.pageNo,
-        pageSize: state.pageSize,
+        pageSize: props.pageSize,
+        // pageSize: state.pageSize,
         getItems: props.read,
         addItem: props.insert,
         patchItem: props.update,
         deleteItem: props.remove,
+
+        pageIndex: state.pageIndex
       });
+      console.log('@@ const collection = new NGridRestCollectionView : ', collection);
 
       // 아이템 설정//
       grid.itemsSource = collection;
