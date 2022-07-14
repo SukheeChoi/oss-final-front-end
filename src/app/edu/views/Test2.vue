@@ -209,7 +209,7 @@
               <th class="table-title" style="width: 15%">주문방법</th>
               <th class="table-title" style="width: 15%">출고일</th>
             </tr>
-            <tr v-for="(order, index) in pastOrder" :key="index" :id="order.orderNo" @click="getPastOrderDetail(order.orderNo, $event)"> 
+            <tr v-for="(order, index) in pastOrder" :key="index" :id="order.orderNo" @click="getPastOrderDetail(order.orderNo)"> 
               <td class="table-body-center">{{order.orderDate}}</td>
               <td>{{order.itemName}}<span class="pl-0" v-if="order.itemCount">외 {{order.itemCount}} 건</span></td>
               <td class="table-body-right">{{order.itemQuantity}}</td>
@@ -319,7 +319,7 @@
             <p v-if="cell.item.unrelease >= 1" class="ow-tag type-category">
               <i class="u">미</i>
             </p>
-            <span :style="cell.item.unrelease ? 'color: rgb(210, 57, 46)' : ''" style="text-decoration: underline; cursor: pointer;" @click="selectModal(cell, $event)">
+            <span :style="cell.item.unrelease ? 'color: rgb(210, 57, 46)' : ''" style="text-decoration: underline; cursor: pointer;" @click="selectModal(cell)">
               {{ cell.item.client }}
             </span>
           </wj-flex-grid-cell-template>
@@ -547,19 +547,16 @@ let modalData = ref(false);
 let clientDetail = ref(null);
 let recentOrder = ref(null);
 let pastOrder = ref(null);
-let pastOrderDetail = ref(null);
+let pastOrderDetail = ref([{},{},{}]);
 
 const openModal = async function () {
   const config = {
     data: {},
     cancelButtonText: '확인',
   }
-  const ok = await childRef.value.open("accept", config);
-  console.log(childRef);
-  console.log('modal ok', ok);
-  if(ok.ok === false) {
-    pastOrderDetail.value = null;
-    console.log("왜 안돼")
+  const childRefData = await childRef.value.open("accept", config);
+  if(childRefData.ok === false) {
+    pastOrderDetail.value = [{},{},{}];
   }
 };
 
@@ -574,10 +571,8 @@ const getModalDetail = async function (orderNo) {
   return modalDetail;
 };
 
-function selectModal(data, event) {
- console.log(data);
- getModal(data.item.clientNo, data.item.orderNo).then((data) => {
-        console.log(data);
+function selectModal(cell) {
+ getModal(cell.item.clientNo, cell.item.orderNo).then((data) => {
         clientDetail.value = data.clientDetail;
         recentOrder.value = data.recentOrder;
         pastOrder.value = data.pastOrder;
@@ -585,33 +580,10 @@ function selectModal(data, event) {
       });
 };
 
-const onSelectionChanged = (grid, target) => {
-  //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
-  if (target.row !== -1) {
-    if (grid.selectedItems[0].orderNo != null) {
-      const orderNo = grid.selectedItems[0].orderNo;
-      const clientNo = grid.selectedItems[0].clientNo;
-      getModal(clientNo, orderNo).then((data) => {
-        console.log(data);
-        clientDetail.value = data.clientDetail;
-        recentOrder.value = data.recentOrder;
-        pastOrder.value = data.pastOrder;
-        openModal();
-      });
-    }
-  }
-};
-
-async function getPastOrderDetail(data, e) {
-  const event = e;
-  console.log(event);
-  console.log(data);
-  const response = getModalDetail(data).then((data) => {
-    console.log(data);
+async function getPastOrderDetail(orderNo) {
+  const response = getModalDetail(orderNo).then((data) => {
     pastOrderDetail.value = data.pastOrderDetail;
   });
-  console.log(pastOrderDetail.value);
-  console.log(response);
 };
 
 </script>
