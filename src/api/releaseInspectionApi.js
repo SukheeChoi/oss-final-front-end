@@ -85,11 +85,23 @@ async function getTotal() {
   return response.data;
 }
 
-// n번째 박스 패킹 완료 버튼 클릭
-async function packing(boxItemData) {
+// n번째 박스 패킹 완료 버튼 클릭 -> update
+async function updateBoxTable(boxItemData) {
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/packing`, boxItemData);
+    response = await axios.post(`/releaseInspection/updateBoxTable`, boxItemData);
+  }catch(error){
+    console.log("#######/releaseInspection/updateBoxTable 통신 실패######")
+    console.log(error);
+  }
+  return response;
+}
+
+// n번째 박스 추가 버튼 클릭 -> insert
+async function insertToBoxTable(boxItemData) {
+  let response = null;
+  try{
+    response = await axios.post(`/releaseInspection/insertToBoxTable`, boxItemData);
   }catch(error){
     console.log("#######/releaseInspection/packing 통신 실패######")
     console.log(error);
@@ -122,10 +134,10 @@ async function packingDone(packingDoneInfo) {
 // }
 
 //ord_sts가 5,6일 때 박스별 품목정보 가져오기
-async function getBoxInfo(orderNo) {
+async function getBoxInfobyOrderNo(orderNo, index) {
   let response = null;
   try{
-    response = await axios.get(`/releaseInspection/getBoxInfobyOrdNo?orderNo=${orderNo}`);
+    response = await axios.get(`/releaseInspection/getBoxInfobyOrdNo?orderNo=${orderNo}&&index=${index}`);
   }catch(error){
     console.log("#######/releaseInspection/getBoxInfobyOrdNo 통신 실패######")
     console.log(error);
@@ -143,7 +155,8 @@ export default{
   unReleaseQtyUpdate,
   scan,
   getTotal,
-  packing,
+  updateBoxTable,
   packingDone,
-  getBoxInfo
+  getBoxInfobyOrderNo,
+  insertToBoxTable
 };

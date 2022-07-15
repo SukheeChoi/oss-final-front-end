@@ -259,7 +259,7 @@
         <div class="item align-y-start">
           <div class="ow-flex-wrap">
             <div class="title-field">박스별품목정보</div>
-            <button class="ow-btn type-state" v-on:click="addBox()" v-if="orderStatus">박스추가+</button>
+            <button class="ow-btn type-state" v-on:click="addBox()" v-if="orderStatus == false">박스추가+</button>
           </div>
         </div>
         <div>
@@ -282,7 +282,7 @@
                 <wj-flex-grid-column-group :binding="'boxItemQuantity'" header="물품수량" :width="63" >
                   <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
                     <div class="ow-input">
-                      <input id="boxItemQtyInput" type="text" :value='cell.item.boxItemQuantity'/>
+                      <input id="boxItemQtyInput" type="text" v-model='cell.item.boxItemQuantity'/>
                     </div>
                   </wj-flex-grid-cell-template>
                 </wj-flex-grid-column-group>
@@ -310,6 +310,8 @@ import releaseInspectionApi from '@/api/releaseInspectionApi';
 export default {
 
   setup() {
+
+    const dummyBox = ref(null);
 
     //스캔버튼 눌렀을 때, orderStatus:false => 4, orderStatus:true => 5,6
     const orderStatus = ref(true);
@@ -387,6 +389,43 @@ export default {
         boxNum = boxNum + 1;
         boxArrays.value.push(`박스${boxNum}`);
       }
+
+      // if(result.release.releaseDone == 0 ){
+        //스캔 버튼 누르면 box테이블 데이터 생성
+      //   boxItemData.value = await releaseInspectionApi.getBoxInfobyOrderNo(tally.releaseCode);
+      // }
+
+      console.log("dummyBox.value >> ", dummyBox.value);
+
+      //api로 전달할 변수(//박스별 검수수량을 저장할 객체 -> 박스 집합)
+      const apiArray = [];
+      
+      console.log("addBox에서의 index >> ", index.value);
+
+      if(index.value == null){
+        for(let i=0; i<dummyBox.value.length; i++) {
+          console.log(i+'번째', dummyBox.value[i]);
+          
+          apiArray.push({"releaseCode": dummyBox.value[i].releaseCode,
+                        "orderItemNo" : dummyBox.value[i].orderItemNo,
+                        "boxNumber": index.value+1, 
+                        "boxItemQuantity": dummyBox.value[i].boxItemQuantity});
+        }        
+      }else{
+        for(let i=0; i<dummyBox.value.length; i++) {
+          console.log(i+'번째', dummyBox.value[i]);
+          
+          apiArray.push({"releaseCode": dummyBox.value[i].releaseCode,
+                        "orderItemNo" : dummyBox.value[i].orderItemNo,
+                        "boxNumber": index.value+2, 
+                        "boxItemQuantity": dummyBox.value[i].boxItemQuantity});
+        }         
+      }
+
+      console.log("apiArray >> ", apiArray);
+
+      //DB에 박스n에 대한 정보 INSERT
+      insertBoxTable(apiArray);
     }
 
     //Filter
@@ -467,20 +506,18 @@ export default {
       barCode: 0,
       releaseDone: ''
     });
- 
-    //박스들(list)의 정보를 포함하는 list
-    const boxItemDataList = [];
 
-    //박스 하나의 정보 -> ref에서 reactive로 변경
+    //박스 하나의 정보 -> v-model로 바인딩
     const boxItemData = ref(null);
 
     // 스캔 버튼 이벤트 함수
     // 출고번호(releaseCode) or 바코드(barCode)
     async function scan(code, kind) {
       //result -> 스캔한 코드에 대한 전체 데이터
-      const result = await releaseInspectionApi.scan(code, kind);
-
+      const result = await getBoxInfobyReleaseCode(code, kind);
+      dummyBox.value = result;
       console.log("result >> ", result);
+      console.log("scan에서의 더미박스 >> ", dummyBox.value.target);
 
       tally.totalPickingQty = 0;
       tally.totalInspectionQty = 0;
@@ -500,8 +537,11 @@ export default {
 
       console.log(orderStatus.value);
 
+      boxArrays.value = [];
+
       if(result[0].status === 4){
         orderStatus.value = false;
+
       }else{
         orderStatus.value = true;
         for(let i=1; i<=result[0].releaseBoxQty; i++){
@@ -512,17 +552,8 @@ export default {
       console.log(orderStatus.value);
 
       console.log("-------------------scan----------------------");
-      console.log("boxItemDataList >> ", boxItemDataList);
-      console.log('boxItemData', boxItemData.value);
 
-      if(kind == "releaseCode") {
-        for(let i=0; i<8; i++){
-          // box테이블 데이터 list에 저장
-          boxItemDataList.push(result);
-        }
-      }
-
-      //boxItemData.value = boxItemDataList[0];
+      // console.log('boxItemData', boxItemData.value);
       
       return result;
     }
@@ -540,37 +571,33 @@ export default {
 
     //n번째 박스 패킹처리
     async function oneBoxPacking(index) {
+      console.log("=====oneBoxPacking 클릭=====")
+      console.log("index.value >> ", index.value);
+      //확인 필요!!
+      console.log("boxItemData.value >> ", boxItemData.value)
 
       //api로 전달할 변수(//박스별 검수수량을 저장할 객체 -> 박스 집합)
       const apiArray = [];
-      const dummyBox = boxItemDataList[index];
-      console.log("dummyBox >> ", dummyBox);
-      console.log(" boxItemDataList[2] >> ", boxItemDataList[2]);
 
-      // for(let i=0; i<boxItemData.value.length; i++) {
-      //   console.log(i+'번째', boxItemData.value[i]);
-        
-      //   apiArray.push({"releaseCode": boxItemData.value[i].releaseCode,
-      //                 "orderItemNo" : boxItemData.value[i].orderItemNo,
-      //                 "boxNumber": index+1, 
-      //                 "boxItemQuantity": boxItemData.value[i].boxItemQuantity});
+      //전달해줄 데이터
+      for(let i=0; i<boxItemData.value.length; i++) {
+        console.log(i+'번째', boxItemData.value[i]);
+        console.log
+        apiArray.push({"releaseCode": boxItemData.value[i].releaseCode,
+                      "orderItemNo" : boxItemData.value[i].orderItemNo,
+                      "boxNumber": boxItemData.value[i].boxNum,
+                      "boxItemQuantity": boxItemData.value[i].boxItemQuantity});
 
-      //   keyData.value++;
-      // }
-      console.log("패킹패킹");
-      console.log(apiArray);
+        keyData.value++;
+      }
 
-      console.log("=====oneBoxPacking 클릭=====")
+      console.log("apiArray >> ", apiArray);
       
       console.log("boxItemData >> ", boxItemData.value);
-      console.log("수정전 boxItemDataList >> ", boxItemDataList);
-      //boxItemDataList 바꿔주기..
-      boxItemDataList[index] = boxItemData.value
-      console.log("수정후 boxItemDataList >> ", boxItemDataList);
 
       //api통신
-      // const result = await releaseInspectionApi.packing(apiArray);
-      // return result;
+      const result = await releaseInspectionApi.updateBoxTable(apiArray);
+      return result;
     }
 
     const boxKey = ref(0);
@@ -578,16 +605,17 @@ export default {
     //ow-tab의 index 감시 (몇 번째 탭 클릭)
     watch(index, (newIndex, oldIndex)=>{
 
-      console.log("===========watch===========");
-      console.log("boxItemDataList >> ", boxItemDataList);
-
-      //뷰 재로딩
-      boxKey.value ++; 
       console.log("현재 index >> ", index.value);
 
-      console.log("boxItemDataList[index] >> ", boxItemDataList[index.value]);
-      boxItemData.value = boxItemDataList[index.value];
-
+      if(orderStatus.value == true){
+        console.log("===========watch===========");
+        getBoxInfobyOrderNo(tally.orderNo, index.value+1); 
+      }else{
+        console.log("===========watch===========");
+        getBoxInfobyOrderNo(tally.orderNo, index.value+1);
+        console.log("tally.orderNo >> ", tally.orderNo);
+        console.log("index.value+1 >> ", index.value+1);
+      }
     },{deep: true});
 
     const SelectionChanged = async (grid, e) => {
@@ -644,6 +672,23 @@ export default {
           }
         }
       }
+    }
+
+    async function getBoxInfobyOrderNo(orderNo, index){
+      const result = await releaseInspectionApi.getBoxInfobyOrderNo(orderNo, index);
+      console.log("getBoxInfobyOrderNo의 result >> ", result);
+      boxItemData.value = result;
+      return result;
+    }
+
+    async function getBoxInfobyReleaseCode(code, kind){
+      const result = await releaseInspectionApi.scan(code, kind);
+      return result;
+    }
+
+    async function insertBoxTable(apiArray){
+      const result = await releaseInspectionApi.insertToBoxTable(apiArray);
+      return result;
     }
 
     return {
