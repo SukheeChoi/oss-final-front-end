@@ -84,6 +84,7 @@ export default {
     watch(
       () => props.before && props.before.modelValue,
       () => {
+        console.log(props);
         const before = Globalize.parseDate(props.before.modelValue, state.format);
         const after = Globalize.parseDate(props.modelValue, state.format);
         if (after < before) {
