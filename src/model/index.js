@@ -358,8 +358,7 @@ export class GridRestCollectionView extends RestCollectionView {
     // wijmo는 zero-base
     this._pgIdx = (options.pageNo ?? 1) - 1;
     this._pgSz = options.pageSize ?? 10;
-    this._pageSizeList = options.pageSizeList ?? [3, 5, 10, 16, 20, 30, 50, 100];
-    // this._pageSizeList = options.pageSizeList ?? [5, 10, 20, 30, 50, 100];
+    this._pageSizeList = options.pageSizeList ?? [5, 10, 20, 30, 50, 100];
     this.scrollRestoration = options.scrollRestoration ?? false;
     // 쿼리 정보 설정
     this._query = options.query ?? {};
@@ -444,6 +443,7 @@ export class GridRestCollectionView extends RestCollectionView {
   }
 
   lookup(query) {
+    console.log('@@ GridRestCollectionView - lookup(query) - 실행');
     this._query = query;
     this._pgIdx = 0;
     this._pgSz = 10;
@@ -451,6 +451,7 @@ export class GridRestCollectionView extends RestCollectionView {
   }
 
   async getItems() {
+    console.log('@@ GridRestCollectionView - async getItems() - 실행');
     if (!isFunction(this._getItems)) {
       console.error('조회 API가 없거나 함수 형태가 아닙니다.');
       return;
@@ -535,6 +536,10 @@ export class NGridRestCollectionView extends GridRestCollectionView {
     this.n = options.n;
     this.i = options.i;
     this.first = this.i === 1;
+
+    console.log('@@ NGridRestCollectionView - constructor - options : ', options);
+    console.log('@@ NGridRestCollectionView - constructor - this._pgSz : ', this._pgSz);
+    console.log('@@ NGridRestCollectionView - constructor - options.pageSize : ', options.pageSize);
   }
 
   get pageCount() {
@@ -542,17 +547,29 @@ export class NGridRestCollectionView extends GridRestCollectionView {
   }
 
   async getItems() {
+    console.log('@@ NGridRestCollectionView - async getItems() - 실행 : ');
+    console.log('@@ NGridRestCollectionView - async getItems() - this : ', this);
     if (!isFunction(this._getItems)) {
       console.error('조회 API가 없거나 함수 형태가 아닙니다.');
       return;
     }
     const fn = this._getItems.bind(this);
     const pageNo = this.pageIndex * this.n + this.i;
-    const result = await fn(this.query, +pageNo, this.pageSize);
+    const result = await fn(this.query, +pageNo, this.pageSize, this.pageIndex);
+    // const result = await fn(this.query, +pageNo, this.pageSize);
     const { totalCount: totalItemCount, data: items } = result;
     this._totalItemCount = totalItemCount;
     return items;
   }
+
+  lookup(query) {
+    this._query = query;
+    this._pgIdx = 0;
+    // this._pgSz = options.pageSize ?? 10;
+    this._pgSz = 15;
+    this.load();
+  }
+
 }
 
 export class DataTransfer {
