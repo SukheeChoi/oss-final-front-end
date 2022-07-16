@@ -83,6 +83,18 @@ async function updateOvertime(requestData) {
   return response.data.data;
 }
 
+//시간 수정하기
+async function updateWorktime(requestData) {
+  console.log(requestData);
+  let response = null;
+  try {
+    response = await axios.put('/label/updateWorktime', requestData);
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+  return response.data.data;
+}
 
 //담당자 이름 기준으로 작업 세부사항 api 요청
 async function getListByLWTNo(labelingWorkTimeNo, searchSelected, searchContent, pageNo, pageSize) {
@@ -110,4 +122,5 @@ export default {
   getOvertime,
   getListByLWTNo,
   updateOvertime,
+  updateWorktime,
 };

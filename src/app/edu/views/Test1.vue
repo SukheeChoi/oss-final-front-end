@@ -31,6 +31,7 @@
           :selectionChanged="onSelectionChanged"
           :initialized="treeInitialized"
           :visibleRowsCount="20"
+          :key="treeKeyData"
         >
           <wj-flex-grid-column header="담당자/업체명" binding="title" :width="130" align="left"></wj-flex-grid-column>
           <wj-flex-grid-column header="수령일" binding="receiveDate" :width="100" align="center"></wj-flex-grid-column>
@@ -212,6 +213,7 @@ const childItemsPath = ['child', 'childrennn'];
 const getTree = ref([]);
 const getGrid = ref([]);
 const keyData = ref(0);
+const treeKeyData = ref(0);
 
 getTree.value = async function (query, pageNo, pageSize) {
   const treeList = await inspectionLabelingApi.getTreeList();
@@ -295,6 +297,7 @@ const openAddModal = async function () {
     };
     const result = await inspectionLabelingApi.updateOvertime(requestData).then((result) => {
       console.log('updateReceiptList - result : ' + result);
+      treeKeyData.value++;
     });
   }
 };
@@ -305,6 +308,7 @@ const openAddModal = async function () {
 const updateDate = ref(false);
 const startInputTime = ref(null);
 const endInputTime = ref(null);
+const placingOrderNo = ref(null);
 
 let modalUpdateData = reactive({
   title: '',
@@ -320,6 +324,23 @@ const openUpdateModal = async function () {
   picked.value = null;
   const childUpdateRefData = await childUpdateRef.value.open();
   console.log(childUpdateRefData);
+
+  if (childUpdateRefData.ok === true) {
+    console.log(modalUpdateData.scheduledStartTime);
+    console.log(modalUpdateData.scheduledEndTime);
+    console.log(labelingWorkTimeNo);
+    const requestData = {
+      placingOrderNo: placingOrderNo.value,
+      labelingWorkTimeNo: labelingWorkTimeNo.value,
+      startTime: modalUpdateData.scheduledStartTime,
+      endTime: modalUpdateData.scheduledEndTime,
+    };
+    console.log(requestData);
+    const result = await inspectionLabelingApi.updateWorktime(requestData).then((result) => {
+      console.log('updateReceiptList - result : ' + result);
+      treeKeyData.value++;
+    });
+  }
 };
 // ----------------------------------------------------------------------------------------------------
 
@@ -377,42 +398,37 @@ const onSelectionChanged = (grid, target) => {
       modalUpdateData.scheduledStartTime = grid.selectedItem.scheduledStartTime;
       modalUpdateData.scheduledEndTime = grid.selectedItem.scheduledEndTime;
 
-
-
-      console.log('예정시간 수정');
-      console.log(grid);
       const testGrid = grid.itemsSource.items[0].child;
       testGrid.map((data) => {
-        if(data.title === grid.selectedItem.employeeName) {
+        if (data.title === grid.selectedItem.employeeName) {
+          console.log(data);
           console.log(data.childrennn);
           console.log(grid.selectedItem.placingOrderNo);
           console.log(data.childrennn.length);
+          labelingWorkTimeNo.value =data.labelingWorkTimeNo;
+          
           //선택한 발주번호가 상위 배열의 어떤 인덱스에 있는지
-          const index = data.childrennn.findIndex(i => i.placingOrderNo === grid.selectedItem.placingOrderNo);
-          console.log(index);
-
+          const index = data.childrennn.findIndex((i) => i.placingOrderNo === grid.selectedItem.placingOrderNo);
+          placingOrderNo.value = grid.selectedItem.placingOrderNo;
           //인덱스가 0인 경우
-          if(index === 0) {
+          if (index === 0) {
             const afterArray = data.childrennn[index + 1];
-            modalUpdateData.min = "09:00";
+            modalUpdateData.min = '09:00';
             modalUpdateData.max = afterArray.scheduledStartTime;
-            console.log("배열 첫 인덱스");
-          } else if(index === data.childrennn.length - 1) {// 인덱스가 마지막(인덱스 == 배열길이)인 경우
-            console.log("배열 마지막 인덱스");
+          } else if (index === data.childrennn.length - 1) {
+            // 인덱스가 마지막(인덱스 == 배열길이)인 경우
             const beforeArray = data.childrennn[index - 1];
-            console.log(beforeArray);
             modalUpdateData.min = beforeArray.scheduledEndTime;
-            modalUpdateData.max = "18:00";
-          } else {  //나머지 일반 경우
-            console.log("배열 중간 인덱스");
+            modalUpdateData.max = '18:00';
+          } else {
+            //나머지 일반 경우
             const beforeArray = data.childrennn[index - 1];
             const afterArray = data.childrennn[index + 1];
             modalUpdateData.min = beforeArray.scheduledEndTime;
             modalUpdateData.max = afterArray.scheduledStartTime;
-
           }
         }
-      })
+      });
       console.log(testGrid);
     }
   }

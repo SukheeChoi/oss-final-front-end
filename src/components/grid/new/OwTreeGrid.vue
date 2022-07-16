@@ -127,7 +127,7 @@ export default {
     const setPage = (c) => {
       const { grid: s, totalItemCount } = c;
       state.totalCount = totalItemCount;
-      s.collapseGroupsToLevel(1);
+      s.collapseGroupsToLevel(2);
     };
 
     /**
