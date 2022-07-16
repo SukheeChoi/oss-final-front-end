@@ -32,18 +32,8 @@
           :initialized="treeInitialized"
           :visibleRowsCount="20"
         >
-          <wj-flex-grid-column
-            header="담당자/업체명"
-            binding="title"
-            :width="130"
-            align="left"
-          ></wj-flex-grid-column>
-          <wj-flex-grid-column
-            header="수령일"
-            binding="receiveDate"
-            :width="100"
-            align="center"
-          ></wj-flex-grid-column>
+          <wj-flex-grid-column header="담당자/업체명" binding="title" :width="130" align="left"></wj-flex-grid-column>
+          <wj-flex-grid-column header="수령일" binding="receiveDate" :width="100" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column
             header="수령<br>품목"
             binding="receiveItem"
@@ -150,52 +140,65 @@
   </div>
   <!-- 수정 모달모달 -->
   <ow-modal
-      type="XS"
-      :title="'[' + modalUpdateData.title + '] 예정시간 수정'"
-      ref="childUpdateRef"
-      v-if="modalUpdateData"
-      :cancelButton="true"
-    >
-      <div>사원명 - {{ modalUpdateData.employeeName }}</div>
-      <div>업체명 - {{ modalUpdateData.title }}</div>
-      <span class="mt-5">
-        <ow-input-time
-          v-model="modalUpdateData.scheduledStartTime"
-          style="width: 100px"
-        ></ow-input-time>
-        <ow-input-time v-model="modalUpdateData.scheduledEndTime" style="width: 100px"></ow-input-time>
-      </span>
-    </ow-modal>
+    type="XS"
+    :title="'[' + modalUpdateData.title + '] 예정시간 수정'"
+    ref="childUpdateRef"
+    v-if="modalUpdateData"
+    :acceptButton="true"
+  >
+    <div>사원명 - {{ modalUpdateData.employeeName }}</div>
+    <div>업체명 - {{ modalUpdateData.title }}</div>
+    <span class="mt-5">
+      <ow-input-time
+        ref="startInputTime"
+        v-if="modalUpdateData.scheduledStartTime"
+        v-model="modalUpdateData.scheduledStartTime"
+        :after="endInputTime"
+        :min="modalUpdateData.min"
+        :max="modalUpdateData.max"
+        style="width: 100px"
+      ></ow-input-time>
+      <ow-input-time
+        ref="endInputTime"
+        v-if="modalUpdateData.scheduledEndTime"
+        v-model="modalUpdateData.scheduledEndTime"
+        :before="startInputTime"
+        :min="modalUpdateData.min"
+        :max="modalUpdateData.max"
+        style="width: 100px"
+      ></ow-input-time>
+    </span>
+  </ow-modal>
   <!-- 추가 모달모달 -->
   <ow-modal
-      type="L"
-      :title="'[' + modalAddData.title + '] 잔업시간 추가'"
-      ref="childAddRef"
-      v-if="modalAddData"
-      :acceptButton="true"
-    >
-      <div>사원명 - {{ modalAddData.title }}</div>
-      <table>
-        <tr>
-          <th class="table-title" style="width: 10%">선택</th>
-          <th class="table-title" style="width: 20%">발주번호</th>
-          <th class="table-title" style="width: 40%">업체명</th>
-          <th class="table-title" style="width: 10%">수령일</th>
-          <th class="table-title" style="width: 10%">수령품목</th>
-          <th class="table-title" style="width: 10%">수령수량</th>
-        </tr>
-        <tr v-for="(order, index) in modalAddData.data" :key="index">
-          <td class="table-body-center">
-            <input type="radio" id="placingOrderNo" :value="order" v-model="picked">
-          </td>
-          <td class="table-body-center">{{ order.placingOrderNo }}</td>
-          <td class="table-body-center">{{ order.title }}</td>
-          <td class="table-body-center">{{ order.receiveDate }}</td>
-          <td class="table-body-center">{{ order.receiveItem }}</td>
-          <td class="table-body-center">{{ order.receiveQuantity }}</td>
-        </tr>
-      </table>
-    </ow-modal>
+    type="L"
+    :title="'[' + modalAddData.title + '] 잔업시간 추가'"
+    ref="childAddRef"
+    v-if="modalAddData"
+    :acceptButton="true"
+  >
+    <div>사원명 - {{ modalAddData.title }}</div>
+    <table>
+      <tr>
+        <th class="table-title" style="width: 10%">선택</th>
+        <th class="table-title" style="width: 20%">발주번호</th>
+        <th class="table-title" style="width: 40%">업체명</th>
+        <th class="table-title" style="width: 10%">수령일</th>
+        <th class="table-title" style="width: 10%">수령품목</th>
+        <th class="table-title" style="width: 10%">수령수량</th>
+      </tr>
+      <tr v-for="(order, index) in modalAddData.data" :key="index">
+        <td class="table-body-center">
+          <input type="radio" id="placingOrderNo" :value="order" v-model="picked" />
+        </td>
+        <td class="table-body-center">{{ order.placingOrderNo }}</td>
+        <td class="table-body-center">{{ order.title }}</td>
+        <td class="table-body-center">{{ order.receiveDate }}</td>
+        <td class="table-body-center">{{ order.receiveItem }}</td>
+        <td class="table-body-center">{{ order.receiveQuantity }}</td>
+      </tr>
+    </table>
+  </ow-modal>
 </template>
 
 <script setup>
@@ -277,23 +280,22 @@ const openAddModal = async function () {
   picked.value = null;
   const childAddRefData = await childAddRef.value.open();
   console.log(childAddRefData);
-  if(childAddRefData.ok === true) {
+  if (childAddRefData.ok === true) {
     //작업 추가하는 로직
     console.log(picked.value);
     console.log(modalAddData.value);
 
     const requestData = {
-        receiveItem: picked.value.receiveItem,
-        receiveQuantity: picked.value.receiveQuantity,
-        placingOrderNo: picked.value.placingOrderNo,
-        labelingWorkTimeNo: labelingWorkTimeNo.value,
-        startTime: startTime.value, 
-        endTime: '18:00',
+      receiveItem: picked.value.receiveItem,
+      receiveQuantity: picked.value.receiveQuantity,
+      placingOrderNo: picked.value.placingOrderNo,
+      labelingWorkTimeNo: labelingWorkTimeNo.value,
+      startTime: startTime.value,
+      endTime: '18:00',
     };
-    const result = await inspectionLabelingApi.updateOvertime(requestData)
-      .then((result) => {
-        console.log('updateReceiptList - result : ' + result);
-      });
+    const result = await inspectionLabelingApi.updateOvertime(requestData).then((result) => {
+      console.log('updateReceiptList - result : ' + result);
+    });
   }
 };
 
@@ -301,11 +303,16 @@ const openAddModal = async function () {
 
 // --------------------------------------- 수정 모달 update -------------------------------------------------------
 const updateDate = ref(false);
+const startInputTime = ref(null);
+const endInputTime = ref(null);
+
 let modalUpdateData = reactive({
   title: '',
   employeeName: '',
   scheduledStartTime: '',
   scheduledEndTime: '',
+  min: '',
+  max: '',
 });
 const childUpdateRef = ref(null);
 
@@ -313,7 +320,6 @@ const openUpdateModal = async function () {
   picked.value = null;
   const childUpdateRefData = await childUpdateRef.value.open();
   console.log(childUpdateRefData);
-
 };
 // ----------------------------------------------------------------------------------------------------
 
@@ -326,7 +332,6 @@ const onSelectionChanged = (grid, target) => {
   updateDate.value = false;
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
-
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
     if (grid.selectedItem.childrennn != null) {
       addDate.value = true;
@@ -338,8 +343,9 @@ const onSelectionChanged = (grid, target) => {
       getOvertime().then((data) => {
         modalAddData.value = {
           data: data,
-          title: title.value};
-        console.log("modalAddDatamodalAddData", modalAddData);
+          title: title.value,
+        };
+        console.log('modalAddDatamodalAddData', modalAddData);
       });
       //---------
 
@@ -370,12 +376,45 @@ const onSelectionChanged = (grid, target) => {
       modalUpdateData.employeeName = grid.selectedItem.employeeName;
       modalUpdateData.scheduledStartTime = grid.selectedItem.scheduledStartTime;
       modalUpdateData.scheduledEndTime = grid.selectedItem.scheduledEndTime;
-      
+
+
+
       console.log('예정시간 수정');
       console.log(grid);
-      console.log(grid.selectedItem);
-    }
+      const testGrid = grid.itemsSource.items[0].child;
+      testGrid.map((data) => {
+        if(data.title === grid.selectedItem.employeeName) {
+          console.log(data.childrennn);
+          console.log(grid.selectedItem.placingOrderNo);
+          console.log(data.childrennn.length);
+          //선택한 발주번호가 상위 배열의 어떤 인덱스에 있는지
+          const index = data.childrennn.findIndex(i => i.placingOrderNo === grid.selectedItem.placingOrderNo);
+          console.log(index);
 
+          //인덱스가 0인 경우
+          if(index === 0) {
+            const afterArray = data.childrennn[index + 1];
+            modalUpdateData.min = "09:00";
+            modalUpdateData.max = afterArray.scheduledStartTime;
+            console.log("배열 첫 인덱스");
+          } else if(index === data.childrennn.length - 1) {// 인덱스가 마지막(인덱스 == 배열길이)인 경우
+            console.log("배열 마지막 인덱스");
+            const beforeArray = data.childrennn[index - 1];
+            console.log(beforeArray);
+            modalUpdateData.min = beforeArray.scheduledEndTime;
+            modalUpdateData.max = "18:00";
+          } else {  //나머지 일반 경우
+            console.log("배열 중간 인덱스");
+            const beforeArray = data.childrennn[index - 1];
+            const afterArray = data.childrennn[index + 1];
+            modalUpdateData.min = beforeArray.scheduledEndTime;
+            modalUpdateData.max = afterArray.scheduledStartTime;
+
+          }
+        }
+      })
+      console.log(testGrid);
+    }
   }
 };
 
@@ -546,14 +585,11 @@ const onInitialized = (grid) => {
   //그리드 셀렉션모드 설정(None)
   grid.selectionMode = 0;
 };
-
-
 </script>
 
 <style scoped lang="scss">
 ::v-deep {
-
-.ow-panel .ow-panel-body {
+  .ow-panel .ow-panel-body {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -562,7 +598,7 @@ const onInitialized = (grid) => {
     background-color: #fff;
     padding: var(--ow-gutter);
     margin-bottom: 10%;
-}
+  }
 
   .wj-cell.wj-header {
     display: flex;
@@ -646,7 +682,7 @@ const onInitialized = (grid) => {
     white-space: nowrap;
   }
 
-    // 모달
+  // 모달
   .table-title {
     background-color: rgb(231, 234, 241);
     text-align: center;
