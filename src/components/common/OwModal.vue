@@ -125,6 +125,7 @@ export default {
     const onAccept = () => {
       if (state.beforeAccept()) {
         state.resolvePromise({ ok: true, control: state.control, once: state.checkedOnce });
+        hidden();
       }
     };
     const onCancel = () => {
