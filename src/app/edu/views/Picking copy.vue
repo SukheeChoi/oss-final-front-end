@@ -50,7 +50,7 @@
   <!-- '수령'탭이 선택된 경우. -->
   <ow-n-grid
     v-if="showReceipt"
-    :n="2"
+    :n="flexGridNum"
     :read="getReceiptList"
     :key="receiptKey"
     :visibleRowsCount="20"
@@ -75,8 +75,10 @@
         <div class="ow-input">
           <input id="receiptUnreleaseInput" type="text"
             v-model="cell.item.receiveUnreleaseQuantity"
+            @input="checkNaturalNumber($event, cell.item.rownum)"
             @change="changeReceiptUnrelease($event, cell.item.orderItem.orderItemNo, cell.item.receiveUnreleaseQuantity)"
           />
+            <!-- :value="naturalNumber" -->
         </div>
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
@@ -91,7 +93,7 @@
   <!-- '전달'탭이 선택된 경우. -->
   <ow-n-grid
     v-if="!showReceipt"
-    :n="2"
+    :n="flexGridNum"
     :read="read"
     :key="deliveryKey"
   >
@@ -117,6 +119,9 @@
   import combineShippingApi from '../../../api/combineShippingApi';
   import { ref, reactive, watch } from 'vue';
 
+  // NGrid 안에 포함될 FlexGrid의 갯수.
+  // NGrid콤포넌트의 n prop에 전달.
+  const flexGridNum = ref(2);
   const receiptKey = ref(0);
   const deliveryKey = ref(0);
   const showReceipt = ref(true);
@@ -136,12 +141,16 @@
   const selectedAssignee = ref('전체');
   const dateList = ref([startDate.value, endDate.value]);
   const pager = reactive({
-    // 페이지 번호
-    pageNo: 1
+    // 현재 페이지의 인덱스
+    pageIndex: 1
+    // 현재 페이지의 번호
+    , pageNo: 1
     // 전체 행 수
     , totalCount: 0
     // 페이지 당 행 수
-    , perPage: 40
+    , rowsPerPage: 40
+    // flexGrid 개당 가질 행의 갯수.
+    , pageSize: 20
   });
   // const totalRows = ref(0);
   // const perPage = ref(0);
@@ -260,7 +269,7 @@
     // }
     // const totalCount = filteredItems.length;
     const totalCount = pager.totalCount;
-    const perPage = pager.perPage;
+    const perPage = pager.rowsPerPage;
 
     // if (param.sort) {
     //   filteredItems = _.sortBy(filteredItems, param.sort);
@@ -310,8 +319,10 @@
     }
     const result = await retrieve({
       ...query,
+      // parameter로 넘어오는 pageNo은 NGrid 내부의 FlexGrid의 번호이므로 선언해둔 상수가 아닌 parameter를 이용.
       pageNo,
-      pageSize: 20,
+      pageSize: pager.pageSize,
+      // pageSize: 20,
       // label: label,
       items: items,
     });
@@ -328,12 +339,15 @@
     console.log('@@ pageNo : ', pageNo);
     console.log('@@ pageSize : ', pageSize);
     console.log('@@ pageIndex : ', pageIndex);
+    pager.pageIndex = pageIndex;
+    pager.pageNo = pageIndex + 1;
+
     const result = await combineShippingApi.getReceiptList(
           toDo.value, selectedVendor.value, Array.from(dateList.value)
           // , pager.pageNo
           // , pageNo
           , pageIndex+1
-          , pager.perPage
+          , pager.rowsPerPage
           );
         // .then((result) => {
         //   // let result2 = null;
@@ -383,6 +397,7 @@
       // return result;
   };
   getReceiptList();
+  receiptKey.value++;
 
   // 수령 Update.
   console.log('before updateReceiptList');
@@ -516,20 +531,17 @@
     clickSearch.value = false;
   });
 
-  // selectedVendor
+  // 담당업체 선택을 감시.
   watch(() => selectedVendor.value
     , (newSelectedVendor, oldSelectedVendor) => {
-      console.log('!! selectedVendor.value : ', selectedVendor.value);
-      console.log('!! newSelectedVendor : ', newSelectedVendor);
       selectedVendor.value = newSelectedVendor;
       getReceiptList();
     }
   );
-  // selectedAssignee
+  // 담당자 선택을 감시.
   watch(() => selectedAssignee.value
     , (newSelectedAssignee, oldSelectedAssignee) => {
       selectedAssignee.value = newSelectedAssignee;
-      
       getDeliveryList();
     }
   );
@@ -612,10 +624,6 @@
   function handleChangeToDelivery() {
     showReceipt.value = false;
   }
-  // 담당자 선택시.
-  // function updateSelectedAssignee(assignee) {
-  //   console.log('!! assignee', assignee);
-  // }
 
   // 할 일 탭 클릭시.
   function handleChangeToTodo() {
@@ -637,8 +645,37 @@
     dateList.value[1] = endDate.value;
   }
 
+  // 조회 버튼 클릭시.
   function handleClickSearch() {
     clickSearch.value = true;
+  }
+
+  //
+  function checkNaturalNumber(event, rownum) {
+    console.log('@@ function checkNaturalNumber(event)');
+    console.log('@@ checkNaturalNumber - event : ', event);
+    console.log('@@ checkNaturalNumber - event.target : ', event.target);
+    console.log('@@ checkNaturalNumber - event.target.value : ', event.target.value);
+    console.log('@@ checkNaturalNumber - pager.pageIndex : ', pager.pageIndex);
+    console.log('@@ checkNaturalNumber - rownum : ', rownum);
+    // 사용자로부터 입력된 미출고값.
+    // 문자나 특수기호 등 잘못된 입력이 존재할 수 있으므로 정규식을 이용해서 자연수만 입력가능하도록.
+    // ================== 수령갯수 기준으로 유효성검사 추가로 필요함!!! ==================
+    // inputUnreleasedQuantity : 사용자로부터 입력받은 미출고값.
+    let inputUnreleasedQuantity = event.target.value;
+    // 미출고값에 자연수만 입력받을 수 있도록 정규식을 이용. 문자나 특수기호가 입력 불가능하게 만듦.
+    inputUnreleasedQuantity = inputUnreleasedQuantity.replace(/[^0-9]/g, '') ;
+    console.log('@@ checkNaturalNumber - inputUnreleasedQuantity : ', inputUnreleasedQuantity);
+    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["receiveUnreleaseQuantity"] - before: ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+    receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = inputUnreleasedQuantity;
+    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["receiveUnreleaseQuantity"] - after : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+    // 미출고 수량은 출고예정 수량(주문수량과 같거나 작음)보다 커질 수 없음.
+    
+    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["informationPartner"]["releaseQuantity"] - after : ', receiptList.value[rownum-1]['informationPartner']['releaseQuantity']);
+    // console.log('@@ checkNaturalNumber - rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex) : ', rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex));
+    // 미출고값이 입력되고 있는 행의 receiptList 내부 index는 (rownum-1) 과 같음.
+
+
   }
 
   // ReceiptList의 unreleased update에 대한 handler.
