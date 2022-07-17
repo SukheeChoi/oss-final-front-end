@@ -669,8 +669,15 @@
     console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["receiveUnreleaseQuantity"] - before: ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
     receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = inputUnreleasedQuantity;
     console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["receiveUnreleaseQuantity"] - after : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
-    // 미출고 수량은 출고예정 수량(주문수량과 같거나 작음)보다 커질 수 없음.
-    
+    // 미출고 수량은 출고 수량(주문수량과 같거나 작음)보다 커질 수 없음.
+    if(parseInt(inputUnreleasedQuantity) > parseInt(receiptList.value[rownum-1]['informationPartner']['releaseQuantity'])) {
+      console.log('@@ checkNaturalNumber - if(inputUnreleasedQuantity > receiptList.value[rownum-1]["receiveUnreleaseQuantity"]) : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+      // 입력된 미출고 수량이 출고 수량보다 큰 경우, 해당 미출고값을 0으로 초기화 하고, alert 띄움.
+      receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = 0;
+      event.target.value = 0;
+      console.log('@@ checkNaturalNumber - inside - if(inputUnreleasedQuantity > receiptList.value[rownum-1]["receiveUnreleaseQuantity"]) : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+      alert('미출고 수량은 출고수량보다 클 수 없습니다.');
+    }
     console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["informationPartner"]["releaseQuantity"] - after : ', receiptList.value[rownum-1]['informationPartner']['releaseQuantity']);
     // console.log('@@ checkNaturalNumber - rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex) : ', rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex));
     // 미출고값이 입력되고 있는 행의 receiptList 내부 index는 (rownum-1) 과 같음.
