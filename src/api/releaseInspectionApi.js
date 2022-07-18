@@ -16,11 +16,9 @@ async function getReleaseInspectionList(){
 
 //필터링된 데이터 가져오기
 async function getFilterList(newGroup){
-  console.log("보내는 데이터", newGroup);
   let response = null;
   try{
     response = await axios.post(`/releaseInspection/getFilterList`, newGroup);
-    console.log("getFilterList 통신성공", response);
   }catch(error){
     console.log("#######/releaseInspection/getFilterList 통신 실패######")
     console.log(error);
@@ -34,8 +32,6 @@ async function releaseInspectionQtyUpdate(releaseCode, barCode){
   let response = null;
   try{
     response = await axios.get(`/releaseInspection/RIQtyUpdate?releaseCode=${releaseCode}&barCode=${barCode}`);
-    console.log("releaseInspectionQtyUpdate >> 일단 통신은 됐다.");
-    console.log(response);
   }catch(error){
     console.log("#######/releaseInspection/releaseInspectionQtyUpdate 통신 실패######")
     console.log(error);
@@ -49,8 +45,6 @@ async function unReleaseQtyUpdate(releaseCode, barCode) {
   let response = null;
   try{
     response = await axios.get(`/releaseInspection/unRleaseQtyUpdate?releaseCode=${releaseCode}&barCode=${barCode}`);
-    console.log("unRleaseQtyUpdate >> 일단 통신은 됐다.");
-    console.log(response);
   }catch(error){
     console.log("#######/releaseInspection/unRleaseQtyUpdate 통신 실패######");
     console.log(error);
@@ -61,12 +55,8 @@ async function unReleaseQtyUpdate(releaseCode, barCode) {
 //스캔 버튼 눌렀을 때,
 async function scan(code, kind) {
   let response = null;
-  console.log("code", code);
-  console.log("kind", kind);
   try{
     response = await axios.get(`/releaseInspection/scanBtnClick?code=${code}&&kind=${kind}`);
-    console.log("scanBtnClick >> 일단 통신은 됐다.");
-    console.log(response.data);
   }catch(error){
     console.log("#######/releaseInspection/scanBtnClick 통신 실패######")
     console.log(error);
@@ -110,10 +100,10 @@ async function insertToBoxTable(boxItemData) {
 }
 
 // 패킹 최종 완료
-async function packingDone(packingDoneInfo) {
+async function packingDone(orderNo) {
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/packingDone`, packingDoneInfo);
+    response = await axios.get(`/releaseInspection/packingDone?orderNo=${orderNo}`);
   }catch(error){
     console.log("#######/releaseInspection/packingDone 통신 실패######")
     console.log(error);

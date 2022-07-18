@@ -366,7 +366,7 @@ export default {
     return {
       modal,
       addGroupModal,
-      ...toRefs(state),
+      ...toRefs(state), 
       initialized,
       getUserList,
       initUser,
