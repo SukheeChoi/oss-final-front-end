@@ -95,7 +95,8 @@
     </div>
   </div>
 
-  <div class="ow-grid-wrap">
+  <div>
+  <!-- <div class="ow-flex-wrap ow-grid-wrap"> -->
     <ow-grid
       headersVisibility="Column"
       allowSorting="None"
