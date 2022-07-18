@@ -2,139 +2,153 @@
 <template>
   <div>
     <div class="row mb-4">
-      <!-- <status-progress-bar :title="'주문'"/> -->
-      <div class="ow-panel">
-        <div class="ow-panel-header">
-          <!-- 주문 단계를 누르면 해당 단계 관리 페이지로 이동 -->
-          <div class="ow-panel-title" onclick="location.href='/edu/Order'">주문</div>
-        </div>
-        <div class="ow-panel-body">
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
-            <div class="progress-bar">
-              <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
-              <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
-              <!-- 퍼센트마다 progress바 다르게 적용 -->
-              <progress class="low" v-if="percentOrd < 60" :value="percentOrd" :max="100"></progress>
-              <progress class="mid" v-else-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
-              <progress class="high" v-else :value="percentOrd" :max="100"></progress>
-            </div>
-          </div>
-          <hr />
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획</div>
-            <div class="align-to-right">
-              {{ orderPlan }}건(<strong style="color: rgb(103, 146, 226)">잔여 {{ orderPlan - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
-            </div>
-          </div>
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">실적</div>
-            <div class="align-to-right">{{ statusOrd - unreleaseCnt }}건</div>
-          </div>
-        </div>
-      </div>
-      <div class="ow-panel">
-        <div class="ow-panel-header">
-          <div class="ow-panel-title">피킹</div>
-        </div>
-        <div class="ow-panel-body">
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
-            <div class="progress-bar">
-              <span :data-value="percentPick" :style="`width: ${percentPick}%`">{{ percentPick }}%</span>
-              <progress class="low" v-if="percentPick < 60" :value="percentPick" max="100"></progress>
-              <progress class="mid" v-else-if="percentPick < 80" :value="percentPick" max="100"></progress>
-              <progress class="high" v-else :value="percentPick" max="100"></progress>
-            </div>
-          </div>
-          <hr />
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획</div>
-            <div class="align-to-right">{{ statusOrd }}건</div>
-          </div>
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">실적</div>
-            <div class="align-to-right">{{ statusPick }}건</div>
-          </div>
-        </div>
-      </div>
-      <div class="ow-panel">
-        <div class="ow-panel-header">
-          <div class="ow-panel-title" onclick="location.href='/edu/ReleaseInspection'">출고검수/패킹</div>
-        </div>
-        <div class="ow-panel-body">
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
-            <div class="progress-bar">
-              <span :data-value="percentPack" :style="`width: ${percentPack}%`">{{ percentPack }}%</span>
-              <progress class="low" v-if="percentPack < 60" :value="percentPack" max="100"></progress>
-              <progress class="mid" v-else-if="percentPack < 80" :value="percentPack" max="100"></progress>
-              <progress class="high" v-else :value="percentPack" max="100"></progress>
-            </div>
-          </div>
-          <hr />
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획</div>
-            <div class="align-to-right">{{ statusPick }}건</div>
-          </div>
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">실적</div>
-            <div class="align-to-right">{{ statusPack }}건</div>
-          </div>
-        </div>
-      </div>
-      <div class="ow-panel">
-        <div class="ow-panel-header">
-          <div class="ow-panel-title" onclick="location.href='/edu/Releases'">출고</div>
-        </div>
-        <div class="ow-panel-body">
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
-            <div class="progress-bar">
-              <span :data-value="percentRls" :style="`width: ${percentRls}%`">{{ percentRls }}%</span>
-              <progress class="low" v-if="percentRls < 60" :value="percentRls" max="100"></progress>
-              <progress class="mid" v-else-if="percentRls < 80" :value="percentRls" max="100"></progress>
-              <progress class="high" v-else :value="percentRls" max="100"></progress>
-            </div>
-          </div>
-          <hr />
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획</div>
-            <div class="align-to-right">{{ statusPack }}건</div>
-          </div>
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">실적</div>
-            <div class="align-to-right">{{ statusRls }}건</div>
-          </div>
-        </div>
-      </div>
-      <div class="ow-panel">
-        <div class="ow-panel-header">
-          <div class="ow-panel-title">택배사 인계</div>
-        </div>
-        <div class="ow-panel-body">
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획 대비 실적 달성률</div>
-            <div class="progress-bar">
-              <span :data-value="percentTrf" :style="`width: ${percentTrf}%`">{{ percentTrf }}%</span>
-              <progress class="low" v-if="percentTrf < 60" :value="percentTrf" max="100"></progress>
-              <progress class="mid" v-else-if="percentTrf < 80" :value="percentTrf" max="100"></progress>
-              <progress class="high" v-else :value="percentTrf" max="100"></progress>
-            </div>
-          </div>
-          <hr />
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">계획</div>
-            <div class="align-to-right">{{ statusRls }}건</div>
-          </div>
-          <div class="ow-flex-wrap">
-            <div class="item txt-dot-square">실적</div>
-            <div class="align-to-right">{{ statusTrf }}건</div>
-          </div>
-        </div>
-      </div>
+      <status-progress-bar
+        :title="'주문'"
+        :link="'Order'"
+        :planNum="orderPlan"
+        :resultNum="statusOrd"
+        :leftoverNum="leftoverCnt"
+        :unreleaseNum="unreleaseCnt"
+        :percentNum="percentOrd"
+      />
+
+      <status-progress-bar :title="'피킹'" :planNum="statusOrd" :resultNum="statusPick" :percentNum="percentPick" />
+
+      <status-progress-bar
+        :title="'출고검수/패킹'"
+        :link="'ReleaseInspection'"
+        :planNum="statusPick"
+        :resultNum="statusPack"
+        :percentNum="percentPack"
+      />
+
+      <status-progress-bar
+        :title="'출고'"
+        :link="'Releases'"
+        :planNum="statusPack"
+        :resultNum="statusRls"
+        :percentNum="percentRls"
+      />
+
+      <status-progress-bar
+        :title="'택배사 인계'"
+        :planNum="statusRls"
+        :resultNum="statusTrf"
+        :percentNum="percentTrf"
+      />
     </div>
     <hr />
+    <!-- 모달모달 -->
+    <ow-modal type="XXXL" title="주문이력 보기" ref="childRef" :cancelButton="true">
+      <div v-if="clientDetail">
+        ■ 거래처 정보
+        <table>
+          <tr>
+            <td class="table-title" style="width: 7%">거래처 정보</td>
+            <td style="width: 15%">{{ clientDetail.clientName }}</td>
+            <td class="table-title" style="width: 7%">대표자</td>
+            <td style="width: 15%">{{ clientDetail.representative }}</td>
+            <td class="table-title" style="width: 7%">연락처</td>
+            <td style="width: 15%">{{ clientDetail.representativeContact }}</td>
+            <td class="table-title" style="width: 7%">대표주소</td>
+            <td style="width: 15%">{{ clientDetail.clientAddress }}</td>
+          </tr>
+          <tr>
+            <td class="table-title">담당지점</td>
+            <td>{{ clientDetail.branchName }}</td>
+            <td class="table-title">영업사원</td>
+            <td>{{ clientDetail.employeeName }}</td>
+            <td class="table-title">영업사원 연락처</td>
+            <td>{{ clientDetail.employeeContact }}</td>
+            <td class="table-title">대표 배송지</td>
+            <td>{{ clientDetail.clientDestination }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="mt-5" v-if="recentOrder">
+        ■ 진행 주문 정보
+        <table>
+          <tr>
+            <th class="table-title" style="width: 7%">주문번호</th>
+            <th class="table-title" style="width: 5%">배송구분</th>
+            <th class="table-title" style="width: 7%">주문일시</th>
+            <th class="table-title" style="width: 30%">품목명</th>
+            <th class="table-title" style="width: 10%">품목코드</th>
+            <th class="table-title" style="width: 15%">업체명</th>
+            <th class="table-title" style="width: 5%">주문수량</th>
+            <th class="table-title" style="width: 5%">피킹수량</th>
+            <th class="table-title" style="width: 5%">검수/패킹</th>
+            <th class="table-title" style="width: 10%">송장번호</th>
+          </tr>
+          <!-- :rowspan="recentOrder.length" -->
+          <tr v-for="(order, index) in recentOrder" :key="index">
+            <td class="table-body-center" v-if="index === 0" :rowspan="recentOrder.length">{{ order.orderNo }}</td>
+            <td class="table-body-center" v-if="index === 0" :rowspan="recentOrder.length">
+              {{ order.orderShippingWay }}
+            </td>
+            <td class="table-body-center" v-if="index === 0" :rowspan="recentOrder.length">{{ order.orderDate }}</td>
+            <td>{{ order.itemName }}</td>
+            <td>{{ order.itemCode }}</td>
+            <td>{{ order.venderName }}</td>
+            <td class="table-body-right">{{ order.orderQuantity }}</td>
+            <td class="table-body-right">{{ order.pickingQuantity }}</td>
+            <td class="table-body-center">{{ order.inspectionPacking }}</td>
+            <td v-if="index === 0" :rowspan="recentOrder.length">{{ order.invoiceCode }}</td>
+          </tr>
+          <tr>
+            <th class="table-title">배송지</th>
+            <td colspan="9" style="color: red">
+              {{ recentOrder[0].shippingAddress }}
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="d-flex mt-5" v-if="pastOrder">
+        <div class="mr-5" style="width: 60%; height: 300px; overflow: auto">
+          ■ 주문 이력
+          <table>
+            <tr>
+              <th class="table-title" style="width: 15%">주문일자</th>
+              <th class="table-title" style="width: 30%">품목명</th>
+              <th class="table-title" style="width: 10%">수량</th>
+              <th class="table-title" style="width: 15%">주문번호</th>
+              <th class="table-title" style="width: 15%">주문방법</th>
+              <th class="table-title" style="width: 15%">출고일</th>
+            </tr>
+            <tr
+              v-for="(order, index) in pastOrder"
+              :key="index"
+              :id="order.orderNo"
+              @click="getPastOrderDetail(order.orderNo)"
+            >
+              <td class="table-body-center">{{ order.orderDate }}</td>
+              <td>
+                {{ order.itemName }}<span class="pl-0" v-if="order.itemCount">외 {{ order.itemCount }} 건</span>
+              </td>
+              <td class="table-body-right">{{ order.itemQuantity }}</td>
+              <td class="table-body-center">{{ order.orderNo }}</td>
+              <td class="table-body-center">{{ order.orderWay }}</td>
+              <td class="table-body-center">{{ order.releaseDate }}</td>
+            </tr>
+          </table>
+        </div>
+        <div style="width: 40%; height: 300px; overflow: auto">
+          ■ 상세 내역
+          <table>
+            <tr>
+              <th class="table-title" style="width: 60%">품목명</th>
+              <th class="table-title" style="width: 30%">품목코드</th>
+              <th class="table-title" style="width: 10%">수량</th>
+            </tr>
+            <tr v-for="(order, index) in pastOrderDetail" :key="index">
+              <td>{{ order.itemName }}</td>
+              <td>{{ order.itemCode }}</td>
+              <td class="table-body-right">{{ order.itemQuantity }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </ow-modal>
     <div class="item mt-4 mb-4">
       <div class="ow-flex-wrap item-size-content">
         <!-- 배송구분(긴급/일반)으로 필터링 : 동시 선택 가능하기 때문에 checkbox -->
@@ -219,7 +233,11 @@
             <p v-if="cell.item.unrelease >= 1" class="ow-tag type-category">
               <i class="u">미</i>
             </p>
-            <span :style="cell.item.unrelease ? 'color: rgb(210, 57, 46)' : ''">
+            <span
+              :style="cell.item.unrelease ? 'color: rgb(210, 57, 46)' : ''"
+              style="text-decoration: underline; cursor: pointer"
+              @click="selectModal(cell)"
+            >
               {{ cell.item.client }}
             </span>
           </wj-flex-grid-cell-template>
@@ -244,11 +262,13 @@
 <script setup>
 import OwNGrid from '@/components/grid/new/OwNGrid';
 import StatusProgressBar from '@/components/progress/StatusProgressBar';
+import clientModalApi from '@/api/clientModalApi';
 import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
 
 // const items = ref([]);
 const orderPlan = ref(300);
+const leftoverCnt = ref(null);
 const statusOrd = ref(null);
 const statusPick = ref(null);
 const statusRls = ref(null);
@@ -396,11 +416,22 @@ async function getFilterList(afterFilterList) {
     console.log('result : ', data);
     console.log('Array.isArray(result) : ' + Array.isArray(data));
     receiptList.value = [];
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.list2.length; i++) {
       receiptList.value.push({
-        client: data[i]['client']['clientName'],
-        level: data[i]['status'],
-        unrelease: data[i]['orderItem']['unreleaseQuantity'],
+        client: data['list2'][i]['client']['clientName'],
+        level: data['list2'][i]['status'],
+        unrelease: data['list2'][i]['orderItem']['unreleaseQuantity'],
+        orderNo: data['list2'][i]['orderNo'],
+        clientNo: data['list2'][i]['client']['clientNo'],
+      });
+    }
+    for (let i = 0; i < data.list1.length; i++) {
+      receiptList.value.push({
+        client: data['list1'][i]['client']['clientName'],
+        level: data['list1'][i]['status'],
+        unrelease: data['list1'][i]['orderItem']['unreleaseQuantity'],
+        orderNo: data['list1'][i]['orderNo'],
+        clientNo: data['list1'][i]['client']['clientNo'],
       });
     }
   });
@@ -409,7 +440,7 @@ async function getFilterList(afterFilterList) {
 //초기화
 const initialize = (s) => {
   //flexGrid 선택 모드 설정 => 선택 안되도록
-  s.selectionMode = 'None';
+  s.selectionMode = 0;
 
   //미출고일 때 cssClass 적용
   s.itemFormatter = (panel, r) => {
@@ -444,15 +475,59 @@ async function getStsCnt() {
   statusRls.value = stsCnt[5] + stsCnt[6];
   statusTrf.value = stsCnt[6];
   //주문 단계마다 완료 퍼센트
+  leftoverCnt.value = orderPlan.value - statusOrd.value;
   percentOrd.value = parseInt((statusOrd.value / orderPlan.value) * 100);
   percentPick.value = parseInt((statusPick.value / statusOrd.value) * 100);
   percentPack.value = parseInt((statusPack.value / statusPick.value) * 100);
   percentRls.value = parseInt((statusRls.value / statusPack.value) * 100);
   percentTrf.value = parseInt((statusTrf.value / statusRls.value) * 100);
-
-  // return stsCnt;
 }
 getStsCnt();
+
+// -------------------------------------------------이동현---------------------------------------------
+const childRef = ref(null);
+
+let modalData = ref(false);
+let clientDetail = ref(null);
+let recentOrder = ref(null);
+let pastOrder = ref(null);
+let pastOrderDetail = ref([{}, {}, {}]);
+
+const openModal = async function () {
+  const config = {
+    data: {},
+    cancelButtonText: '확인',
+  };
+  const childRefData = await childRef.value.open('accept', config);
+  if (childRefData.ok === false) {
+    pastOrderDetail.value = [{}, {}, {}];
+  }
+};
+
+const getModal = async function (clientNo, orderNo) {
+  const modal = await clientModalApi.getModal(clientNo, orderNo);
+  return modal;
+};
+
+const getModalDetail = async function (orderNo) {
+  const modalDetail = await clientModalApi.getModalDetail(orderNo);
+  return modalDetail;
+};
+
+function selectModal(cell) {
+  getModal(cell.item.clientNo, cell.item.orderNo).then((data) => {
+    clientDetail.value = data.clientDetail;
+    recentOrder.value = data.recentOrder;
+    pastOrder.value = data.pastOrder;
+    openModal();
+  });
+}
+
+async function getPastOrderDetail(orderNo) {
+  const response = getModalDetail(orderNo).then((data) => {
+    pastOrderDetail.value = data.pastOrderDetail;
+  });
+}
 </script>
 
 <style scoped lang="scss">
@@ -462,83 +537,30 @@ getStsCnt();
     font-weight: 800;
   }
 
-  .low,
-  .mid,
-  .high {
-    display: block;
-    border: 0 none;
-    border-radius: 2px;
-    background: gainsboro;
-  }
-
-  .low::-webkit-progress-bar,
-  .mid::-webkit-progress-bar,
-  .high::-webkit-progress-bar {
-    background: transparent;
-  }
-
-  .low::-webkit-progress-value {
-    border-radius: 2px;
-    background: rgb(246, 193, 68);
-  }
-
-  .mid::-webkit-progress-value {
-    border-radius: 2px;
-    background: rgb(63, 132, 88);
-  }
-
-  .high::-webkit-progress-value {
-    border-radius: 2px;
-    background: rgb(44, 112, 244);
-  }
-
-  .progress-bar {
-    position: relative;
-    background-color: white;
-    width: 50%;
-    height: 100%;
-  }
-
-  .progress-bar span {
-    position: absolute;
-    display: inline-block;
-    color: white;
-    text-align: center;
-    font-weight: 600;
-  }
-
   .ow-flex-wrap .filter-checkbox-label,
   .filter-radio-label {
     margin-left: 5px;
     margin-right: 0;
   }
 
-  .ow-flex-wrap .item .radiobtn {
-    background-color: #e1e6ea;
-    padding: 3px;
-    border-radius: 2px;
-  }
-
   .arrow_down {
-    opacity: 1; /* 불투명도 */
     display: block; /* 줄바꿈 */
-    height: auto;
+    // height: auto;
     transition: 0.5s ease; /* 속도 조절 */
-    backface-visibility: hidden; /* 요소의 뒷면이 사용자를 향할 때 보이면 안됨 */
   }
 
   .explain {
+    position: absolute;
+    display: none;
     z-index: 100;
     transition: 0.5s ease;
-    opacity: 0;
-    position: absolute;
     background-color: white;
     padding: 1em;
     border: 1px solid black;
   }
 
   .arrow_down:hover + .explain {
-    opacity: 1;
+    display: inline-block;
   }
 
   .ow-grid .wj-cell.wj-header {
@@ -556,6 +578,20 @@ getStsCnt();
         color: rgb(210, 57, 46);
       }
     }
+  }
+
+  // 모달
+  .table-title {
+    background-color: rgb(231, 234, 241);
+    text-align: center;
+  }
+
+  .table-body-center {
+    text-align: center;
+  }
+
+  .table-body-right {
+    text-align: right;
   }
 }
 </style>

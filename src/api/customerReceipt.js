@@ -22,8 +22,8 @@ async function getFilterList(filterList) {
     // console.log("api - filterList.pageSize : " + filterList.pageSize);
     // console.log("api - filterList.startRowIndex : " + filterList.startRowIndex);
     const response = await axios.post(`/client/getFilterList`, filterList);
-    receiptList = response.data.list;
-    console.log("api - receiptList : " + receiptList[0]['unrelease']);
+    receiptList = response.data;
+    // console.log("api - receiptList : " + receiptList[0]['orderItem']['unreleaseQuantity']);
   } catch (error) {
     console.log(error);
   }

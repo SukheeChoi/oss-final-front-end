@@ -1,51 +1,91 @@
 <template>
   <ow-panel>
     <!-- 헤더를 누르면 해당 단계 관리 페이지로 이동 -->
-    <template #title onclick={this.handleClick}>{{ title }}</template>
-
+    <template #title>
+      <router-link :to="`/edu/${link}`">{{ title }}</router-link>
+    </template>
     <div class="ow-flex-wrap">
       <div class="item txt-dot-square">계획 대비 실적 달성률</div>
       <div class="progress-bar">
-        <span :data-value="percentOrd" :style="`width: ${percentOrd}%`">{{ percentOrd }}%</span>
-        <progress class="low" v-if="percentOrd < 60" :value="percentOrd" :max="100"></progress>
-        <progress class="mid" v-else-if="percentOrd < 80" :value="percentOrd" :max="100"></progress>
-        <progress class="high" v-else :value="percentOrd" :max="100"></progress>
+        <!--  span 태그를 통해 progress바 위에 퍼센티지 수치를 나타냄 -->
+        <span :data-value="percentNum" :style="`width: ${percentNum}%`">{{ percentNum }}%</span>
+        <!-- 퍼센트마다 progress바 다르게 적용 -->
+        <progress class="low" v-if="percentNum < 60" :value="percentNum" :max="100"></progress>
+        <progress class="mid" v-else-if="percentNum < 80" :value="percentNum" :max="100"></progress>
+        <progress class="high" v-else :value="percentNum" :max="100"></progress>
       </div>
     </div>
     <hr />
     <div class="ow-flex-wrap">
       <div class="item txt-dot-square">계획</div>
       <div class="align-to-right">
-        {{ orderPlan }}건(<strong style="color: rgb(103, 146, 226)">잔여 {{ 300 - statusOrd }}건</strong> / <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseCnt }}건</strong>)
+        {{ planNum }}건
+        <span v-if="leftoverNum && unreleaseNum">
+          <strong style="color: rgb(103, 146, 226)">(잔여 {{ leftoverNum }}건 / </strong>
+          <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseNum }}건)</strong>
+        </span>
       </div>
     </div>
     <div class="ow-flex-wrap">
       <div class="item txt-dot-square">실적</div>
-      <div class="align-to-right">{{ statusOrd }}건</div>
+      <div class="align-to-right">{{ resultNum - unreleaseNum }}건</div>
     </div>
   </ow-panel>
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue';
+import { defineProps, ref, watch } from 'vue';
 
 const props = defineProps({
   title: {
     Type: String,
     default: '',
   },
+  link: {
+    Type: String,
+    default: '',
+  },
+  planNum: {
+    Type: Number,
+    default: 300,
+  },
+  resultNum: {
+    Type: Number,
+    default: 0,
+  },
+  leftoverNum: Number,
+  unreleaseNum: {
+    Type: Number,
+    default: 0,
+  },
+  percentNum: {
+    Type: Number,
+    default: 0,
+  },
 });
+
+console.log('component - props.title : ' + props.title);
+console.log('component - props.link : ' + props.link);
+console.log('component - props.planNum : ' + props.planNum);
+console.log('component - props.resultNum : ' + props.resultNum);
+console.log('component - props.unreleaseNum : ' + props.unreleaseNum);
+console.log('component - props.percentNum : ' + props.percentNum);
 </script>
 
 <style scoped lang="scss">
 ::v-deep {
+  .ow-panel .ow-panel-header .ow-panel-title {
+    justify-content: center;
+    font-weight: 800;
+  }
+
   .low,
   .mid,
   .high {
     display: block;
     border: 0 none;
     border-radius: 2px;
-    background: gainsboro;
+    background: rgb(228, 233, 236);
   }
 
   .low::-webkit-progress-bar,
@@ -67,6 +107,25 @@ const props = defineProps({
   .high::-webkit-progress-value {
     border-radius: 2px;
     background: rgb(44, 112, 244);
+  }
+
+  .progress-bar {
+    position: relative;
+    background-color: white;
+    width: 50%;
+    height: 100%;
+  }
+
+  .progress-bar span {
+    position: absolute;
+    display: inline-block;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  a {
+    color: white;
   }
 }
 </style>
