@@ -80,7 +80,7 @@ async function updateOvertime(requestData) {
   } catch (error) {
     console.log(error);
   }
-  return response.data.data;
+  return response.data.result;
 }
 
 //시간 수정하기
@@ -93,7 +93,7 @@ async function updateWorktime(requestData) {
   } catch (error) {
     console.log(error);
   }
-  return response.data.data;
+  return response.data;
 }
 
 //담당자 이름 기준으로 작업 세부사항 api 요청

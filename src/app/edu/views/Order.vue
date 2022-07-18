@@ -146,7 +146,6 @@ const selectUnrelease = ref(['released', 'unreleased']);
 const getData = ref([]);
 const keyData = ref(0);
 
-
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
@@ -222,6 +221,7 @@ watch(
 function getSearchList() {
   keyData.value++;
 }
+
 </script>
 <style scoped lang="scss">
 :deep {
