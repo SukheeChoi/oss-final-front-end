@@ -23,7 +23,7 @@
       <div class="left h-100">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <button class="ow-btn type-util">예정시간수정</button>
-          <button class="ow-btn type-util">추가</button>
+          <button class="ow-btn type-util" @click="openAddModal" :disabled="!addDate">추가</button>
         </div>
         <ow-tree-grid
           :read="getTree"
@@ -148,6 +148,36 @@
       </div>
     </div>
   </div>
+  <!-- 추가 모달모달 -->
+  <ow-modal
+      type="L"
+      :title="'[' + modalAddData.title + '] 잔업시간 추가'"
+      ref="childAddRef"
+      v-if="modalAddData"
+      :acceptButton="true"
+    >
+      <div>사원명 - {{ modalAddData.title }}</div>
+      <table>
+        <tr>
+          <th class="table-title" style="width: 10%">선택</th>
+          <th class="table-title" style="width: 20%">발주번호</th>
+          <th class="table-title" style="width: 25%">업체명</th>
+          <th class="table-title" style="width: 25%">수령일</th>
+          <th class="table-title" style="width: 10%">수령품목</th>
+          <th class="table-title" style="width: 10%">수령수량</th>
+        </tr>
+        <tr v-for="(order, index) in modalAddData.data" :key="index">
+          <td class="table-body-center">
+            <input type="radio" id="placingOrderNo" :value="order" v-model="picked">
+          </td>
+          <td class="table-body-center">{{ order.placingOrderNo }}</td>
+          <td class="table-body-center">{{ order.title }}</td>
+          <td class="table-body-center">{{ order.receiveDate }}</td>
+          <td class="table-body-center">{{ order.receiveItem }}</td>
+          <td class="table-body-center">{{ order.receiveQuantity }}</td>
+        </tr>
+      </table>
+    </ow-modal>
 </template>
 
 <script setup>
@@ -212,22 +242,79 @@ async function getStatus() {
 }
 getStatus();
 
+// --------------------------------------- 추가 모달에 띄울 잔업 -------------------------------------------------------
+const childAddRef = ref(null);
+const modalAddData = ref(null);
+const addDate = ref(false);
+const picked = ref(null);
+const labelingWorkTimeNo = ref(null);
+const startTime = ref(null);
+
+const getOvertime = async function () {
+  const overtime = await inspectionLabelingApi.getOvertime();
+  return overtime;
+};
+
+const openAddModal = async function () {
+  picked.value = null;
+  const childAddRefData = await childAddRef.value.open();
+  console.log(childAddRefData);
+  if(childAddRefData.ok === true) {
+    //작업 추가하는 로직
+    console.log(picked.value);
+    console.log(modalAddData.value);
+
+    const requestData = {
+        receiveItem: picked.value.receiveItem,
+        receiveQuantity: picked.value.receiveQuantity,
+        placingOrderNo: picked.value.placingOrderNo,
+        labelingWorkTimeNo: labelingWorkTimeNo.value,
+        startTime: startTime.value, 
+        endTime: '18:00',
+    };
+    const result = await inspectionLabelingApi.updateOvertime(requestData)
+      .then((result) => {
+        console.log('updateReceiptList - result : ' + result);
+      });
+  }
+};
+
+// ----------------------------------------------------------------------------------------------------
+
+// --------------------------------------- 수정 모달 update -------------------------------------------------------
+const updateDate = false;
+
+// ----------------------------------------------------------------------------------------------------
+
 //트리 그리드 셀렉션 핸들러
 const onSelectionChanged = (grid, target) => {
   //반응형 변수 세팅(검색 조건 리셋)
   searchSelected.value = '';
   searchContent.value = '';
-  console.log("왜 안돼?")
+  addDate.value = false;
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
+
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
-    if (grid.selectedItems[0].childrennn != null) {
-      title.value = grid.selectedItems[0].title;
-      const labelingWorkTimeNo = grid.selectedItems[0].labelingWorkTimeNo;
+    if (grid.selectedItem.childrennn != null) {
+      addDate.value = true;
+      title.value = grid.selectedItem.title;
+      labelingWorkTimeNo.value = grid.selectedItem.labelingWorkTimeNo;
+      startTime.value = grid.selectedItem.childrennn.at(-1).scheduledEndTime;
+      console.log(grid.selectedItem);
+      //------
+      getOvertime().then((data) => {
+        modalAddData.value = {
+          data: data,
+          title: title.value};
+        console.log("modalAddDatamodalAddData", modalAddData);
+      });
+      //---------
+
       getGrid.value = async function (query, pageNo, pageSize) {
         //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
         const lee = await inspectionLabelingApi.getListByLWTNo(
-          labelingWorkTimeNo,
+          labelingWorkTimeNo.value,
           searchSelected.value,
           searchContent.value,
           pageNo,
@@ -305,7 +392,7 @@ const treeInitialized = (grid) => {
         function timeCheckFunc(paramTime) {
           let timeCheck = false;
 
-          if (paramTime >= startTime && paramTime <= endTime) {
+          if (paramTime >= startTime && paramTime <= endTime - 1) {
             timeCheck = true;
           }
           return timeCheck;
@@ -413,6 +500,8 @@ const onInitialized = (grid) => {
   //그리드 셀렉션모드 설정(None)
   grid.selectionMode = 0;
 };
+
+
 </script>
 
 <style scoped lang="scss">
@@ -509,6 +598,20 @@ const onInitialized = (grid) => {
     color: red;
     text-align: center;
     white-space: nowrap;
+  }
+
+    // 모달
+  .table-title {
+    background-color: rgb(231, 234, 241);
+    text-align: center;
+  }
+
+  .table-body-center {
+    text-align: center;
+  }
+
+  .table-body-right {
+    text-align: right;
   }
 }
 </style>

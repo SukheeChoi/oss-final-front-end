@@ -186,7 +186,7 @@
             <td class="table-body-right">{{order.orderQuantity}}</td>
             <td class="table-body-right">{{order.pickingQuantity}}</td>
             <td class="table-body-center">{{order.inspectionPacking}}</td>
-            <td v-if="index === 0" :rowspan="recentOrder.length">{{order.invoiceCode}}</td>
+            <td class="table-body-center" v-if="index === 0" :rowspan="recentOrder.length">{{order.invoiceCode}}</td>
           </tr>
           <tr>
             <th class="table-title">
@@ -540,7 +540,7 @@ async function getunrlsCnt() {
 }
 getunrlsCnt();
 
-// ----------------------------------------------------------------이동현----------------------------------------------------------------
+// -------------------------------------------------이동현---------------------------------------------
 const childRef = ref(null);
 
 let modalData = ref(false);

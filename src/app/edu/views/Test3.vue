@@ -18,21 +18,69 @@
       </div>
     </div>
     <hr />
-    <!-- 모달모달 -->
-    <ow-modal type="XS" :title="'[' + modalData.title + '] 예정시간 수정'" ref="childRef" v-if="modalData" :cancelButton="true">
-      <div>사원명 - {{modalData.employeeName}}</div>
-      <div>업체명 - {{modalData.title}}</div>
-       <span class="mt-5">
-        <ow-input-time v-model="modalData.scheduledStartTime" style="width: 100px" ></ow-input-time>
-        <ow-input-time v-model="modalData.scheduledEndTime" style="width: 100px" ></ow-input-time>
-       </span> 
+    <!-- 수정 모달모달 -->
+    <ow-modal
+      type="XS"
+      :title="'[' + modalUpdateData.title + '] 예정시간 수정'"
+      ref="childUpdateRef"
+      v-if="modalUpdateData"
+      :cancelButton="true"
+    >
+      <div>사원명 - {{ modalUpdateData.employeeName }}</div>
+      <div>업체명 - {{ modalUpdateData.title }}</div>
+      <span class="mt-5">
+        <ow-input-time
+          v-model="modalUpdateData.scheduledStartTime"
+          :before="timeData"
+          style="width: 100px"
+        ></ow-input-time>
+        <ow-input-time :props="timeData" style="width: 100px"></ow-input-time>
+      </span>
+    </ow-modal>
+
+    <!-- 추가 모달모달 -->
+    <ow-modal
+      type="M"
+      :title="'[' + modalAddData.employeeName + '] 잔업시간 추가'"
+      ref="childAddRef"
+      v-if="modalAddData"
+      :cancelButton="true"
+    >
+      <div>사원명 - {{ modalAddData.employeeName }}</div>
+      <table>
+        <tr>
+          <th class="table-title" style="width: 10%">선택</th>
+          <th class="table-title" style="width: 40%">업체명</th>
+          <th class="table-title" style="width: 10%">수령일</th>
+          <th class="table-title" style="width: 10%">수령품목</th>
+          <th class="table-title" style="width: 10%">수령수량</th>
+        </tr>
+        <tr v-for="(order, index) in modalAddData.data" :key="index">
+          <td class="table-body-center">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              :value="order.placingOrderNo"
+              id="defaultCheck1"
+              :disabled="order.receiveQuantity === order.labelingItemQuantity"
+              v-model="checkedTitle"
+            />
+          </td>
+          <td class="table-body-center">{{ order.title }}</td>
+          <td class="table-body-center">{{ order.receiveItem }}</td>
+          <td class="table-body-center">{{ order.receiveQuantity }}</td>
+          <td class="table-body-center">{{ order.inspectionQuantity }}</td>
+          <td class="table-body-center">{{ order.passItemQuantity }}</td>
+          <td class="table-body-center">{{ order.labelingItemQuantity }}</td>
+        </tr>
+      </table>
     </ow-modal>
     <div class="d-flex">
       <!-- 왼쪽 화면 -->
       <div class="left h-100">
         <div class="d-flex justify-content-end mt-5 mb-5">
-          <button class="ow-btn type-util" @click="openModal" :disabled="!updateDate" >예정시간수정</button>
-          <button class="ow-btn type-util">추가</button>
+          <button class="ow-btn type-util" @click="openUpdateModal" :disabled="!updateDate">예정시간수정</button>
+          <button class="ow-btn type-util" @click="openAddModal" :disabled="!addDate">추가</button>
         </div>
         <ow-tree-grid
           :read="getTree"
@@ -41,12 +89,7 @@
           :initialized="treeInitialized"
           :visibleRowsCount="20"
         >
-          <wj-flex-grid-column
-            header="담당자/업체명"
-            binding="title"
-            :width="130"
-            align="left"
-          ></wj-flex-grid-column>
+          <wj-flex-grid-column header="담당자/업체명" binding="title" :width="130" align="left"></wj-flex-grid-column>
           <wj-flex-grid-column header="수령일" binding="receiveDate" :width="100" align="center"></wj-flex-grid-column>
           <wj-flex-grid-column
             header="수령<br>품목"
@@ -125,13 +168,7 @@
           <div class="ow-panel-body1">
             <b-row>
               <div v-if="!title" style="font-size: 20px">담당자를 선택해주세요!</div>
-              <ow-grid
-                v-if="title"
-                :read="getGrid"
-                :key="keyData"
-                :initialized="onInitialized"
-                :visibleRowsCount="15"
-              >
+              <ow-grid v-if="title" :read="getGrid" :key="keyData" :initialized="onInitialized" :visibleRowsCount="15">
                 <template #left>&nbsp;</template>
                 <wj-flex-grid-column binding="vendorName" header="업체명" :width="100" align="left" />
                 <wj-flex-grid-column binding="itemName" header="품목명" width="*" align="left" />
@@ -187,13 +224,21 @@ getTree.value = async function (query, pageNo, pageSize) {
 const title = ref(null);
 const searchSelected = ref(null);
 const searchContent = ref(null);
-let modalData = reactive({
-  title : '',
+
+let modalUpdateData = reactive({
+  title: '',
   employeeName: '',
-  scheduledStartTime : '',
-  scheduledEndTime : '',
+  scheduledStartTime: '',
+  scheduledEndTime: '',
 });
+
+const modalAddData = ref([]);
+
+let timeData = { modelValue: modalUpdateData.scheduledStartTime };
+
 const updateDate = ref(false);
+const addDate = ref(false);
+const checkedTitle = ref([]);
 
 const orderStatus = ref([
   { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
@@ -236,6 +281,8 @@ const onSelectionChanged = (grid, target) => {
   searchSelected.value = '';
   searchContent.value = '';
   updateDate.value = false;
+  addDate.value = false;
+
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
     //childrenn이라는 key가 null이 아니면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
@@ -260,19 +307,33 @@ const onSelectionChanged = (grid, target) => {
         };
         return result;
       };
-      keyData.value++;
 
+      keyData.value++;      
     }
-    //child와 childrenn이라는 key가 없으면 업체명이므로 예정시간 수정 api 호출
+
+    //child와 childrenn이라는 key가 없으면 업체명이므로 예정시간 수정 api 호출(업체명)
     if (!grid.selectedItems[0].childrennn && !grid.selectedItems[0].child && !grid.selectedItems[0].startTime) {
-      modalData.title = grid.selectedItems[0].title;
-      modalData.employeeName = grid.selectedItems[0].employeeName;
-      modalData.scheduledStartTime = grid.selectedItems[0].scheduledStartTime;
-      modalData.scheduledEndTime = grid.selectedItems[0].scheduledEndTime;
+      modalUpdateData.title = grid.selectedItem.title;
+      modalUpdateData.employeeName = grid.selectedItem.employeeName;
+      modalUpdateData.scheduledStartTime = grid.selectedItem.scheduledStartTime;
+      modalUpdateData.scheduledEndTime = grid.selectedItem.scheduledEndTime;
       updateDate.value = true;
       console.log('예정시간 수정');
+      console.log(grid);
       console.log(grid.selectedItems[0]);
     }
+    console.log(grid.selectedItem);
+      modalAddData.value = async function() {
+        addDate.value = true;
+        const data = await inspectionLabelingApi.getOvertime();
+
+        const result = {
+          data: data,
+          employeeName: grid.selectedItem.employeeName,
+        }
+        console.log(result);
+        return result;
+      }
   }
 };
 
@@ -335,7 +396,7 @@ const treeInitialized = (grid) => {
         function timeCheckFunc(paramTime) {
           let timeCheck = false;
 
-          if (paramTime >= startTime && paramTime <= endTime) {
+          if (paramTime >= startTime && paramTime <= endTime - 1) {
             timeCheck = true;
           }
           return timeCheck;
@@ -426,7 +487,7 @@ const treeInitialized = (grid) => {
     }
   });
   //그리드 셀렉션모드 설정(Row)
-  grid.selectionMode = 4;
+  grid.selectionMode = 3;
 };
 
 //그리드 설정
@@ -443,19 +504,35 @@ const onInitialized = (grid) => {
   //그리드 셀렉션모드 설정(None)
   grid.selectionMode = 0;
 };
-const childRef = ref(null);
 
-const openModal = async function () {
+const childUpdateRef = ref(null);
+const childAddRef = ref(null);
+
+const openUpdateModal = async function () {
   const config = {
     data: {},
     cancelButtonText: '확인',
-  }
-  console.log(childRef);
-  const ok = await childRef.value.open("accept", config);
+  };
+  console.log(childUpdateRef);
+  const ok = await childUpdateRef.value.open('accept', config);
   console.log('modal ok', ok);
-  console.log(modalData);
+  console.log(modalUpdateData);
 };
 
+const openAddModal = async function () {
+  const config = {
+    data: {},
+    cancelButtonText: '확인',
+  };
+  console.log(childAddRef);
+  const ok = await childAddRef.value.open('accept', config);
+  if(ok === false) {
+    checkedTitle.value = [];
+  }
+  console.log('modal ok', ok);
+  console.log(checkedTitle);
+  console.log(modalAddData);
+};
 </script>
 
 <style scoped lang="scss">
@@ -556,6 +633,19 @@ const openModal = async function () {
   .ow-flex-wrap.dir-col {
     flex-direction: column;
     align-items: center;
-}
+  }
+
+  .table-title {
+    background-color: rgb(231, 234, 241);
+    text-align: center;
+  }
+
+  .table-body-center {
+    text-align: center;
+  }
+
+  .table-body-right {
+    text-align: right;
+  }
 }
 </style>
