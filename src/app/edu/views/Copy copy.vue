@@ -1,667 +1,3 @@
- 4ever / final-front-end
- 
- 
-ReleaseInspection.vue 23 KB
-  
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158
-159
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
-180
-181
-182
-183
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196
-197
-198
-199
-200
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
-220
-221
-222
-223
-224
-225
-226
-227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237
-238
-239
-240
-241
-242
-243
-244
-245
-246
-247
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
-259
-260
-261
-262
-263
-264
-265
-266
-267
-268
-269
-270
-271
-272
-273
-274
-275
-276
-277
-278
-279
-280
-281
-282
-283
-284
-285
-286
-287
-288
-289
-290
-291
-292
-293
-294
-295
-296
-297
-298
-299
-300
-301
-302
-303
-304
-305
-306
-307
-308
-309
-310
-311
-312
-313
-314
-315
-316
-317
-318
-319
-320
-321
-322
-323
-324
-325
-326
-327
-328
-329
-330
-331
-332
-333
-334
-335
-336
-337
-338
-339
-340
-341
-342
-343
-344
-345
-346
-347
-348
-349
-350
-351
-352
-353
-354
-355
-356
-357
-358
-359
-360
-361
-362
-363
-364
-365
-366
-367
-368
-369
-370
-371
-372
-373
-374
-375
-376
-377
-378
-379
-380
-381
-382
-383
-384
-385
-386
-387
-388
-389
-390
-391
-392
-393
-394
-395
-396
-397
-398
-399
-400
-401
-402
-403
-404
-405
-406
-407
-408
-409
-410
-411
-412
-413
-414
-415
-416
-417
-418
-419
-420
-421
-422
-423
-424
-425
-426
-427
-428
-429
-430
-431
-432
-433
-434
-435
-436
-437
-438
-439
-440
-441
-442
-443
-444
-445
-446
-447
-448
-449
-450
-451
-452
-453
-454
-455
-456
-457
-458
-459
-460
-461
-462
-463
-464
-465
-466
-467
-468
-469
-470
-471
-472
-473
-474
-475
-476
-477
-478
-479
-480
-481
-482
-483
-484
-485
-486
-487
-488
-489
-490
-491
-492
-493
-494
-495
-496
-497
-498
-499
-500
-501
-502
-503
-504
-505
-506
-507
-508
-509
-510
-511
-512
-513
-514
-515
-516
-517
-518
-519
-520
-521
-522
-523
-524
-525
-526
-527
-528
-529
-530
-531
-532
-533
-534
-535
-536
-537
-538
-539
-540
-541
-542
-543
-544
-545
-546
-547
-548
-549
-550
-551
-552
-553
-554
-555
-556
-557
-558
-559
-560
-561
-562
-563
-564
-565
-566
-567
-568
-569
-570
-571
-572
-573
-574
-575
-576
-577
-578
-579
-580
-581
-582
-583
-584
-585
-586
-587
-588
-589
-590
-591
-592
-593
-594
-595
-596
-597
-598
-599
-600
-601
-602
-603
-604
-605
-606
-607
-608
-609
-610
-611
-612
-613
-614
-615
-616
-617
-618
-619
-620
-621
-622
-623
-624
-625
-626
-627
-628
-629
-630
-631
-632
-633
-634
-635
-636
-637
-638
-639
-640
-641
-642
-643
-644
-645
-646
-647
-648
-649
-650
-651
-652
-653
-654
-655
-656
-657
-658
-659
 <template>
   <div class="ow-flex-wrap dir-col" style="--gap: 10px">
     <div class="item">
@@ -698,21 +34,17 @@ ReleaseInspection.vue 23 KB
     <div class="item ow-flex-wrap dir-col" style="--size: 80%">
       <div class="container-fluid">
         <div class="ow-grid-wrap">
-          <ow-grid
-            class="ow-grid"
+          <ow-grid-2
             headersVisibility="Column"
-            selectionMode="RowRange"
             :read="releaseInspectionData"
             :allowMerging="'Cells'"
             :initialized="onInitialized"
             :autoRowHeights="true"
             :autoGenerateColumns="false"
             :selectionChanged="SelectionChanged"
-            :is-read-only="true"
-            :header="false"
-            :footer="false"
             :key = "keyData"
-            :pageNo = "pageNo"
+            :pageValue = "pageValue.value"
+            :page="page"         
           >
             <!-- :autoRowHeights="true" -->
             <template #left>&nbsp;</template>
@@ -829,7 +161,7 @@ ReleaseInspection.vue 23 KB
               align="center"
               :allowMerging="true"
             ></wj-flex-grid-column>
-          </ow-grid>
+          </ow-grid-2>
         </div>
       </div>
     </div>
@@ -847,9 +179,10 @@ ReleaseInspection.vue 23 KB
               <div class="state">
                 <div class="state-item w-100">{{ tally.clientName }}</div>
                 <div class="state-item ow-select">
-                  <select name="" id="">
-                    <option value="긴급" selected>긴급</option>
-                    <option value="일반">일반</option>
+                  <select v-model="tally.category">
+                    <option>긴급</option>
+                    <option>일반</option>
+                    <span>Selected: {{ tally.category }}</span>
                   </select>
                 </div>
               </div>
@@ -876,7 +209,7 @@ ReleaseInspection.vue 23 KB
                 <div class="state-item">
                   <div class="w-100">*총미출고수량</div>
                   <div class="ow-input mr-1" style="--width: 60px">
-                    <input type="text" v-model="tally.unRelease" />
+                    <input type="text" v-model="tally.totalUnRelease" />
                   </div>
                 </div>
               </div>
@@ -893,6 +226,7 @@ ReleaseInspection.vue 23 KB
                 <td>
                   <div class="ow-input">
                     <input type="text" v-model="tally.releaseCode" />
+                    <button class="ow-btn type-state ml-3" v-on:click="scan(tally.releaseCode, 'releaseCode')">스캔</button>
                   </div>
                 </td>
               </tr>
@@ -900,8 +234,8 @@ ReleaseInspection.vue 23 KB
                 <th scope="row">바코드스캔</th>
                 <td>
                   <div class="ow-input">
-                    <input type="text" v-model="scannedBarcode" />
-                    <button class="ow-btn type-state ml-3" v-on:click="scan(tally.releaseCode)">스캔</button>
+                    <input type="text" v-model="tally.barCode"/>
+                    <button class="ow-btn type-state ml-3" v-on:click="scan(tally.barCode, 'barCode')">스캔</button>
                   </div>
                 </td>
               </tr>
@@ -912,18 +246,10 @@ ReleaseInspection.vue 23 KB
             </tbody>
           </table>
           <div class="container">
-            <button
-              class="ow-btn type-util float-right ml-2"
-              style="float: right"
-              v-on:click="unrelease(tally.releaseCode, scannedBarcode)"
-            >
+            <button class="ow-btn type-util float-right ml-2" style="float: right" v-on:click="unrelease(tally.releaseCode)">
               미출고처리
             </button>
-            <button
-              class="ow-btn type-util float-right"
-              style="float: right"
-              v-on:click="inspection(tally.releaseCode, scannedBarcode)"
-            >
+            <button class="ow-btn type-util float-right" style="float: right" v-on:click="inspection(tally.releaseCode)">
               검수처리
             </button>
           </div>
@@ -981,7 +307,7 @@ ReleaseInspection.vue 23 KB
 import { ref, reactive, toRefs, watch, toRaw, onMounted } from 'vue';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 import releaseInspectionApi from '@/api/releaseInspectionApi';
-
+//import OwGrid2 from '@/components/grid/new/OwGrid2';
 export default {
 
   setup() {
@@ -998,7 +324,11 @@ export default {
         mergedColumns: [0, 1, 2, 3, 4, 5, 'releasePrintDate', 'boxQty', 14, 15, 16],
       };
       grid.mergeManager = new SimpleMergeManager(config);
+      grid.selectionMode = 4 //RowRange
     };
+
+    //
+    const pageValue = ref(1);
 
     //현황
     const statusBar = reactive({
@@ -1006,7 +336,7 @@ export default {
       totalPickingQty: null,      //피킹완료건
       commonPickingQty: null,     //피킹완료건 -> 일반
       emergencyPickingQty: null,  //피킹완료건 -> 긴급
-      totalRlsQty: null,          //출고검수/패킹건
+      totalRlsQty: null,          //출고검수/패킹
       commonRlsQty: null,         //출고검수/패킹건 -> 일반
       emergencyRlsQty: null,      //출고검수/패킹건 -> 긴급
     });
@@ -1029,65 +359,69 @@ export default {
     getTotal();
 
     //검수 버튼 이벤트 함수
-    async function inspection(releaseCode, scannedBarcode) {
-      let codes = { releaseCode: releaseCode, scannedBarcode: scannedBarcode };
-      const result = await releaseInspectionApi.releaseInspectionQtyUpdate(codes);
+    async function inspection(releaseCode) {
+      console.log("검수처리 버튼 클릭 >>", releaseCode)
+      const result = await releaseInspectionApi.releaseInspectionQtyUpdate(releaseCode);
       return result;
     }
 
     //미출고 버튼 이벤트 함수
-    async function unrelease(releaseCode, scannedBarcode) {
-      let codes = { releaseCode: releaseCode, scannedBarcode: scannedBarcode };
-      const result = await releaseInspectionApi.unReleaseQtyUpdate(codes);
+    async function unrelease(releaseCode) {
+      const result = await releaseInspectionApi.unReleaseQtyUpdate(releaseCode);
       return result;
     }
 
     //box테이블(오른쪽 아래) 데이터 가져오기
     const boxItemData = ref(null);
 
-    //스캔 버튼 이벤트 함수
-    async function scan(releaseCode) {
-
-      const result = await releaseInspectionApi.scan(releaseCode);
+    // 스캔 버튼 이벤트 함수
+    // 출고번호(releaseCode) or 바코드(barCode)
+    async function scan(code, kind) {
+      //스캔해서 총검수수량과 같은 정보를 가져온다.
+      const result = await releaseInspectionApi.scan(code, kind);
 
       tally.clientName = result.client.clientName;
-      tally.totalPickingQty = result.picking.pickingQty;
-      tally.totalInspectionQty = result.releaseInspectionQuantity;
-      tally.unRelease = result.unReleased;
+      tally.totalPickingQty = result.picking.pickingQty;            //총피킹수량
+      tally.totalInspectionQty = result.releaseInspectionQuantity;  //총검수수량
+      tally.totalUnRelease = result.unReleased;                     //총미출고수량
       tally.orderNo = result.order.orderNo;
+      tally.category = result.order.shippingCategory;
+      tally.barCode = result.release.releaseBarCode;                //바코드
+      tally.releaseCode = result.release.releaseCode;               //출고번호
+      //tally.releaseDone = result.release.releaseDone;               //출고검수여부
 
-      //스캔 버튼 누르면 box테이블 데이터 생성
-      boxItemData.value = [];
-
-      console.log(rIData.value);
-
-      for (let i = 0; i < rIData.value.length; i++) {
-        if (rIData.value[i].orderNo === tally.orderNo) {
-          boxItemData.value.push(rIData.value[i]);
-        }
+      console.log("scan result>>", result);
+ 
+      // 1) 출고검수 이전일 때, releaseDone = 0
+      if(result.release.releaseDone == 0 ){
+        //스캔 버튼 누르면 box테이블 데이터 생성
+        boxItemData.value = await releaseInspectionApi.getBoxInfo(tally.releaseCode);
       }
-
-      console.log('boxItemData', boxItemData.value);
+    
+      console.log('boxItemData >>', boxItemData);
       return result;
     }
 
     //박스 개수
     var boxNum = 0;
 
-    //ow-tab에서 사용하는 item
+    //ow-tab에서 사용하는 item ex) 박스1, 박스2, 박스3...
     let boxArrays = ref([]);
 
-    //ow-tab에 넘겨줄 index
+    //ow-tab의 model에 넘겨줄 index
     var index = ref(0);
 
     //박스 추가 버튼 -> boxArrays에 추가
     function addBox() {
-      boxNum = boxNum + 1;
       //박스는 8개까지 만들 수 있다.
-      if (boxNum < 9) {
+      if (boxNum < 8) {
+        boxNum = boxNum + 1;
         boxArrays.value.push(`박스${boxNum}`);
       }
     }
+
+    //박스들(list)의 정보를 포함하는 list
+    const boxItemDataList = ref([]);
 
     //n번째 박스 패킹처리
     async function oneBoxPacking(index) {
@@ -1101,11 +435,6 @@ export default {
         
         apiArray.push({"releaseCode": boxItemData.value[i].releaseCode,
                       "boxNumber": index+1, 
-                      "itemCode": boxItemData.value[i].code,
-                      "itemName": boxItemData.value[i].itemName,
-                      "releaseInspectionQty": parseInt(boxItemData.value[i].note),
-                      "pickingQty": boxItemData.value[i].pickingQty,
-                      "orderItemQty": boxItemData.value[i].orderItemqty,
                       "orderItemNo" : boxItemData.value[i].orderItemNo});
 
         boxItemData.value[i].note = null;
@@ -1113,11 +442,19 @@ export default {
         keyData.value++;
       }
 
+      console.log("패킹패킹");
+      console.log(apiArray);
       
-      console.log("패킹패킹")
-      console.log(apiArray);      
+      //몇번째 박스인지 정보 넣어줌.
+      boxItemData.value.push({"boxNumber": index+1});
 
-      const result = await releaseInspectionApi.packing(apiArray);
+      //boxItemDataList에 push
+      boxItemDataList.value.push(boxItemData.value);
+
+      console.log("boxItemDataList.value >> ", boxItemDataList.value);
+
+      //api통신
+      // const result = await releaseInspectionApi.packing(apiArray);
       return result;
     }
 
@@ -1153,17 +490,41 @@ export default {
     //순수 데이터
     const rIData = ref(null);
 
+    //page로 넘겨줄 object
+    const page = reactive({"pageNo":1, "pageSize" : 3});
+    
+    //read에 전달되는 function
     releaseInspectionData.value = async function (query, pageNo, pageSize) {
       
       //releaseInspectionApi 통신할 때 필요한 매개변수
       const apiData = {"emptyGroup": toRaw(emptyGroup.value), "pageNo":pageNo, "pageSize":pageSize};
-      
+      console.log("apiData >> ",apiData);
+
       //통신하고 받아온 값 => DB데이터&totalCount
       const list = await releaseInspectionApi.getFilterList(apiData);
       console.log("list >>", list);
 
       //순수 데이터(totalCount 제외)
       rIData.value = list.data;
+
+      for (let i = 0; i < list.data.length; i++) {
+      if (list.data[i].boxQty === 0) {
+        list.data[i].boxQty = ' ';
+      }
+      if (list.data[i].releasePrintDate === null) {
+        list.data[i].releasePrintDate = ' ';
+      }
+      if (list.data[i].receiptePrintDate === null) {
+        list.data[i].receiptePrintDate = ' ';
+      }
+      if (list.data[i].done === 0) {
+        list.data[i].done = 'N';
+      }else if(list.data[i].done === 1) {
+        list.data[i].done = 'Y';
+      }
+    }
+
+      page.pageNo = list.pageNo;
 
       return {"data":list.data, "pageNo":list.pageNo, pageSize, "totalCount":list.totalCount};
     }
@@ -1181,38 +542,40 @@ export default {
     {deep: true});
 
     //scannedBarcode 감시
-    watch(scannedBarcode, (newScannedBarcode, oldScannedBarcode) => {
-      console.log('scannedBarcode 객체 변경 감시');
-      console.log('newScannedBarcode:', newScannedBarcode);
-      console.log('oldScannedBarcode:', oldScannedBarcode);
+    // watch(scannedBarcode, (newScannedBarcode, oldScannedBarcode) => {
+    //   console.log('scannedBarcode 객체 변경 감시');
+    //   console.log('newScannedBarcode:', newScannedBarcode);
+    //   console.log('oldScannedBarcode:', oldScannedBarcode);
+    // });
 
-      /*
-        *바코드스캔에 새로운 바코드가 스캔되면 이전 바코드값은 이상이 없으므로
-        *해당 바코드값 상품의 총검수수량이 1 증가
-        *만약 이상이 있는 바코드일 경우(미출고 되어야할 바코드일 경우), 미출고 처리 버튼 클릭
-        */
-    });
+    //ow-tab의 index 감시 (몇 번째 탭 클릭)
+    watch(index, (newIndex, oldIndex)=>{
+
+    })
 
 
+    //오른쪽 위 정보 ex)거래처명, 총검수수량
     const tally = reactive({
       clientName: '',
-      category: 0,
+      category: '',
       totalPickingQty: 10,
       totalInspectionQty: 0,
       releaseCode: 0,
       orderNo: 0,
-      unRelease: 0,
+      totalUnRelease: 0,
+      barCode: 0,
+      releaseDone: ''
     });
 
     const SelectionChanged = async (grid, e) => {
-      // console.log("=======================");
-      // console.log(grid.collectionView);
-      // var item = grid.collectionView.currentItem;
-      // console.log("============item===========");
-      // console.log(item);
 
-      console.log('범위가 제대로 나오나요?');
-      console.log(grid.selectedRanges);
+      console.log('범위');
+      console.log(grid.selectedRanges[0]._row);
+      console.log(grid.selectedRanges[0]._row2);
+
+      console.log("===========grid===========")
+      console.log(grid);
+      console.log(e);
 
       console.log('첫번째 데이터');
       console.log(grid.getCellData(0, 0, false));
@@ -1222,26 +585,12 @@ export default {
       tally.totalPickingQty = 0;
       tally.totalInspectionQty = 0;
 
-      for (let i = 0; i < ranges.length; i++) {
-        aggregateRange(tally, grid, ranges, i);
-      }
-
-      //grid.getCellData(r, c, false)
-
-      // console.log(e._p);
-      // console.log(e._p._activeCell["wj-cell-index"].panel._activeCell);
-      //console.log(e._p._activeCell["wj-cell-index"]["panel"]["_rng"]["_row2"]);
-
-      // e._p._activeCell["wj-cell-index"]["rng"]["_col1"] = 16;
-      // e._p._activeCell["wj-cell-index"]["rng"]["_col2"] = 16;
-      // console.log("===========바꼈니??============");
-      // console.log(e._p._activeCell["wj-cell-index"]["rng"]);
+      aggregateRange(tally, grid, ranges);
     };
 
-    function aggregateRange(tally, grid, ranges, index) {
-      let rng = ranges[index];
-      for (let r = rng.topRow; r <= rng.bottomRow; r++) {
-        for (let c = rng.leftCol; c <= rng.rightCol; c++) {
+    function aggregateRange(tally, grid, ranges) {
+      for (let r = grid.selectedRanges[0]._row; r <= grid.selectedRanges[0]._row2; r++) {
+        for (let c = 0; c <= 16; c++) {
           // account for overlapping ranges
           let overlapped = false;
           for (let i = 0; i < index && !overlapped; i++) {
@@ -1253,21 +602,18 @@ export default {
           // tally non-overlapped cells
           if (!overlapped) {
             let data = grid.getCellData(r, c, false);
-            if (r === rng.topRow) {
+            if (r === grid.selectedRanges[0]._row) {
               if (c === 1) {
+                tally.totalUnRelease = '-';
                 tally.clientName = data;
               } else if (c === 2) {
-
                 tally.category = data;
               } else if (c === 3) {
-
                 tally.releaseCode = data;
               } else if (c === 5) {
-
                 tally.orderNo = data;
               }
             }
-
             if (c === 9) {
               tally.totalPickingQty += data;
             } else if (c === 10) {
@@ -1297,7 +643,9 @@ export default {
       statusBar,
       packingDone,
       oneBoxPacking,
-      keyData
+      keyData,
+      pageValue,
+      page
     };
   },
 };
@@ -1321,4 +669,3 @@ export default {
   justify-content: flex-start;
 }
 </style>
-© 2022 KOSA Git Server페이지: 394ms 템플릿: 0ms  한국어 웹 사이트
