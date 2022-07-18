@@ -270,7 +270,7 @@
                 <wj-flex-grid-column-group :binding="'no'" header="No" :width="40" />
                 <wj-flex-grid-column-group :binding="'itemName'" header="품목명" :width="100" />
                 <wj-flex-grid-column-group :binding="'code'" header="품목코드" :width="100" />
-                <wj-flex-grid-column-group :binding="'orderItemqty'" header="주문수량" :width="63" />
+                <wj-flex-grid-column-group :binding="'orderItemQuantity'" header="주문수량" :width="63" />
                 <wj-flex-grid-column-group :binding="'pickingQty'" header="피킹수량" :width="63" />
                 <wj-flex-grid-column-group :binding="'releaseInspectionQuantity'" header="검수수량" :width="63" >
                   <!-- <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">-->
@@ -362,6 +362,7 @@ export default {
     //검수 버튼 이벤트 함수
     async function inspection(releaseCode) {
       const result = await releaseInspectionApi.releaseInspectionQtyUpdate(releaseCode);
+      
       return result;
     }
 
@@ -392,7 +393,8 @@ export default {
       //스캔 버튼 누르면 box테이블 데이터 생성
       boxItemData.value = [];
 
-      console.log(rIData.value);
+      console.log("rIData.value>>", rIData.value);
+      console.log("result>>", result);
 
       for (let i = 0; i < rIData.value.length; i++) {
         if (rIData.value[i].orderNo === tally.orderNo) {
@@ -441,7 +443,7 @@ export default {
                       "itemName": boxItemData.value[i].itemName,
                       "releaseInspectionQty": parseInt(boxItemData.value[i].note),
                       "pickingQty": boxItemData.value[i].pickingQty,
-                      "orderItemQty": boxItemData.value[i].orderItemqty,
+                      "orderItemQuantity": boxItemData.value[i].orderItemQuantity,
                       "orderItemNo" : boxItemData.value[i].orderItemNo});
 
         boxItemData.value[i].note = null;
