@@ -51,7 +51,7 @@
   <ow-n-grid
     v-if="showReceipt"
     :n="2"
-    :read="read"
+    :read="getReceiptList"
     :key="receiptKey"
     :visibleRowsCount="20"
     :totalCount="pager.totalCount"
@@ -316,34 +316,63 @@
   // '수령'탭에 바인딩할 데이터를 불러옴.
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
-  const getReceiptList = async () => {
-    console.log('@@ pager.pageNo', pager.pageNo);
-    const result = await combineShippingApi.getReceiptList(
+  const pn = ref(0);
+  const getReceiptList = async (query, pageNo, pageSize) => {
+    console.log('@@ getReceiptList 실행');
+    console.log('@@ pager.pageNo : ', pager.pageNo);
+    console.log('@@ query : ', query);
+    console.log('@@ pageNo : ', pageNo);
+    console.log('@@ pageSize : ', pageSize);
+    pn.value = pageNo;
+    watch(
+      () => pn,
+      (newPN, oldPN) => {
+        console.log('@@ watch - newPN : ', newPN);
+      }
+    );
+
+    // const result = await combineShippingApi.getReceiptList(
+    let result = await combineShippingApi.getReceiptList(
           toDo.value, selectedVendor.value, Array.from(dateList.value)
-          , pager.pageNo
+          , Math.ceil(pageNo/2)
+          // , pager.pageNo
           // , pager.totalCount
           , pager.perPage
           , 
-          )
-        .then((result) => {
-          if(result.receiptList != null) {
-            receiptList.value = result.receiptList;
-            pager.pageNo = result.pager.pageNo;
-            pager.totalCount = result.pager.totalRows;
-            pager.perPage = result.pager.rowsPerPage;
-            read();
-            // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-            receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
-          } else {
-            receiptList.value = [];
-            read();
-            // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-            receiptKey.value++;
-          }
-          getVendorList();
-        });
+    );
+    console.log('@@ getReceiptList - const result = await combineShippingApi.getReceiptList - result : ', result);
+        // .then((result) => {
+        //   });
+    if(result.receiptList != null) {
+      receiptList.value = result.receiptList;
+      pager.pageNo = result.pager.pageNo;
+      pager.totalCount = result.pager.totalRows;
+      pager.perPage = result.pager.rowsPerPage;
+      // read();
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      // receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
+    } else {
+      receiptList.value = [];
+      // read();
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      // receiptKey.value++;
+    }
+    getVendorList();
+
+    const result2 = await retrieve({
+      ...query,
+      // pageNo: pager.pageNo,
+      pageNo,
+      // pageSize: pager.pageSize,
+      pageSize: 20,
+      // label: label,
+      items: receiptList.value,
+      // items: items,
+    });
+    console.log('@@ result2 : ', result2);
+    return result2;
   };
-  getReceiptList();
+  // getReceiptList();
 
   // 수령 Update.
   console.log('before updateReceiptList');

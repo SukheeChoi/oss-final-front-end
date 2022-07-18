@@ -111,7 +111,7 @@
       <!-- 출고검수/패킹 탭 -->
       <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm border-center">
         <wj-flex-grid-column-group
-          binding="RLS_NO"
+          binding="RLS_CODE"
           header="출고번호"
           align="center"
           :width="80"
@@ -148,7 +148,7 @@
         />
         <!-- 합산 불필요(로직변경) -->
         <wj-flex-grid-column-group
-          binding="RI_URLS"
+          binding="OI_URLS_QTY"
           header="미출고수량"
           align="right"
           :width="55"
@@ -223,7 +223,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="PAC_BX_QTY"
+          binding="RLS_BX_QTY"
           header="Box수량"
           align="right"
           :width="60"
@@ -234,7 +234,7 @@
       <!-- 출고 탭 -->
       <wj-flex-grid-column-group header="출고" align="center">
         <wj-flex-grid-column-group
-          binding="RLS_EMP_NAME"
+          binding="R_EMP_NAME"
           header="담당자"
           align="center"
           :width="60"
@@ -250,7 +250,7 @@
           :allowMerging="true"
         />
         <wj-flex-grid-column-group
-          binding="RLS_RLS_IVC_CODE"
+          binding="RLS_IVC_CODE"
           header="송장번호"
           align="left"
           :width="100"
@@ -259,7 +259,7 @@
         />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group
-        binding="PAC_NT"
+        binding="OI_NT"
         header="비고"
         align="center"
         :width="100"
@@ -267,7 +267,7 @@
         :allowMerging="true"
       >
       <wj-flex-grid-column-group
-        binding="PAC_NT"
+        binding="OI_NT"
         header="비고"
         align="center"
         :width="100"
@@ -359,6 +359,7 @@ async function getAssigneeList() {
 
 // 리스트 전체 조회.
 const getAfterPickingList = async (query, pageNo, pageSize) => {
+  console.log('@@ const getAfterPickingList - pageNo : ', pageNo);
   const result = await afterPickingApi.getAfterPickingList(filterList, pageNo, pageSize);
   // .then((result) => {
   //   if(result != null && result.list != null) {
@@ -406,14 +407,7 @@ const onInitialized = (flex) => {
   };
 
   flex.mergeManager = new SimMergeManager(config);
-  flex.allowMerging = true;
-  flex.formatItem.addHandler((grid, e) => {
-    console.log(grid);
-    console.log(e);
-    let col = grid.getColumn('비고');
-    console.log(col);
 
-  });
 };
 
 const selectSearchLabel = '검색';
@@ -519,16 +513,16 @@ function search() {
     align-items: center;
     justify-content: center;
     line-height: inherit;
+
+    color: #333333;
+    background-color: #E8ECF1;
+    // background-color: #E1E7EE;
   }
-}
-  
-:deep {
+
   .wj-flexgrid .wj-cell.wj-align-center {
     justify-content: center;
   }
-}
 
-:deep {
   .wj-cell.border-center {
     display: flex;
     align-items: center;

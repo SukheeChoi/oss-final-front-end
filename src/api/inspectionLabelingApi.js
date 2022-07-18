@@ -58,14 +58,51 @@ async function getTreeList() {
   return response.data.data;
 }
 
+//잔업 가져오기
+async function getOvertime() {
+  let response = null;
+  try {
+    response = await axios.get('/label/getOverTime');
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+  return response.data.data;
+}
+
+//잔업 추가하기
+async function updateOvertime(requestData) {
+  console.log(requestData);
+  let response = null;
+  try {
+    response = await axios.put('/label/updateOvertime', requestData);
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+  return response.data.data;
+}
+
+//시간 수정하기
+async function updateWorktime(requestData) {
+  console.log(requestData);
+  let response = null;
+  try {
+    response = await axios.put('/label/updateWorktime', requestData);
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+  return response.data.data;
+}
+
 //담당자 이름 기준으로 작업 세부사항 api 요청
 async function getListByLWTNo(labelingWorkTimeNo, searchSelected, searchContent, pageNo, pageSize) {
   let response = null;
   try {
     response = await axios.get('/label/getListByLWTNo', {
       params: { labelingWorkTimeNo, searchSelected, searchContent, pageNo, pageSize },
-    });
-    console.log(response);
+    }); 
     response.data.data.map((data) => {
       if(data.accepted === false) {
         data.accepted = null;
@@ -82,5 +119,8 @@ async function getListByLWTNo(labelingWorkTimeNo, searchSelected, searchContent,
 export default {
   getStatus,
   getTreeList,
+  getOvertime,
   getListByLWTNo,
+  updateOvertime,
+  updateWorktime,
 };

@@ -723,7 +723,7 @@ class SimMergeManager extends MergeManager {
         break;
         case CellType.Cell:
           if (this.isMerged(p, c)) {
-            this.rowMergedRange(p, range);
+            this.rowMergedRange(p, rng);
         }
         break;
     }
