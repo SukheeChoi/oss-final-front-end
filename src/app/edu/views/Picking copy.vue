@@ -237,6 +237,7 @@
     console.log('@@ retrieve - param : ', param);
     console.log('param.items.length : ' + param.items.length);
     console.log('param.label : ' + param.label);
+    console.log('@@@@ param.pageNo : ' + param.pageNo);
     let items = _.cloneDeep(param.items);
     // let filteredItems = [];
     let filteredItems = items;
@@ -295,10 +296,24 @@
 
 
     if (param.pageNo) {
+      // 한 페이지에 한 개의 그리드만 채워질 경우.
       if(filteredItems.length < param.pageSize) {
-
-      } else {
-        filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
+        if(param.pageNo%2 !== 0) {// 페이지에서 왼쪽 flexGrid
+        console.log('*** if(filteredItems.length < param.pageSize) - if(param.pageNo%2 !== 0) : ', items);
+        filteredItems = filteredItems;
+        // filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize, filteredItems.length-1);
+        } else {// 페이지에서 오른쪽 flexGrid
+        console.log('*** if(filteredItems.length < param.pageSize) - else : ', items);
+          filteredItems = [];
+        }
+      } else {// 한 페이지에 두 개의 그리드가 채워질 경우.
+        if(param.pageNo%2 !== 0) {// 페이지에서 왼쪽 flexGrid
+          console.log('*** else - if(param.pageNo%2 !== 0) : ', items);
+          filteredItems = filteredItems.splice(0, param.pageSize);
+        } else {// 페이지에서 오른쪽 flexGrid
+          console.log('*** else - else : ', items);
+          filteredItems = filteredItems.splice(param.pageSize, filteredItems.length-1);
+        }
       }
     }
 
