@@ -290,18 +290,13 @@
     //     filteredItems = filteredItems.reverse();
     //   }
     // }
-    // if (param.pageNo) {
-    //   filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
-    // }
-
-
+ 
     if (param.pageNo) {
       // 한 페이지에 한 개의 그리드만 채워질 경우.
       if(filteredItems.length < param.pageSize) {
         if(param.pageNo%2 !== 0) {// 페이지에서 왼쪽 flexGrid
         console.log('*** if(filteredItems.length < param.pageSize) - if(param.pageNo%2 !== 0) : ', items);
         filteredItems = filteredItems;
-        // filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize, filteredItems.length-1);
         } else {// 페이지에서 오른쪽 flexGrid
         console.log('*** if(filteredItems.length < param.pageSize) - else : ', items);
           filteredItems = [];
@@ -316,18 +311,6 @@
         }
       }
     }
-
-    
-    // console.log('@@ filteredItems.length : ', filteredItems.length);
-    // if(items != null && filteredItems.length < param.pageSize) {
-    //   console.log('@@ if(filteredItems.length < param.pageSize)');
-    //   if(param.pageNo) {
-    //     console.log('@@ retrieve - if(filteredItems.length < param.pageSize) - if(param.pageNo)');
-    //   } else {
-    //   }
-    // } else {
-    //   filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
-    // }
 
     return Promise.resolve({
       data: filteredItems
