@@ -50,14 +50,15 @@
   <!-- '수령'탭이 선택된 경우. -->
   <ow-n-grid
     v-if="showReceipt"
-    :n="2"
-    :read="read"
+    :n="flexGridNum"
+    :read="getReceiptList"
     :key="receiptKey"
     :visibleRowsCount="20"
     :totalCount="pager.totalCount"
   >
     <!-- :pageSize="30" -->
     <!-- v-model="pager.pageNo"
+    :read="read"
     :totalCount="53"
     :total-rows="pager.totalRows"
     :per-page="pager.perPage" -->
@@ -69,13 +70,16 @@
     <wj-flex-grid-column header="품목코드" binding="item.itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="showReceipt==true && toDo==1" header="출고수량" binding="informationPartner.releaseQuantity" align="right" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="showReceipt==true && toDo==0" header="수령수량" binding="receiveQuantity" align="right" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==1" header="미출고" binding="receiveUnreleaseQuantity" :width="60">
+    <wj-flex-grid-column v-if="toDo==1" header="미출고" binding="receiveUnreleaseQuantity" align="right" :width="60">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
         <div class="ow-input">
           <input id="receiptUnreleaseInput" type="text"
+            style="text-align: right"
             v-model="cell.item.receiveUnreleaseQuantity"
+            @input="checkNaturalNumber($event, cell.item.rownum)"
             @change="changeReceiptUnrelease($event, cell.item.orderItem.orderItemNo, cell.item.receiveUnreleaseQuantity)"
           />
+            <!-- :value="naturalNumber" -->
         </div>
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
@@ -90,22 +94,33 @@
   <!-- '전달'탭이 선택된 경우. -->
   <ow-n-grid
     v-if="!showReceipt"
-    :n="2"
-    :read="read"
+    :n="flexGridNum"
+    :read="getDeliveryList"
     :key="deliveryKey"
+    :visibleRowsCount="20"
+    :totalCount="pager.totalCount"
   >
+    <!-- :read="read" -->
     <!-- :initialized="initialize" -->
     <template #left>&nbsp;</template>
     <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
-    <wj-flex-grid-column header="주문/출고번호" binding="order_release_no" align="center" width="2*"></wj-flex-grid-column>
-    <wj-flex-grid-column header="품목명" binding="itemName" align="left" width="3*"></wj-flex-grid-column>
-    <wj-flex-grid-column header="품목코드" binding="itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
+    <wj-flex-grid-column header="주문/출고번호" binding="orderItem.orderNo" align="center" width="2*">
+      <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+        <span>{{cell.item.orderItem.orderNo}}/{{cell.item.release.releaseCode}}</span>
+      </wj-flex-grid-cell-template>
+    </wj-flex-grid-column>
+    <wj-flex-grid-column header="품목명" binding="item.itemName" align="left" width="3*"></wj-flex-grid-column>
+    <wj-flex-grid-column header="품목코드" binding="item.itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="showReceipt==false && toDo==1" header="수령수량" binding="receiveQuantity" align="right" :width="70"></wj-flex-grid-column>
     <wj-flex-grid-column v-if="showReceipt==false && toDo==0" header="전달수량" binding="deliveryQuantity" align="right" :width="70"></wj-flex-grid-column>
-    <wj-flex-grid-column header="미출고" binding="unreleased" :width="60"></wj-flex-grid-column>
-    <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="orderItemNo" align="center" :width="70" wordWrap="true">
+    <wj-flex-grid-column header="미출고" binding="orderItem.unreleaseQuantity" align="right" :width="60">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
-        <button class="ow-btn type-icon check-state" @click="handleDeliveryCheckBtn($event, cell.item.orderItemNo)"></button>
+        <span>{{cell.item.orderItem.unreleaseQuantity || 0}}</span>
+      </wj-flex-grid-cell-template>
+    </wj-flex-grid-column>
+    <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="orderItem.orderItemNo" align="center" :width="70" wordWrap="true">
+      <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+        <button class="ow-btn type-icon check-state" @click="handleDeliveryCheckBtn($event, cell.item.orderItem.orderItemNo)"></button>
         <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
@@ -116,6 +131,9 @@
   import combineShippingApi from '../../../api/combineShippingApi';
   import { ref, reactive, watch } from 'vue';
 
+  // NGrid 안에 포함될 FlexGrid의 갯수.
+  // NGrid콤포넌트의 n prop에 전달.
+  const flexGridNum = ref(2);
   const receiptKey = ref(0);
   const deliveryKey = ref(0);
   const showReceipt = ref(true);
@@ -123,10 +141,11 @@
   const startDate = ref(new Date());
   const endDate = ref(new Date());
   const clickSearch = ref(false);
-  const vendorList = ref({
-    name: '전체'
-    , value: '전체'
-  });
+  const vendorList = ref(null);
+  // const vendorList = ref([{
+  //   name: '전체'
+  //   , value: '전체'
+  // }]);
   const selectedVendor = ref('전체');
   const assigneeList = ref([{
     name: '전체'
@@ -135,17 +154,17 @@
   const selectedAssignee = ref('전체');
   const dateList = ref([startDate.value, endDate.value]);
   const pager = reactive({
-    // 페이지 인덱스
-    pageIndex: 0
-    // 페이지 번호
+    // 현재 페이지의 인덱스
+    pageIndex: 1
+    // 현재 페이지의 번호
     , pageNo: 1
     // 전체 행 수
     , totalCount: 0
     // 페이지 당 행 수
-    , perPage: 40
+    , rowsPerPage: 40
+    // flexGrid 개당 가질 행의 갯수.
+    , pageSize: 20
   });
-  // const totalRows = ref(0);
-  // const perPage = ref(0);
   const receiptList = ref([]);
   const receiptedList = ref([]);
   const deliveryList = ref([]);
@@ -171,8 +190,8 @@
               dbVendor.push(
                 {
                   name: result.list[i]['vendorName']
-                  , value: result.list[i]['vendorName']
-                  // , value: result.list[i]['vendorCode']
+                  // , value: result.list[i]['vendorName']
+                  , value: result.list[i]['vendorNo']
                   // , disabled: false
                 }
               );
@@ -200,8 +219,8 @@
               console.log('## result.list[i] : ', result.list[i]);
               dbAssignee.push(
                 {
-                  name: result.list[i]
-                  , value: result.list[i]
+                  name: result.list[i]['employeeName']
+                  , value: result.list[i]['employeeId']
                   , disabled: false
                 }
               );
@@ -214,9 +233,10 @@
   };
 
   const retrieve = (param) => {
-    console.log('param', param);
+    console.log('@@ retrieve - param : ', param);
     console.log('param.items.length : ' + param.items.length);
     console.log('param.label : ' + param.label);
+    console.log('@@@@ param.pageNo : ' + param.pageNo);
     let items = _.cloneDeep(param.items);
     // let filteredItems = [];
     let filteredItems = items;
@@ -261,36 +281,46 @@
     // }
     // const totalCount = filteredItems.length;
     const totalCount = pager.totalCount;
-    const perPage = pager.perPage;
-    // const pageNo = pager.pageNo;
-    // const pageSize = 20;
-    if (param.sort) {
-      filteredItems = _.sortBy(filteredItems, param.sort);
-      if (['desc', 'DESC'].includes(param.direction)) {
-        filteredItems = filteredItems.reverse();
-      }
-    }
+    const perPage = pager.rowsPerPage;
+
+    // if (param.sort) {
+    //   filteredItems = _.sortBy(filteredItems, param.sort);
+    //   if (['desc', 'DESC'].includes(param.direction)) {
+    //     filteredItems = filteredItems.reverse();
+    //   }
+    // }
+ 
     if (param.pageNo) {
-      filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 10, param.pageSize ?? 10);
+      // 한 페이지에 한 개의 그리드만 채워질 경우.
+      if(filteredItems.length < param.pageSize) {
+        if(param.pageNo%2 !== 0) {// 페이지에서 왼쪽 flexGrid
+        console.log('*** if(filteredItems.length < param.pageSize) - if(param.pageNo%2 !== 0) : ', items);
+        filteredItems = filteredItems;
+        } else {// 페이지에서 오른쪽 flexGrid
+        console.log('*** if(filteredItems.length < param.pageSize) - else : ', items);
+          filteredItems = [];
+        }
+      } else {// 한 페이지에 두 개의 그리드가 채워질 경우.
+        if(param.pageNo%2 !== 0) {// 페이지에서 왼쪽 flexGrid
+          console.log('*** else - if(param.pageNo%2 !== 0) : ', items);
+          filteredItems = filteredItems.splice(0, param.pageSize);
+        } else {// 페이지에서 오른쪽 flexGrid
+          console.log('*** else - else : ', items);
+          filteredItems = filteredItems.splice(param.pageSize, filteredItems.length-1);
+        }
+      }
     }
 
     return Promise.resolve({
       data: filteredItems
-      , status: 200
-      , code: 'OK'
-      , message: 'Success'
+      // , status: 200
+      // , code: 'OK'
+      // , message: 'Success'
       , totalCount: 400
-      // , perPage
-      // , pageNo
-      // , pageSize: 20
     });
   };
 
   async function read(query, pageNo, pageSize) {
-    console.log('@@ async function read - query : ', query);
-    console.log('@@ async function read - pageNo : ', pageNo);
-    console.log('@@ async function read - Math.ceil(pageNo/2) : ', Math.ceil(pageNo/2));
-    console.log('@@ async function read - pageSize : ', pageSize);
     let label = '';
     let items = [];
     if(showReceipt.value === true) {
@@ -302,48 +332,88 @@
     }
     const result = await retrieve({
       ...query,
-      // pageNo: pager.pageNo,
+      // parameter로 넘어오는 pageNo은 NGrid 내부의 FlexGrid의 번호이므로 선언해둔 상수가 아닌 parameter를 이용.
       pageNo,
-      // pageSize: pager.pageSize,
-      pageSize: 20,
-      label: label,
+      pageSize: pager.pageSize,
+      // pageSize: 20,
+      // label: label,
       items: items,
     });
-    console.log('result', result);
+    console.log('@@ async function read(query, pageNo, pageSize) - result :', result);
     return result;
   }
 
   // '수령'탭에 바인딩할 데이터를 불러옴.
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
-  const getReceiptList = async () => {
-    console.log('@@ pager.pageNo', pager.pageNo);
+  async function getReceiptList(query, pageNo, pageSize=20, pageIndex=0) {
+    console.log('@@ pager.pageNo : ', pager.pageNo);
+    console.log('@@ pager.rowsPerPage : ', pager.rowsPerPage);
+    console.log('@@ pageNo : ', pageNo);
+    console.log('@@ pageSize : ', pageSize);
+    console.log('@@ pageIndex : ', pageIndex);
+    pager.pageIndex = pageIndex;
+    pager.pageNo = pageIndex + 1;
+
     const result = await combineShippingApi.getReceiptList(
-          toDo.value, selectedVendor.value, Array.from(dateList.value)
-          , pager.pageNo
-          // , pager.totalCount
-          , pager.perPage
-          , 
-          )
-        .then((result) => {
-          if(result.receiptList != null) {
-            receiptList.value = result.receiptList;
-            pager.pageNo = result.pager.pageNo;
-            pager.totalCount = result.pager.totalRows;
-            pager.perPage = result.pager.rowsPerPage;
-            read();
-            // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-            receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
-          } else {
-            receiptList.value = [];
-            read();
-            // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-            receiptKey.value++;
-          }
-          getVendorList();
-        });
+      toDo.value
+      , selectedVendor.value
+      , Array.from(dateList.value)
+      , pageIndex+1
+      , pager.rowsPerPage
+    );
+      // .then((result) => {
+      //   // let result2 = null;
+
+      // });
+    if(result != null && result.receiptList != null) {
+      receiptList.value = result.receiptList;
+      pager.pageNo = result.pager.pageNo;
+      pager.totalCount = result.pager.totalRows;
+      pager.rowsPerPage = result.pager.rowsPerPage;
+      read();
+      // receiptKey.value++;
+      // result2 = read(query, pageNo, pageSize);
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      // receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
+    } else {
+      receiptList.value = [];
+      read();
+      // result2 = read(query, pageNo, pageSize);
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      // receiptKey.value++;
+    }
+    // getVendorList();
+    // vendorKey.value++;
+
+    // return result2;
+    const receiptResult = read(query, pageNo, pageSize);
+    // const receiptResult = {
+    //   data: receiptList.value
+    //   , status: 200
+    //   , code: 'OK'
+    //   , message: 'Success'
+    //   , totalCount: pager.totalCount
+    //   // , perPage
+    //   // , pageNo
+    //   // , pageSize: 20
+    // }
+    // return ({
+    //   data: receiptList.value
+    //   , status: 200
+    //   , code: 'OK'
+    //   , message: 'Success'
+    //   , totalCount: pager.totalCount
+    //   // , perPage
+    //   // , pageNo
+    //   // , pageSize: 20
+    // });
+    return receiptResult;
+    // return result;
   };
   getReceiptList();
+  receiptKey.value++;
+  // getVendorList();
 
   // 수령 Update.
   console.log('before updateReceiptList');
@@ -359,22 +429,38 @@
   };
 
   // '전달' 탭에서 바인딩할 데이터를 불러옴.
-  async function getDeliveryList() {
-    const result = await combineShippingApi.getDeliveryList(toDo.value, selectedAssignee.value, Array.from(dateList.value))
-        .then((result) => {
-          if(result != null && result.deliveryList != null) {
-            deliveryList.value = result.deliveryList;
-            read();
-            deliveryKey.value++;
-          } else {
-            deliveryList.value = [];
-            read();
-            deliveryKey.value++;
-          }
-          getAssigneeList();
-          // assigneeKey++;
-          // 수령/전달 페이지 전환시에도 담당업체/담당자 초기화하지 않음.(날짜 변경시에는 초기화.)
-      });
+  async function getDeliveryList(query, pageNo, pageSize=20, pageIndex=0) {
+    pager.pageIndex = pageIndex;
+    pager.pageNo = pageIndex + 1;
+    
+    const result = await combineShippingApi.getDeliveryList(
+      toDo.value
+      , selectedAssignee.value
+      , Array.from(dateList.value)
+      , pageIndex+1
+      , pager.rowsPerPage
+    );
+        // .then((result) => {
+        // });
+    if(result != null && result.deliveryList != null) {
+      deliveryList.value = result.deliveryList;
+      pager.pageNo = result.pager.pageNo;
+      pager.totalCount = result.pager.totalRows;
+      pager.rowsPerPage = result.pager.rowsPerPage;
+      read();
+      // deliveryKey.value++;
+    } else {
+      deliveryList.value = [];
+      read();
+      // deliveryKey.value++;
+    }
+    // getAssigneeList();
+    // assigneeKey++;
+    // 수령/전달 페이지 전환시에도 담당업체/담당자 초기화하지 않음.(날짜 변경시에는 초기화.)
+
+    const deliveryResult = read(query, pageNo, pageSize);
+    console.log('@@ deliveryResult : ', deliveryResult);
+    return deliveryResult;
   };
 
   // 전달된 항목 정보 update.
@@ -434,9 +520,11 @@
 
     if(newShowReceipt === true) {
       getReceiptList();
+      receiptKey.value++;
       getVendorList();
     } else {
       getDeliveryList();
+      deliveryKey.value++;
       getAssigneeList();
     }
   });
@@ -456,10 +544,12 @@
       // 선택된 담당업체 초기화.
       selectedVendor.value = '전체';
       getReceiptList(); // 내부에서 getVendorList() 호출.
+      receiptKey.value++;
     } else {
       // 선택된 담당자 초기화.
       selectedAssignee.value = '전체';
       getDeliveryList(); // 내부에서 getAssigneeList() 호출.
+      deliveryKey.value++;
     }
   });
   // 조회 감시.
@@ -471,27 +561,31 @@
 
     if(showReceipt.value === true) {
       getReceiptList();
+      receiptKey.value++;
+      getVendorList();
     } else {
       getDeliveryList();
+      deliveryKey.value++;
+      getAssigneeList();
     }
     clickSearch.value = false;
   });
 
-  // selectedVendor
+  // 담당업체 선택을 감시.
   watch(() => selectedVendor.value
     , (newSelectedVendor, oldSelectedVendor) => {
-      console.log('!! selectedVendor.value : ', selectedVendor.value);
-      console.log('!! newSelectedVendor : ', newSelectedVendor);
       selectedVendor.value = newSelectedVendor;
+      console.log('*** watch(() => selectedVendor.value - selectedVendor.value : ', selectedVendor.value);
       getReceiptList();
+      receiptKey.value++;
     }
   );
-  // selectedAssignee
+  // 담당자 선택을 감시.
   watch(() => selectedAssignee.value
     , (newSelectedAssignee, oldSelectedAssignee) => {
       selectedAssignee.value = newSelectedAssignee;
-      
       getDeliveryList();
+      deliveryKey.value++;
     }
   );
 
@@ -573,10 +667,6 @@
   function handleChangeToDelivery() {
     showReceipt.value = false;
   }
-  // 담당자 선택시.
-  // function updateSelectedAssignee(assignee) {
-  //   console.log('!! assignee', assignee);
-  // }
 
   // 할 일 탭 클릭시.
   function handleChangeToTodo() {
@@ -598,8 +688,43 @@
     dateList.value[1] = endDate.value;
   }
 
+  // 조회 버튼 클릭시.
   function handleClickSearch() {
     clickSearch.value = true;
+  }
+
+  //
+  function checkNaturalNumber(event, rownum) {
+    console.log('@@ function checkNaturalNumber(event)');
+    console.log('@@ checkNaturalNumber - event : ', event);
+    console.log('@@ checkNaturalNumber - event.target : ', event.target);
+    console.log('@@ checkNaturalNumber - event.target.value : ', event.target.value);
+    console.log('@@ checkNaturalNumber - pager.pageIndex : ', pager.pageIndex);
+    console.log('@@ checkNaturalNumber - rownum : ', rownum);
+    // 사용자로부터 입력된 미출고값.
+    // 문자나 특수기호 등 잘못된 입력이 존재할 수 있으므로 정규식을 이용해서 자연수만 입력가능하도록.
+    // ================== 수령갯수 기준으로 유효성검사 추가로 필요함!!! ==================
+    // inputUnreleasedQuantity : 사용자로부터 입력받은 미출고값.
+    let inputUnreleasedQuantity = event.target.value;
+    // 미출고값에 자연수만 입력받을 수 있도록 정규식을 이용. 문자나 특수기호가 입력 불가능하게 만듦.
+    inputUnreleasedQuantity = inputUnreleasedQuantity.replace(/[^0-9]/g, '') ;
+    console.log('@@ checkNaturalNumber - inputUnreleasedQuantity : ', inputUnreleasedQuantity);
+    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["receiveUnreleaseQuantity"] - before: ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+    receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = inputUnreleasedQuantity;
+    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["receiveUnreleaseQuantity"] - after : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+    // 미출고 수량은 출고 수량(주문수량과 같거나 작음)보다 커질 수 없음.
+    if(parseInt(inputUnreleasedQuantity) > parseInt(receiptList.value[rownum-1]['informationPartner']['releaseQuantity'])) {
+      console.log('@@ checkNaturalNumber - if(inputUnreleasedQuantity > receiptList.value[rownum-1]["receiveUnreleaseQuantity"]) : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+      // 입력된 미출고 수량이 출고 수량보다 큰 경우, 해당 미출고값을 0으로 초기화 하고, alert 띄움.
+      receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = 0;
+      event.target.value = 0;
+      console.log('@@ checkNaturalNumber - inside - if(inputUnreleasedQuantity > receiptList.value[rownum-1]["receiveUnreleaseQuantity"]) : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+      alert('미출고 수량은 출고수량보다 클 수 없습니다.');
+    }
+    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["informationPartner"]["releaseQuantity"] - after : ', receiptList.value[rownum-1]['informationPartner']['releaseQuantity']);
+    // console.log('@@ checkNaturalNumber - rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex) : ', rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex));
+    // 미출고값이 입력되고 있는 행의 receiptList 내부 index는 (rownum-1) 과 같음.
+
   }
 
   // ReceiptList의 unreleased update에 대한 handler.

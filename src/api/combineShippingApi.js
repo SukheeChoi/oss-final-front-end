@@ -50,12 +50,12 @@ async function getAssigneeList(toDo=1, dateList=Array.from([])) {
 // param: 담당자 코드, pageNo
 // '수령'탭에서 표시할 list.
 async function getReceiptList(toDo=1, selectedVendor='전체', dateList=Array.from([]), pageNo=1, perPage=40) {
-  console.log('getReceiptList');
+  console.log('*** combineShippingApi - getReceiptList - selectedVendor : ', selectedVendor);
   let receiptList = null;
   try {
     let params = new URLSearchParams();
     params.append('toDo', toDo);
-    params.append('vendorName', selectedVendor);
+    params.append('vendorId', selectedVendor);
     params.append('dateList', Array.from(dateList));
     params.append('pageNo', pageNo);
     params.append('perPage', perPage);
@@ -74,7 +74,7 @@ async function getDeliveryList(toDo=1, selectedAssignee='전체', dateList=Array
   try {
     let params = new URLSearchParams();
     params.append('toDo', toDo);
-    params.append('employeeName', selectedAssignee);
+    params.append('employeeId', selectedAssignee);
     params.append('dateList', Array.from(dateList));
     params.append('pageNo', pageNo);
     params.append('perPage', perPage);

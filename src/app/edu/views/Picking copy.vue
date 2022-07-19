@@ -141,10 +141,11 @@
   const startDate = ref(new Date());
   const endDate = ref(new Date());
   const clickSearch = ref(false);
-  const vendorList = ref({
-    name: '전체'
-    , value: '전체'
-  });
+  const vendorList = ref(null);
+  // const vendorList = ref([{
+  //   name: '전체'
+  //   , value: '전체'
+  // }]);
   const selectedVendor = ref('전체');
   const assigneeList = ref([{
     name: '전체'
@@ -164,8 +165,6 @@
     // flexGrid 개당 가질 행의 갯수.
     , pageSize: 20
   });
-  // const totalRows = ref(0);
-  // const perPage = ref(0);
   const receiptList = ref([]);
   const receiptedList = ref([]);
   const deliveryList = ref([]);
@@ -191,8 +190,8 @@
               dbVendor.push(
                 {
                   name: result.list[i]['vendorName']
-                  , value: result.list[i]['vendorName']
-                  // , value: result.list[i]['vendorCode']
+                  // , value: result.list[i]['vendorName']
+                  , value: result.list[i]['vendorNo']
                   // , disabled: false
                 }
               );
@@ -220,8 +219,8 @@
               console.log('## result.list[i] : ', result.list[i]);
               dbAssignee.push(
                 {
-                  name: result.list[i]
-                  , value: result.list[i]
+                  name: result.list[i]['employeeName']
+                  , value: result.list[i]['employeeId']
                   , disabled: false
                 }
               );
@@ -347,7 +346,7 @@
   // '수령'탭에 바인딩할 데이터를 불러옴.
   // employeeId에는 필터에서 선택된 담당자의 id가 들어감.
   // 로드시에 필터에는 담당자 정보를 이름순으로 정렬한 첫번째 값이 선택된 상태.
-  const getReceiptList = async (query, pageNo, pageSize=20, pageIndex=0) => {
+  async function getReceiptList(query, pageNo, pageSize=20, pageIndex=0) {
     console.log('@@ pager.pageNo : ', pager.pageNo);
     console.log('@@ pager.rowsPerPage : ', pager.rowsPerPage);
     console.log('@@ pageNo : ', pageNo);
@@ -357,59 +356,64 @@
     pager.pageNo = pageIndex + 1;
 
     const result = await combineShippingApi.getReceiptList(
-          toDo.value, selectedVendor.value, Array.from(dateList.value)
-          , pageIndex+1
-          , pager.rowsPerPage
-          );
-        // .then((result) => {
-        //   // let result2 = null;
+      toDo.value
+      , selectedVendor.value
+      , Array.from(dateList.value)
+      , pageIndex+1
+      , pager.rowsPerPage
+    );
+      // .then((result) => {
+      //   // let result2 = null;
 
-        // });
-      if(result != null && result.receiptList != null) {
-        receiptList.value = result.receiptList;
-        pager.pageNo = result.pager.pageNo;
-        pager.totalCount = result.pager.totalRows;
-        pager.rowsPerPage = result.pager.rowsPerPage;
-        read();
-        // receiptKey.value++;
-        // result2 = read(query, pageNo, pageSize);
-        // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-        // receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
-      } else {
-        receiptList.value = [];
-        // result2 = read(query, pageNo, pageSize);
-        // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
-        // receiptKey.value++;
-      }
-      getVendorList();
-
-      // return result2;
-      const receiptResult = read(query, pageNo, pageSize);
-      // const receiptResult = {
-      //   data: receiptList.value
-      //   , status: 200
-      //   , code: 'OK'
-      //   , message: 'Success'
-      //   , totalCount: pager.totalCount
-      //   // , perPage
-      //   // , pageNo
-      //   // , pageSize: 20
-      // }
-      // return ({
-      //   data: receiptList.value
-      //   , status: 200
-      //   , code: 'OK'
-      //   , message: 'Success'
-      //   , totalCount: pager.totalCount
-      //   // , perPage
-      //   // , pageNo
-      //   // , pageSize: 20
       // });
-      return receiptResult;
-      // return result;
+    if(result != null && result.receiptList != null) {
+      receiptList.value = result.receiptList;
+      pager.pageNo = result.pager.pageNo;
+      pager.totalCount = result.pager.totalRows;
+      pager.rowsPerPage = result.pager.rowsPerPage;
+      read();
+      // receiptKey.value++;
+      // result2 = read(query, pageNo, pageSize);
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      // receiptKey.value++; // 자동으로 read() 실행? 그러면 :read에 getReceiptList(), getDeliveryList()를 할당하면 되나?
+    } else {
+      receiptList.value = [];
+      read();
+      // result2 = read(query, pageNo, pageSize);
+      // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
+      // receiptKey.value++;
+    }
+    // getVendorList();
+    // vendorKey.value++;
+
+    // return result2;
+    const receiptResult = read(query, pageNo, pageSize);
+    // const receiptResult = {
+    //   data: receiptList.value
+    //   , status: 200
+    //   , code: 'OK'
+    //   , message: 'Success'
+    //   , totalCount: pager.totalCount
+    //   // , perPage
+    //   // , pageNo
+    //   // , pageSize: 20
+    // }
+    // return ({
+    //   data: receiptList.value
+    //   , status: 200
+    //   , code: 'OK'
+    //   , message: 'Success'
+    //   , totalCount: pager.totalCount
+    //   // , perPage
+    //   // , pageNo
+    //   // , pageSize: 20
+    // });
+    return receiptResult;
+    // return result;
   };
   getReceiptList();
   receiptKey.value++;
+  // getVendorList();
 
   // 수령 Update.
   console.log('before updateReceiptList');
@@ -435,28 +439,28 @@
       , Array.from(dateList.value)
       , pageIndex+1
       , pager.rowsPerPage
-      );
+    );
         // .then((result) => {
         // });
-      if(result != null && result.deliveryList != null) {
-        deliveryList.value = result.deliveryList;
-        pager.pageNo = result.pager.pageNo;
-        pager.totalCount = result.pager.totalRows;
-        pager.rowsPerPage = result.pager.rowsPerPage;
-        read();
-        // deliveryKey.value++;
-      } else {
-        deliveryList.value = [];
-        read();
-        // deliveryKey.value++;
-      }
-      getAssigneeList();
-      // assigneeKey++;
-      // 수령/전달 페이지 전환시에도 담당업체/담당자 초기화하지 않음.(날짜 변경시에는 초기화.)
+    if(result != null && result.deliveryList != null) {
+      deliveryList.value = result.deliveryList;
+      pager.pageNo = result.pager.pageNo;
+      pager.totalCount = result.pager.totalRows;
+      pager.rowsPerPage = result.pager.rowsPerPage;
+      read();
+      // deliveryKey.value++;
+    } else {
+      deliveryList.value = [];
+      read();
+      // deliveryKey.value++;
+    }
+    // getAssigneeList();
+    // assigneeKey++;
+    // 수령/전달 페이지 전환시에도 담당업체/담당자 초기화하지 않음.(날짜 변경시에는 초기화.)
 
-      const deliveryResult = read(query, pageNo, pageSize);
-      console.log('@@ deliveryResult : ', deliveryResult);
-      return deliveryResult;
+    const deliveryResult = read(query, pageNo, pageSize);
+    console.log('@@ deliveryResult : ', deliveryResult);
+    return deliveryResult;
   };
 
   // 전달된 항목 정보 update.
@@ -558,9 +562,11 @@
     if(showReceipt.value === true) {
       getReceiptList();
       receiptKey.value++;
+      getVendorList();
     } else {
       getDeliveryList();
       deliveryKey.value++;
+      getAssigneeList();
     }
     clickSearch.value = false;
   });
@@ -569,6 +575,7 @@
   watch(() => selectedVendor.value
     , (newSelectedVendor, oldSelectedVendor) => {
       selectedVendor.value = newSelectedVendor;
+      console.log('*** watch(() => selectedVendor.value - selectedVendor.value : ', selectedVendor.value);
       getReceiptList();
       receiptKey.value++;
     }
@@ -717,7 +724,6 @@
     console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["informationPartner"]["releaseQuantity"] - after : ', receiptList.value[rownum-1]['informationPartner']['releaseQuantity']);
     // console.log('@@ checkNaturalNumber - rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex) : ', rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex));
     // 미출고값이 입력되고 있는 행의 receiptList 내부 index는 (rownum-1) 과 같음.
-
 
   }
 
