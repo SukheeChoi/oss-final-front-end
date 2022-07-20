@@ -65,10 +65,18 @@ async function scan(code, kind) {
 }
 
 //맨 위에 현황 (주문건: 1360건 | 피킹완료건: 530건(긴급5건/일반525건) | 출고검수/패킹건: 0건(긴급3건/일반125건))
-async function getTotal() {
+/*
+  작성자: 신현주
+  메소드 기능: '출고검수/패킹' 페이지의 현황 정보를 서버로부터 가져오기 위한 axios 통신 수행
+  return: 현황 정보(JSON)을 담는 JSON
+  parameter: 불필요.
+*/
+async function getSummary() {
   let response = null;
   try {
     response = await axios.get("/releaseInspection/releaseInspectionStatus");
+    console.log("=========================================================");
+    console.log(response);
   } catch (error) {
     console.log(error);
   }
@@ -135,16 +143,13 @@ async function getBoxInfobyOrderNo(orderNo, index) {
   return response.data;
 }
 
-
-
-
 export default{
   getReleaseInspectionList,
   getFilterList,
   releaseInspectionQtyUpdate,
   unReleaseQtyUpdate,
   scan,
-  getTotal,
+  getSummary,
   updateBoxTable,
   packingDone,
   getBoxInfobyOrderNo,
