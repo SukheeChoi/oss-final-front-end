@@ -15,10 +15,18 @@ async function getReleaseInspectionList(){
 };
 
 //필터링된 데이터 가져오기
-async function getFilterList(newGroup){
+/*
+  작성자: 신현주
+  메소드 기능: 필터링된 정보를 서버로부터 가져오기 위한 axios 통신 수행
+  return: 필터링된 정보(JSON)을 담는 JSON
+  parameter: 필터 조건(긴급/일반)과 페이저 정보(pageNo,pageSize)
+*/
+async function getFilterList(apiData){
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/getFilterList`, newGroup);
+    response = await axios.post(`/releaseInspection/getFilterList`, apiData);
+    console.log("=========================================================");
+    console.log(response);
   }catch(error){
     console.log("#######/releaseInspection/getFilterList 통신 실패######")
     console.log(error);
@@ -53,6 +61,12 @@ async function unReleaseQtyUpdate(releaseCode, barCode) {
 }
 
 //스캔 버튼 눌렀을 때,
+/*
+  작성자: 신현주
+  메소드 기능: 출고번호 혹은 바코드를 스캔시, 스캔된 물품에 대한 정보를 서버로부터 가져오기 위한 axios 통신 수행
+  return: 스캔된 물품에 대한 정보를 담는 JSON
+  parameter
+*/
 async function scan(code, kind) {
   let response = null;
   try{
@@ -65,7 +79,13 @@ async function scan(code, kind) {
 }
 
 //맨 위에 현황 (주문건: 1360건 | 피킹완료건: 530건(긴급5건/일반525건) | 출고검수/패킹건: 0건(긴급3건/일반125건))
-async function getTotal() {
+/*
+  작성자: 신현주
+  메소드 기능: '출고검수/패킹' 페이지의 현황 정보를 서버로부터 가져오기 위한 axios 통신 수행
+  return: 현황 정보(JSON)을 담는 JSON
+  parameter: 불필요.
+*/
+async function getSummary() {
   let response = null;
   try {
     response = await axios.get("/releaseInspection/releaseInspectionStatus");
@@ -135,16 +155,13 @@ async function getBoxInfobyOrderNo(orderNo, index) {
   return response.data;
 }
 
-
-
-
 export default{
   getReleaseInspectionList,
   getFilterList,
   releaseInspectionQtyUpdate,
   unReleaseQtyUpdate,
   scan,
-  getTotal,
+  getSummary,
   updateBoxTable,
   packingDone,
   getBoxInfobyOrderNo,

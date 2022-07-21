@@ -46,8 +46,6 @@ const MenuList2 = [
       Menu.create('합배송 품목 수령/전달', 'DISTSub5'),
       // Menu.create('합배송 품목 수령/전달 copy', 'DISTSub5-2'),
       Menu.create('검품검수 및 라벨링 모니터링', 'DISTSub6'),
-      // Menu.create('Copy', 'DISTSub7'),
-      // Menu.create('Copy2', 'DISTSub8'),
     ])
   ])
 ];

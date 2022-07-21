@@ -43,7 +43,6 @@
             :autoGenerateColumns="false"
             :selectionChanged="SelectionChanged"
             :key = "keyData"
-            :pageValue = "pageValue.value"
             :page="page"         
           >
             <!-- :autoRowHeights="true" -->
@@ -126,10 +125,12 @@
               :allowMerging="true"
               :width="75"
               align="center"
-              :wordWrap="true"
               :multiline="true"
-              :cellTemplate="releasePrintBtn"
-            ></wj-flex-grid-column>
+            >
+              <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+                <button id="receipt-check-btn" class="ow-btn type-state" @click="releasePrintBtn($event, cell.item)">인쇄</button>
+              </wj-flex-grid-cell-template>            
+            </wj-flex-grid-column>
             <wj-flex-grid-column
               :binding="'releaseBoxQty'"
               :header="'출고Box<br/>수량'"
@@ -152,10 +153,12 @@
               :allowMerging="true"
               :width="75"
               align="center"
-              :wordWrap="true"
               :multiline="true"
-              :cellTemplate="receiptePrintBtn"
-            ></wj-flex-grid-column>
+            >
+              <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+                <button id="receipt-check-btn" class="ow-btn type-state" @click="receiptPrintBtn($event, cell.item)">인쇄</button>
+              </wj-flex-grid-cell-template>
+            </wj-flex-grid-column>
             <wj-flex-grid-column
               :binding="'note'"
               :header="'비고'"
@@ -304,7 +307,19 @@
     </div>
   </div>
 
-  <ow-modal type="XS" title="박스 패킹 실패"  ref="modalRef" :cancelButton="true" style="font-size: 130%;" >
+  <ow-modal type="XS" :title="'박스'+`${index+1}`+' 패킹실패'" ref="modalRef" :cancelButton="true" style="font-size: 130%;" >
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100px; max-height: calc(100vh - 36px - 62px) !important;">
+      <span>박스{{index+1}}의 물품의 수량을 확인해 주세요!</span>
+    </div>
+  </ow-modal>
+
+  <ow-modal type="XS" title="출고요청서 인쇄"  ref="releasePrintRef" :cancelButton="true" style="font-size: 130%;" >
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100px; max-height: calc(100vh - 36px - 62px) !important;">
+      <span>{{dateRef}}</span>
+    </div>
+  </ow-modal>
+
+  <ow-modal type="XS" title="거래명세서 인쇄"  ref="receiptePrintRef" :cancelButton="true" style="font-size: 130%;" >
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100px; max-height: calc(100vh - 36px - 62px) !important;">
       <span>박스{{index+1}}의 물품의 수량을 확인해 주세요!</span>
     </div>
@@ -319,26 +334,20 @@ import releaseInspectionApi from '@/api/releaseInspectionApi';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 
 export default {
-  props: {
-    items: [Object, Array],
-  },
-
   setup() {
-
-    const releasePrintBtn = CellMaker.makeButton({
-      text: '출력하기', //<b>${item.country}</b>
-      click: (e, ctx) => alert('Clicked Button ** ' + ctx.item.country + ' **')
-    })
-
-    const receiptePrintBtn = CellMaker.makeButton({
-      text: '출력하기', //<b>${item.country}</b>
-      click: (e, ctx) => alert('Clicked Button ** ' + ctx.item.country + ' **')
-    })
-
-    const modal = ref(null);
-
     const dummyBox = ref(null);
     const boxKey = ref(0);
+
+    //출력시 필요한 현재 날짜 (2022-07-05 11:27:00)
+    let today = new Date();
+    let year = today.getFullYear();     // 년도
+    let month = today.getMonth() + 1;   // 월
+    let date = today.getDate();         // 날짜
+    let hours = today.getHours();       // 시
+    let minutes = today.getMinutes();   // 분
+    let seconds = today.getSeconds();   // 초
+    
+    let dateRef = ref(year+'-'+month+'-'+date+' '+hours+':'+minutes+':'+seconds);
 
     //스캔버튼 눌렀을 때, orderStatus:false => 4, orderStatus:true => 5,6
     const orderStatus = ref(true);
@@ -358,8 +367,6 @@ export default {
         }
       });
     };
-
-    const pageValue = ref(1);
 
     //현황
     const statusBar = reactive({
@@ -466,27 +473,23 @@ export default {
     //전체 데이터(왼쪽) 가져오기(totalCount 정보까지 가지고 있음.)
     const releaseInspectionData = ref([]);
     const keyData = ref(0);
-    
-    //순수 데이터
-    const rIData = ref(null);
 
     //실험
     const list = ref(null)
 
     //page로 넘겨줄 object
-    const page = reactive({"pageNo":1, "pageSize" : 3});
+    const page = reactive({"pageNo":1, "pageSize" : 5});
     
     //read에 전달되는 function
     releaseInspectionData.value = async function (query, pageNo, pageSize) {
+
+      console.log(pageNo);
       
       //releaseInspectionApi 통신할 때 필요한 매개변수
       const apiData = {"emptyGroup": toRaw(emptyGroup.value), "pageNo":pageNo, "pageSize":pageSize};
 
       //통신하고 받아온 값 => DB데이터&totalCount
       list.value = await releaseInspectionApi.getFilterList(apiData);
-
-      //순수 데이터(totalCount 제외)
-      rIData.value = list.value.data;
 
       for (let i = 0; i < list.value.data.length; i++) {
       if (list.value.data[i].releaseBoxQty === 0) {
@@ -514,8 +517,12 @@ export default {
 
     //Filter [긴급/일반] 변화 감시
     watch(emptyGroup, (newGroup, oldGroup) => {
+      //필터 체크 해서 grid 다시 그려줄 때 pageNo는 1로 두어서 첫페이지로 올 수 있게 한다.
+      page.pageNo = 1;
+      
       //필터링 될 때마다 그리드 업데이트+
       keyData.value++;
+
       console.log("releaseInspectionData.value >> ",releaseInspectionData.value);
     },
     {deep: true});
@@ -647,18 +654,8 @@ export default {
     },{deep: true});
 
     const SelectionChanged = async (grid, e) => {
-
-      // console.log('범위');
-      // console.log(grid.selectedRanges[0]._row);
-      // console.log(grid.selectedRanges[0]._row2);
-
-      // console.log("grid >> ", grid);
-      // console.log(e);
-
-      // console.log('첫번째 데이터');
-      // console.log(grid.getCellData(0, 0, false));
-
       let ranges = grid.selectedRanges;
+      let sel = grid.selection;
 
       tally.totalPickingQty = 0;
       tally.totalInspectionQty = 0;
@@ -719,9 +716,20 @@ export default {
       return result;
     }
 
-    //-------
-    const modalRef = ref(null);
+    //출고요청서 인쇄 btn
+    function releasePrintBtn(e,ctx) {
+      console.log("ctx >> ", ctx);
+      openreleaseModal();
+    }
 
+    //거래명세서 인쇄 btn
+    function receiptPrintBtn(e, ctx) {
+      console.log("ctx >> ", ctx);
+      openreleaseModal();
+    }
+
+    //박스N 패킹완료 버튼 유효성 검사 모달
+    const modalRef = ref(null);
     const openModal = async function () {
       const config = {
         data: {},
@@ -730,8 +738,27 @@ export default {
       const childRefData = await modalRef.value.open('accept', config);
     };
 
+    //출고요청서 인쇄 버튼
+    const releasePrintRef = ref(null);
+    const openreleaseModal = async function () {
+      const config = {
+        data: {},
+        cancelButtonText: '확인',
+      };
+      const childRefData = await releasePrintRef.value.open('accept', config);
+    };
+
+    //거래명세서 인쇄 버튼
+    const receiptePrintRef = ref(null);
+    const openreceipteModal = async function () {
+      const config = {
+        data: {},
+        cancelButtonText: '확인',
+      };
+      const childRefData = await receiptePrintRef.value.open('accept', config);
+    };
+
     return {
-      // ...toRefs(state),
       onInitialized,
       releaseInspectionData,
       checkboxGroup5,
@@ -748,16 +775,18 @@ export default {
       statusBar,
       keyData,
       boxKey,
-      pageValue,
       page,
       boxItemData,
       oneBoxPacking,
       orderStatus,
       packingDone,
-      modalRef,
       openModal,
       releasePrintBtn,
-      receiptePrintBtn
+      modalRef,
+      releasePrintRef,
+      receiptePrintRef,
+      dateRef,
+      receiptPrintBtn
     };
   },
 };
@@ -765,6 +794,12 @@ export default {
 
 <style scoped lang="scss">
 :deep {
+  .ow-grid .wj-cells .wj-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .wj-cell.wj-header {
     display: flex;
     align-items: center;
@@ -786,10 +821,7 @@ export default {
   
   //center
   .wj-flexgrid .wj-cell .wj-align-center {
-    display: flex;
     justify-content: center;    
-    align-items: center;
-    line-height: inherit;
   }
   .wj-flexgrid .wj-colheaders .wj-header.wj-colgroup.wj-align-right {
     justify-content: flex-start;
@@ -799,13 +831,6 @@ export default {
     align-items: center;
     line-height: inherit;
   }
-  .wj-cell .wj-align-center {
-    display: flex;
-    justify-content: center;    
-    align-items: center;
-    line-height: inherit;
-  }
-
 }
 </style>
 
