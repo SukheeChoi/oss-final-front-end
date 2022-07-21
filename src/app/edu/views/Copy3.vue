@@ -43,7 +43,6 @@
             :autoGenerateColumns="false"
             :selectionChanged="SelectionChanged"
             :key = "keyData"
-            :pageValue = "pageValue.value"
             :page="page"         
           >
             <!-- :autoRowHeights="true" -->
@@ -369,8 +368,6 @@ export default {
       });
     };
 
-    const pageValue = ref(1);
-
     //현황
     const statusBar = reactive({
       total: null,                //주문건
@@ -476,27 +473,23 @@ export default {
     //전체 데이터(왼쪽) 가져오기(totalCount 정보까지 가지고 있음.)
     const releaseInspectionData = ref([]);
     const keyData = ref(0);
-    
-    //순수 데이터
-    const rIData = ref(null);
 
     //실험
     const list = ref(null)
 
     //page로 넘겨줄 object
-    const page = reactive({"pageNo":1, "pageSize" : 3});
+    const page = reactive({"pageNo":1, "pageSize" : 5});
     
     //read에 전달되는 function
     releaseInspectionData.value = async function (query, pageNo, pageSize) {
+
+      console.log(pageNo);
       
       //releaseInspectionApi 통신할 때 필요한 매개변수
       const apiData = {"emptyGroup": toRaw(emptyGroup.value), "pageNo":pageNo, "pageSize":pageSize};
 
       //통신하고 받아온 값 => DB데이터&totalCount
       list.value = await releaseInspectionApi.getFilterList(apiData);
-
-      //순수 데이터(totalCount 제외)
-      rIData.value = list.value.data;
 
       for (let i = 0; i < list.value.data.length; i++) {
       if (list.value.data[i].releaseBoxQty === 0) {
@@ -524,8 +517,12 @@ export default {
 
     //Filter [긴급/일반] 변화 감시
     watch(emptyGroup, (newGroup, oldGroup) => {
+      //필터 체크 해서 grid 다시 그려줄 때 pageNo는 1로 두어서 첫페이지로 올 수 있게 한다.
+      page.pageNo = 1;
+      
       //필터링 될 때마다 그리드 업데이트+
       keyData.value++;
+
       console.log("releaseInspectionData.value >> ",releaseInspectionData.value);
     },
     {deep: true});
@@ -656,13 +653,6 @@ export default {
       }
     },{deep: true});
 
-    const keyDataChange = ref(false);
-
-    //keyData 감시
-    watch(keyData, (newKey, oldKey)=>{
-      keyDataChange.value= true;
-    })
-
     const SelectionChanged = async (grid, e) => {
       let ranges = grid.selectedRanges;
       let sel = grid.selection;
@@ -785,7 +775,6 @@ export default {
       statusBar,
       keyData,
       boxKey,
-      pageValue,
       page,
       boxItemData,
       oneBoxPacking,
