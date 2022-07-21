@@ -12,7 +12,6 @@ async function getStatus() {
   let response = null;
   try {
     response = await axios.get('/label/status');
-    console.log(response);
   } catch (error) {
     console.log(error);
   }
@@ -54,16 +53,6 @@ async function getTreeList() {
         k.passItemQuantity = "dd";
         k.inspectionQuantity = "dd";
         k.labelingItemQuantity = "dd";
-        //지연시간에 분 붙이기
-        k.childrennn.map((m) => {
-          if(m.progressRate) {
-            m.progressRate = m.progressRate + "%"
-          }
-          
-          if (m.lateTime) {
-            m.lateTime = m.lateTime + '분';
-          }
-        });
       });
     });
   } catch (error) {
