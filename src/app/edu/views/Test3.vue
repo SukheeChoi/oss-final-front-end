@@ -5,7 +5,7 @@
       <div class="item size-fix" style="--gap-item: 6px">
         <div class="ow-flex-wrap">
           <div class="item size-fix" style="--gap-item: 6px">
-            <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
+            <ow-status-bar label="현황" :items="itemStatus"></ow-status-bar>
           </div>
         </div>
       </div>
@@ -18,67 +18,10 @@
       </div>
     </div>
     <hr />
-    <!-- 수정 모달모달 -->
-    <ow-modal
-      type="XS"
-      :title="'[' + modalUpdateData.title + '] 예정시간 수정'"
-      ref="childUpdateRef"
-      v-if="modalUpdateData"
-      :cancelButton="true"
-    >
-      <div>사원명 - {{ modalUpdateData.employeeName }}</div>
-      <div>업체명 - {{ modalUpdateData.title }}</div>
-      <span class="mt-5">
-        <ow-input-time
-          v-model="modalUpdateData.scheduledStartTime"
-          :before="timeData"
-          style="width: 100px"
-        ></ow-input-time>
-        <ow-input-time :props="timeData" style="width: 100px"></ow-input-time>
-      </span>
-    </ow-modal>
-
-    <!-- 추가 모달모달 -->
-    <ow-modal
-      type="M"
-      :title="'[' + modalAddData.employeeName + '] 잔업시간 추가'"
-      ref="childAddRef"
-      v-if="modalAddData"
-      :cancelButton="true"
-    >
-      <div>사원명 - {{ modalAddData.employeeName }}</div>
-      <table>
-        <tr>
-          <th class="table-title" style="width: 10%">선택</th>
-          <th class="table-title" style="width: 40%">업체명</th>
-          <th class="table-title" style="width: 10%">수령일</th>
-          <th class="table-title" style="width: 10%">수령품목</th>
-          <th class="table-title" style="width: 10%">수령수량</th>
-        </tr>
-        <tr v-for="(order, index) in modalAddData.data" :key="index">
-          <td class="table-body-center">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              :value="order.placingOrderNo"
-              id="defaultCheck1"
-              :disabled="order.receiveQuantity === order.labelingItemQuantity"
-              v-model="checkedTitle"
-            />
-          </td>
-          <td class="table-body-center">{{ order.title }}</td>
-          <td class="table-body-center">{{ order.receiveItem }}</td>
-          <td class="table-body-center">{{ order.receiveQuantity }}</td>
-          <td class="table-body-center">{{ order.inspectionQuantity }}</td>
-          <td class="table-body-center">{{ order.passItemQuantity }}</td>
-          <td class="table-body-center">{{ order.labelingItemQuantity }}</td>
-        </tr>
-      </table>
-    </ow-modal>
     <div class="d-flex">
       <!-- 왼쪽 화면 -->
-      <div class="left h-100">
-        <div class="d-flex justify-content-end mt-5 mb-5">
+      <div class="parent">
+        <div class="d-flex flex-grow-1 justify-content-end mt-5 mb-5">
           <button class="ow-btn type-util" @click="openUpdateModal" :disabled="!updateDate">예정시간수정</button>
           <button class="ow-btn type-util" @click="openAddModal" :disabled="!addDate">추가</button>
         </div>
@@ -87,7 +30,8 @@
           :childItemsPath="['child', 'childrennn']"
           :selectionChanged="onSelectionChanged"
           :initialized="treeInitialized"
-          :visibleRowsCount="20"
+          :visibleRowsCount="15"
+          :key="treeKeyData"
         >
           <wj-flex-grid-column header="담당자/업체명" binding="title" :width="130" align="left"></wj-flex-grid-column>
           <wj-flex-grid-column header="수령일" binding="receiveDate" :width="100" align="center"></wj-flex-grid-column>
@@ -140,7 +84,7 @@
         </ow-tree-grid>
       </div>
       <!-- 오른쪽 화면 -->
-      <div class="right flex-fill">
+      <div class="flex-grow-1">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <div class="item align-to-right" style="--gap-item: 6px">
             <div class="title-field">검색</div>
@@ -165,7 +109,7 @@
               ■ <span v-if="title">[{{ title }}]</span>검품검수 및 라벨링 내역
             </div>
           </div>
-          <div class="ow-panel-body1">
+          <div class="ow-panel-body">
             <b-row>
               <div v-if="!title" style="font-size: 20px">담당자를 선택해주세요!</div>
               <ow-grid v-if="title" :read="getGrid" :key="keyData" :initialized="onInitialized" :visibleRowsCount="15">
@@ -195,73 +139,132 @@
       </div>
     </div>
   </div>
+  <!-- 수정 모달모달 -->
+  <ow-modal
+    type="XS"
+    :title="'[' + modalUpdateData.title + '] 예정시간 수정'"
+    ref="childUpdateRef"
+    v-if="modalUpdateData"
+    :acceptButton="true"
+    style="font-size: 14px"
+  >
+    <div>사원명 - {{ modalUpdateData.employeeName }}</div>
+    <div>업체명 - {{ modalUpdateData.title }}</div>
+    <span class="mt-5">
+      <ow-input-time
+        ref="startInputTime"
+        v-if="modalUpdateData.scheduledStartTime"
+        v-model="modalUpdateData.scheduledStartTime"
+        :after="endInputTime"
+        :min="modalUpdateData.min"
+        :max="modalUpdateData.max"
+        style="width: 100px"
+      ></ow-input-time>
+
+      <ow-input-time
+        ref="endInputTime"
+        v-if="modalUpdateData.scheduledEndTime"
+        v-model="modalUpdateData.scheduledEndTime"
+        :before="startInputTime"
+        :min="modalUpdateData.min"
+        :max="modalUpdateData.max"
+        style="width: 100px"
+      ></ow-input-time>
+    </span>
+  </ow-modal>
+  <!-- 추가 모달모달 -->
+  <ow-modal
+    type="L"
+    :title="'[' + modalAddData.title + '] 잔업 추가'"
+    ref="childAddRef"
+    v-if="modalAddData"
+    :acceptButton="true"
+    style="font-size: 14px"
+  >
+    <div>사원명 - {{ modalAddData.title }}</div>
+    <table>
+      <tr>
+        <th class="table-title" style="width: 10%">선택</th>
+        <th class="table-title" style="width: 20%">발주번호</th>
+        <th class="table-title" style="width: 20%">업체명</th>
+        <th class="table-title" style="width: 30%">수령일</th>
+        <th class="table-title" style="width: 10%">수령품목</th>
+        <th class="table-title" style="width: 10%">수령수량</th>
+      </tr>
+      <tr v-for="(order, index) in modalAddData.data" :key="index">
+        <td class="table-body-center">
+          <input type="radio" id="placingOrderNo" :value="order" v-model="picked" />
+        </td>
+        <td class="table-body-center">{{ order.placingOrderNo }}</td>
+        <td class="table-body-center">{{ order.title }}</td>
+        <td class="table-body-center">{{ order.receiveDate }}</td>
+        <td class="table-body-center">{{ order.receiveItem }}</td>
+        <td class="table-body-center">{{ order.receiveQuantity }}</td>
+      </tr>
+    </table>
+  </ow-modal>
 </template>
 
 <script setup>
-import { ref, reactive, toRefs, watch, computed, toRaw, onMounted } from 'vue';
+import { ref, reactive } from 'vue';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
 import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { TreeMergeManager, SimpleMergeManager } from '@/utils/wijmo.grid';
-import OwModal from '../../../components/common/OwModal.vue';
 
-const childItemsPath = ['child', 'childrennn'];
+const childItemsPath = ['child', 'childrennn']; //트리그리드 자식 경로 설정
 
-const getTree = ref([]);
-const getGrid = ref([]);
-const keyData = ref(0);
+const getTree = ref([]); //트리그리드 데이터가 저장되는 ref 객체
+const getGrid = ref([]); //그리드 데이터가 저장되는 ref 객체
+const keyData = ref(0); //그리드 리렌더링을 위한 ref 객체
+const treeKeyData = ref(0); //트리그리드 리렌더링을 위한 ref 객체
 
-getTree.value = async function (query, pageNo, pageSize) {
+/*
+ * 작성자: 이동현
+ * 기능: 트리그리드에 띄워질 데이터(담당자별 작업, 업체별 작업)들을 가져오는 기능
+ * 리턴 값: data: Array
+ */
+getTree.value = async function () {
   const treeList = await inspectionLabelingApi.getTreeList();
 
   const result = {
-    totalCount: 1,
     data: treeList,
   };
 
   return result;
 };
 
-const title = ref(null);
-const searchSelected = ref(null);
-const searchContent = ref(null);
+const title = ref(null); //모달이나 판넬에 띄워질 담당자가 저장되는 ref 객체
+const searchSelected = ref(null); //검색조건이 저장되는 ref 객체
+const searchContent = ref(null); //검색내용이 저장되는 ref 객체
 
-let modalUpdateData = reactive({
-  title: '',
-  employeeName: '',
-  scheduledStartTime: '',
-  scheduledEndTime: '',
-});
-
-const modalAddData = ref([]);
-
-let timeData = { modelValue: modalUpdateData.scheduledStartTime };
-
-const updateDate = ref(false);
-const addDate = ref(false);
-const checkedTitle = ref([]);
-
-const orderStatus = ref([
+//주문현황이 저장되는 ref 객체
+const itemStatus = ref([
   { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
 ]);
 
+//검품검수현황이 저장되는 ref 객체
 const inspectionStatus = ref([
   { name: '양품 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '누락 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '파손 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
 ]);
 
+/*
+  작성자: 이동현
+  기능: 현황을 가져오는 기능
+*/
 async function getStatus() {
   const result = await inspectionLabelingApi.getStatus().then((data) => {
-    orderStatus.value[0].value = data.receiveItem;
-    orderStatus.value[0].plusValue = data.receiveItemQuantity;
+    itemStatus.value[0].value = data.receiveItem;
+    itemStatus.value[0].plusValue = data.receiveItemQuantity;
 
-    orderStatus.value[1].value = data.inspectionItem;
-    orderStatus.value[1].plusValue = data.inspectionItemQuantity;
+    itemStatus.value[1].value = data.inspectionItem;
+    itemStatus.value[1].plusValue = data.inspectionItemQuantity;
 
-    orderStatus.value[2].value = data.labelingItem;
-    orderStatus.value[2].plusValue = data.labelingItemQuantity;
+    itemStatus.value[2].value = data.labelingItem;
+    itemStatus.value[2].plusValue = data.labelingItemQuantity;
 
     inspectionStatus.value[0].value = data.passedItem;
     inspectionStatus.value[0].plusValue = data.passedItemQuantity;
@@ -275,25 +278,153 @@ async function getStatus() {
 }
 getStatus();
 
+// --------------------------------------- 추가 모달에 띄울 잔업 -------------------------------------------------------
+const childAddRef = ref(null); //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
+const modalAddData = ref(null); //모달에 띄울 데이터를 저장하는 ref 객체
+const addDate = ref(false); //추가버튼을 제어하는 ref 객체
+const picked = ref(null); //추가 모달에서 선택한 잔업을 저장하는 ref 객체
+const labelingWorkTimeNo = ref(null); //담당자의 작업번호를 저장하는 ref 객체
+const lastStartTime = ref(null); //잔업의 시작시간(마지막 작업의 끝 시간)을 저장하는 ref 객체
+
+/*
+  작성자: 이동현
+  기능: 모달에 띄워질 잔업을 가져오는 기능
+  리턴 값: Array
+*/
+const getOvertime = async function () {
+  const overtime = await inspectionLabelingApi.getOvertime();
+  return overtime;
+};
+
+/*
+  작성자: 이동현
+  기능: 추가 모달화면을 띄우는 기능, 자식컴포넌트인 owModal의 open 메소드를 실행시킨다.
+*/
+const openAddModal = async function () {
+  picked.value = null; //선택한 잔업을 초기화
+  const childAddRefData = await childAddRef.value.open();
+
+  //모달의 확인을 클릭할 때 실행
+  if (childAddRefData.ok === true) {
+    const requestData = {
+      receiveItem: picked.value.receiveItem,
+      receiveQuantity: picked.value.receiveQuantity,
+      placingOrderNo: picked.value.placingOrderNo,
+      labelingWorkTimeNo: labelingWorkTimeNo.value,
+      startTime: lastStartTime.value,
+      endTime: '18:00',
+    };
+
+    /*
+      작성자: 이동현
+      기능: 해당 담당자에게 잔업을 추가하는 기능
+      매개변수: requestData {
+        receiveItem: 수령 품목 개수
+        receiveQuantity: 수령 수량
+        placingOrderNo: 발주번호
+        labelingWorkTimeNo: 작업번호
+        startTime: 시작시간
+        endTime: '18:00',
+      }
+      리턴 값: String
+    */
+    const result = await inspectionLabelingApi.updateOvertime(requestData).then((result) => {
+      if (result === 'success') {
+        alert('잔업이 추가되었습니다!');
+      } else {
+        alert('오류가 발생했습니다.');
+      }
+      treeKeyData.value++;
+    });
+  }
+};
+
+// ----------------------------------------------------------------------------------------------------
+
+// --------------------------------------- 수정 모달 update -------------------------------------------------------
+const childUpdateRef = ref(null); //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
+const updateDate = ref(false); //수정버튼을 제어하는 ref 객체
+const startInputTime = ref(null); //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 앞쪽 / 시작 owInputTime
+const endInputTime = ref(null); //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 뒷쪽 / 끝 owInputTime
+const placingOrderNo = ref(null); //작업의 발주번호를 저장하는 ref 객체
+
+let modalUpdateData = reactive({
+  //모달에 띄울 데이터를 저장하는 reactive 객체
+  title: '',
+  employeeName: '',
+  scheduledStartTime: '',
+  scheduledEndTime: '',
+  min: '',
+  max: '',
+});
+
+/*
+  작성자: 이동현
+  기능: 수정 모달화면을 띄우는 기능, 자식컴포넌트인 owModal의 open 메소드를 실행시킨다.
+*/
+const openUpdateModal = async function () {
+  picked.value = null;
+  const childUpdateRefData = await childUpdateRef.value.open();
+
+  //모달의 확인을 클릭할 때 실행
+  if (childUpdateRefData.ok === true) {
+    const requestData = {
+      placingOrderNo: placingOrderNo.value,
+      labelingWorkTimeNo: labelingWorkTimeNo.value,
+      startTime: modalUpdateData.scheduledStartTime,
+      endTime: modalUpdateData.scheduledEndTime,
+    };
+    /*
+      작성자: 이동현
+      기능: 해당 담당자에게 잔업을 추가하는 기능
+      매개변수: requestData {
+        placingOrderNo: 발주번호
+        labelingWorkTimeNo: 작업번호
+        startTime: 시작시간
+        endTime: '18:00',
+      }
+      리턴 값: String
+    */
+    const result = await inspectionLabelingApi.updateWorktime(requestData).then((result) => {
+      if (result === 'success') {
+        alert('시간이 수정되었습니다!');
+      } else {
+        alert('오류가 발생했습니다.');
+      }
+      treeKeyData.value++;
+    });
+  }
+};
+
 //트리 그리드 셀렉션 핸들러
 const onSelectionChanged = (grid, target) => {
-  //반응형 변수 세팅(검색 조건 리셋)
-  searchSelected.value = '';
-  searchContent.value = '';
-  updateDate.value = false;
-  addDate.value = false;
+  //ref 객체 세팅(검색 조건 리셋)
+  searchSelected.value = ''; //검색조건 리셋
+  searchContent.value = ''; //검색내용 리셋
+  addDate.value = false; //버튼 비활성화
+  updateDate.value = false; //버튼 비활성화
 
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
-    //childrenn이라는 key가 null이 아니면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
-    if (grid.selectedItems[0].childrennn != null) {
-      title.value = grid.selectedItems[0].title;
+    //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
+    if (grid.selectedItem.childrennn != null) {
+      addDate.value = true; //추가 버튼 활성화
+      title.value = grid.selectedItem.title; //모달에 띄울 제목 설정
+      labelingWorkTimeNo.value = grid.selectedItem.labelingWorkTimeNo; //잔업 추가요청 파라미터 / 작업번호 설정
+      lastStartTime.value = grid.selectedItem.childrennn.at(-1).scheduledEndTime; //잔업 추가요청 파라미터 / 마지막 작업의 끝 시간을 추가할 잔업의 시작시간으로 설정
 
-      const labelingWorkTimeNo = grid.selectedItems[0].labelingWorkTimeNo;
+      //잔업 가져와서 modalAddData에 저장
+      getOvertime().then((data) => {
+        modalAddData.value = {
+          data: data,
+          title: title.value,
+        };
+      });
+
       getGrid.value = async function (query, pageNo, pageSize) {
         //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
         const lee = await inspectionLabelingApi.getListByLWTNo(
-          labelingWorkTimeNo,
+          labelingWorkTimeNo.value,
           searchSelected.value,
           searchContent.value,
           pageNo,
@@ -307,33 +438,58 @@ const onSelectionChanged = (grid, target) => {
         };
         return result;
       };
-
-      keyData.value++;      
+      keyData.value++;
     }
 
-    //child와 childrenn이라는 key가 없으면 업체명이므로 예정시간 수정 api 호출(업체명)
-    if (!grid.selectedItems[0].childrennn && !grid.selectedItems[0].child && !grid.selectedItems[0].startTime) {
+    if (!grid.selectedItem.childrennn && !grid.selectedItem.child && !grid.selectedItem.startTime) {
+      updateDate.value = true;
+
       modalUpdateData.title = grid.selectedItem.title;
       modalUpdateData.employeeName = grid.selectedItem.employeeName;
       modalUpdateData.scheduledStartTime = grid.selectedItem.scheduledStartTime;
       modalUpdateData.scheduledEndTime = grid.selectedItem.scheduledEndTime;
-      updateDate.value = true;
-      console.log('예정시간 수정');
-      console.log(grid);
-      console.log(grid.selectedItems[0]);
-    }
-    console.log(grid.selectedItem);
-      modalAddData.value = async function() {
-        addDate.value = true;
-        const data = await inspectionLabelingApi.getOvertime();
 
-        const result = {
-          data: data,
-          employeeName: grid.selectedItem.employeeName,
+      const testGrid = grid.itemsSource.items[0].child;
+      testGrid.map((data) => {
+        if (data.title === grid.selectedItem.employeeName) {
+          console.log(data);
+          console.log(data.childrennn);
+          console.log(grid.selectedItem.placingOrderNo);
+          console.log(data.childrennn.length);
+          labelingWorkTimeNo.value = data.labelingWorkTimeNo;
+
+          //선택한 발주번호가 상위 배열의 어떤 인덱스에 있는지
+
+          const index = data.childrennn.findIndex((i) => i.placingOrderNo === grid.selectedItem.placingOrderNo);
+
+          placingOrderNo.value = grid.selectedItem.placingOrderNo;
+          //인덱스가 0인 경우
+          if (index === 0) {
+            modalUpdateData.min = '09:00';
+
+            // 작업이 하나만 있을 경우에는 18:00시, 작업이 2개 이상 있을 시에는 뒷 작업의 시작시간
+            if (data.childrennn.length === 1) {
+              modalUpdateData.max = '18:00';
+            } else {
+              const afterArray = data.childrennn[index + 1];
+              modalUpdateData.max = afterArray.scheduledStartTime;
+            }
+          } else if (index === data.childrennn.length - 1) {
+            // 인덱스가 마지막(인덱스 == 배열길이)인 경우
+            const beforeArray = data.childrennn[index - 1];
+            modalUpdateData.min = beforeArray.scheduledEndTime;
+            modalUpdateData.max = '18:00';
+          } else {
+            //나머지 일반 경우
+            const beforeArray = data.childrennn[index - 1];
+            const afterArray = data.childrennn[index + 1];
+            modalUpdateData.min = beforeArray.scheduledEndTime;
+            modalUpdateData.max = afterArray.scheduledStartTime;
+          }
         }
-        console.log(result);
-        return result;
-      }
+      });
+      console.log(testGrid);
+    }
   }
 };
 
@@ -504,50 +660,30 @@ const onInitialized = (grid) => {
   //그리드 셀렉션모드 설정(None)
   grid.selectionMode = 0;
 };
-
-const childUpdateRef = ref(null);
-const childAddRef = ref(null);
-
-const openUpdateModal = async function () {
-  const config = {
-    data: {},
-    cancelButtonText: '확인',
-  };
-  console.log(childUpdateRef);
-  const ok = await childUpdateRef.value.open('accept', config);
-  console.log('modal ok', ok);
-  console.log(modalUpdateData);
-};
-
-const openAddModal = async function () {
-  const config = {
-    data: {},
-    cancelButtonText: '확인',
-  };
-  console.log(childAddRef);
-  const ok = await childAddRef.value.open('accept', config);
-  if(ok === false) {
-    checkedTitle.value = [];
-  }
-  console.log('modal ok', ok);
-  console.log(checkedTitle);
-  console.log(modalAddData);
-};
 </script>
 
 <style scoped lang="scss">
 ::v-deep {
-  .ow-panel .ow-panel-body {
+  .d-flex .ow-panel {
     display: flex;
+    width: 100%;
+    flex: 1 1 var(--size-panel, 0);
+    height: auto;
+    min-height: 0;
     flex-direction: column;
-    flex: 1;
-    border: 2px solid #6980af;
-    border-top: 0;
-    background-color: #fff;
-    padding: var(--ow-gutter);
-    margin-bottom: 10%;
+    margin-left: 1em;
   }
-
+  .ow-panel .ow-panel-header {
+    display: flex;
+    height: 26px;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 0 12px;
+    background-color: #284077;
+    border-radius: 4px 4px 0 0;
+    color: #fff;
+    font-size: 13px;
+  }
   .wj-cell.wj-header {
     display: flex;
     align-items: center;
@@ -630,11 +766,7 @@ const openAddModal = async function () {
     white-space: nowrap;
   }
 
-  .ow-flex-wrap.dir-col {
-    flex-direction: column;
-    align-items: center;
-  }
-
+  // 모달
   .table-title {
     background-color: rgb(231, 234, 241);
     text-align: center;

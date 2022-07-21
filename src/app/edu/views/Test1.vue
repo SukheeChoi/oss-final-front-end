@@ -183,8 +183,8 @@
       <tr>
         <th class="table-title" style="width: 10%">선택</th>
         <th class="table-title" style="width: 20%">발주번호</th>
-        <th class="table-title" style="width: 40%">업체명</th>
-        <th class="table-title" style="width: 10%">수령일</th>
+        <th class="table-title" style="width: 20%">업체명</th>
+        <th class="table-title" style="width: 30%">수령일</th>
         <th class="table-title" style="width: 10%">수령품목</th>
         <th class="table-title" style="width: 10%">수령수량</th>
       </tr>
@@ -203,45 +203,55 @@
 </template>
 
 <script setup>
-import { ref, reactive, toRefs, watch, computed, toRaw } from 'vue';
+import { ref, reactive } from 'vue';
 import inspectionLabelingApi from '@/api/inspectionLabelingApi';
 import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { TreeMergeManager, SimpleMergeManager } from '@/utils/wijmo.grid';
 
-const childItemsPath = ['child', 'childrennn'];
+const childItemsPath = ['child', 'childrennn']; //트리그리드 자식 경로 설정
 
-const getTree = ref([]);
-const getGrid = ref([]);
-const keyData = ref(0);
-const treeKeyData = ref(0);
+const getTree = ref([]);    //트리그리드 데이터가 저장되는 ref 객체
+const getGrid = ref([]);    //그리드 데이터가 저장되는 ref 객체
+const keyData = ref(0);     //그리드 리렌더링을 위한 ref 객체
+const treeKeyData = ref(0); //트리그리드 리렌더링을 위한 ref 객체
 
-getTree.value = async function (query, pageNo, pageSize) {
+/*
+* 작성자: 이동현
+* 기능: 트리그리드에 띄워질 데이터(담당자별 작업, 업체별 작업)들을 가져오는 기능
+* 리턴 값: data: Array
+*/
+getTree.value = async function () {
   const treeList = await inspectionLabelingApi.getTreeList();
 
   const result = {
-    totalCount: 1,
     data: treeList,
   };
 
   return result;
 };
 
-const title = ref(null);
-const searchSelected = ref(null);
-const searchContent = ref(null);
+const title = ref(null);          //모달이나 판넬에 띄워질 담당자가 저장되는 ref 객체
+const searchSelected = ref(null); //검색조건이 저장되는 ref 객체
+const searchContent = ref(null);  //검색내용이 저장되는 ref 객체
 
+//주문현황이 저장되는 ref 객체
 const orderStatus = ref([
   { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
 ]);
 
+//검품검수현황이 저장되는 ref 객체
 const inspectionStatus = ref([
   { name: '양품 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '누락 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '파손 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
 ]);
 
+/*
+  작성자: 이동현
+  기능: 현황을 가져오는 기능
+*/
 async function getStatus() {
   const result = await inspectionLabelingApi.getStatus().then((data) => {
     orderStatus.value[0].value = data.receiveItem;
@@ -266,37 +276,63 @@ async function getStatus() {
 getStatus();
 
 // --------------------------------------- 추가 모달에 띄울 잔업 -------------------------------------------------------
-const childAddRef = ref(null);
-const modalAddData = ref(null);
-const addDate = ref(false);
-const picked = ref(null);
-const labelingWorkTimeNo = ref(null);
-const startTime = ref(null);
+const childAddRef = ref(null);        //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
+const modalAddData = ref(null);       //모달에 띄울 데이터를 저장하는 ref 객체
+const addDate = ref(false);           //추가버튼을 제어하는 ref 객체
+const picked = ref(null);             //추가 모달에서 선택한 잔업을 저장하는 ref 객체
+const labelingWorkTimeNo = ref(null); //담당자의 작업번호를 저장하는 ref 객체
+const lastStartTime = ref(null);      //잔업의 시작시간(마지막 작업의 끝 시간)을 저장하는 ref 객체
 
+/*
+  작성자: 이동현
+  기능: 모달에 띄워질 잔업을 가져오는 기능
+  리턴 값: Array
+*/
 const getOvertime = async function () {
   const overtime = await inspectionLabelingApi.getOvertime();
   return overtime;
 };
 
+/*
+  작성자: 이동현
+  기능: 추가 모달화면을 띄우는 기능, 자식컴포넌트인 owModal의 open 메소드를 실행시킨다.
+*/
 const openAddModal = async function () {
-  picked.value = null;
+  picked.value = null;  //선택한 잔업을 초기화
   const childAddRefData = await childAddRef.value.open();
-  console.log(childAddRefData);
+  
+  //모달의 확인을 클릭할 때 실행
   if (childAddRefData.ok === true) {
-    //작업 추가하는 로직
-    console.log(picked.value);
-    console.log(modalAddData.value);
-
+    
     const requestData = {
       receiveItem: picked.value.receiveItem,
       receiveQuantity: picked.value.receiveQuantity,
       placingOrderNo: picked.value.placingOrderNo,
       labelingWorkTimeNo: labelingWorkTimeNo.value,
-      startTime: startTime.value,
+      startTime: lastStartTime.value,
       endTime: '18:00',
     };
+
+    /*
+      작성자: 이동현
+      기능: 해당 담당자에게 잔업을 추가하는 기능
+      매개변수: requestData {
+        receiveItem: 수령 품목 개수
+        receiveQuantity: 수령 수량
+        placingOrderNo: 발주번호
+        labelingWorkTimeNo: 작업번호
+        startTime: 시작시간
+        endTime: '18:00',
+      }
+      리턴 값: String
+    */
     const result = await inspectionLabelingApi.updateOvertime(requestData).then((result) => {
       console.log('updateReceiptList - result : ' + result);
+      if(result === "success") {
+        alert("잔업이 추가되었습니다!");
+      } else {
+        alert("오류가 발생했습니다.");
+      }
       treeKeyData.value++;
     });
   }
@@ -305,12 +341,13 @@ const openAddModal = async function () {
 // ----------------------------------------------------------------------------------------------------
 
 // --------------------------------------- 수정 모달 update -------------------------------------------------------
-const updateDate = ref(false);
-const startInputTime = ref(null);
-const endInputTime = ref(null);
-const placingOrderNo = ref(null);
+const childUpdateRef = ref(null); //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
+const updateDate = ref(false);    //수정버튼을 제어하는 ref 객체
+const startInputTime = ref(null); //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 앞쪽 / 시작 owInputTime
+const endInputTime = ref(null);   //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 뒷쪽 / 끝 owInputTime
+const placingOrderNo = ref(null); //작업의 발주번호를 저장하는 ref 객체
 
-let modalUpdateData = reactive({
+let modalUpdateData = reactive({  //모달에 띄울 데이터를 저장하는 reactive 객체
   title: '',
   employeeName: '',
   scheduledStartTime: '',
@@ -318,7 +355,7 @@ let modalUpdateData = reactive({
   min: '',
   max: '',
 });
-const childUpdateRef = ref(null);
+
 
 const openUpdateModal = async function () {
   picked.value = null;
@@ -346,7 +383,7 @@ const openUpdateModal = async function () {
 
 //트리 그리드 셀렉션 핸들러
 const onSelectionChanged = (grid, target) => {
-  //반응형 변수 세팅(검색 조건 리셋)
+  //ref 객체 세팅(검색 조건 리셋)
   searchSelected.value = '';
   searchContent.value = '';
   addDate.value = false;
@@ -358,7 +395,7 @@ const onSelectionChanged = (grid, target) => {
       addDate.value = true;
       title.value = grid.selectedItem.title;
       labelingWorkTimeNo.value = grid.selectedItem.labelingWorkTimeNo;
-      startTime.value = grid.selectedItem.childrennn.at(-1).scheduledEndTime;
+      lastStartTime.value = grid.selectedItem.childrennn.at(-1).scheduledEndTime;
       console.log(grid.selectedItem);
       //------
       getOvertime().then((data) => {
@@ -412,9 +449,15 @@ const onSelectionChanged = (grid, target) => {
           placingOrderNo.value = grid.selectedItem.placingOrderNo;
           //인덱스가 0인 경우
           if (index === 0) {
-            const afterArray = data.childrennn[index + 1];
             modalUpdateData.min = '09:00';
-            modalUpdateData.max = afterArray.scheduledStartTime;
+            
+            if(data.childrennn.length === 1) {
+              modalUpdateData.max = "18:00";
+            } else {
+              const afterArray = data.childrennn[index + 1];
+              modalUpdateData.max = afterArray.scheduledStartTime;
+            }
+            
           } else if (index === data.childrennn.length - 1) {
             // 인덱스가 마지막(인덱스 == 배열길이)인 경우
             const beforeArray = data.childrennn[index - 1];
