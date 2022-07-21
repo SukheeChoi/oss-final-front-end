@@ -74,6 +74,14 @@ async function getAssigneeList(filterList) {
   return : 페이지네이션을 위한 Pager 객체와 Grid에 바인딩 할 목록(List)을 담은 JSON.
   parameter : 다중 필터링용 필터값/담당자/부분일치 검색 키워드/페이지네이션 위한 페이지 번호, 페이지 별 행 개수.
 */
+/**
+ * 
+ * @author 최숙희
+ * @param {Object} filterList 
+ * @param {Number} pageNo 
+ * @param {Number} pageSize 
+ * @returns 
+ */
 async function getAfterPickingList(filterList, pageNo=1, pageSize=10) {
   let afterPickingList = null;
   try {

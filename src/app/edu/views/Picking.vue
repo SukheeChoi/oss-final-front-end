@@ -88,7 +88,8 @@
             @input="checkReceiptUnreleaseInput($event, cell.item.rownum)"
             @change="changeReceiptUnrelease($event, cell.item.orderItem.orderItemNo, cell.item.receiveUnreleaseQuantity)"
           />
-            <!-- :value="naturalNumber" -->
+            <!-- :modelValue="cell.item.receiveUnreleaseQuantity"
+            @update:modelValue="checkReceiptUnreleaseInput($event, cell.item.rownum)" -->
         </div>
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
@@ -484,8 +485,17 @@
         receiptKey.value++;
       });
   };
-
-  // '전달' 탭에서 바인딩할 데이터를 불러옴.
+  
+  /**
+   * 전달 탭 상태에서
+   * NGrid에 바인딩할 데이터를 반환함.
+   * 
+   * @author 최숙희
+   * @param {Object} query 
+   * @param {Number} pageNo FlexGrid의 번호
+   * @param {Number} pageSize FlexGrid 별 행 수
+   * @param {Number} pageIndex Ngrid
+   */
   async function getDeliveryList(query, pageNo, pageSize=20, pageIndex=0) {
     pager.pageIndex = pageIndex;
     pager.pageNo = pageIndex + 1;
@@ -518,7 +528,7 @@
     const deliveryResult = read(query, pageNo, pageSize);
     console.log('@@ deliveryResult : ', deliveryResult);
     return deliveryResult;
-  };
+  }
 
   // 전달된 항목 정보 update.
   // deliveredList.value.push(
@@ -552,6 +562,13 @@
   //   }
   // );
 
+  /**
+   * 전달&&할일 탭
+   * 전달여부를 업데이트하는 통신 수행하고
+   * 새로운 전달 데이터를 서버로부터 읽어와서 NGrid에 바인딩하는 메소드 호출.
+   * 
+   * @author 최숙희
+   */
   async function updateDeliveryList() {
     const result = await combineShippingApi.updateDeliveryList(deliveredList.value)
       .then(() => {
@@ -560,7 +577,6 @@
         getDeliveryList(toDo.value, '', dateList.value);
         deliveryKey.value++;
       });
-    // return result;
   }
 
   // 모달 이용하기 위한 함수
