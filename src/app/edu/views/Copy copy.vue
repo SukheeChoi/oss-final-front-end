@@ -34,7 +34,7 @@
     <div class="item ow-flex-wrap dir-col" style="--size: 80%">
       <div class="container-fluid">
         <div class="ow-grid-wrap">
-          <ow-grid
+          <ow-grid-2
             headersVisibility="Column"
             :read="releaseInspectionData"
             :allowMerging="'Cells'"
@@ -161,7 +161,7 @@
               align="center"
               :allowMerging="true"
             ></wj-flex-grid-column>
-          </ow-grid>
+          </ow-grid-2>
         </div>
       </div>
     </div>
@@ -209,7 +209,7 @@
                 <div class="state-item">
                   <div class="w-100">*총미출고수량</div>
                   <div class="ow-input mr-1" style="--width: 60px">
-                    <input type="text" v-model="tally.unRelease" />
+                    <input type="text" v-model="tally.totalUnRelease" />
                   </div>
                 </div>
               </div>
@@ -270,7 +270,7 @@
                 <wj-flex-grid-column-group :binding="'no'" header="No" :width="40" />
                 <wj-flex-grid-column-group :binding="'itemName'" header="품목명" :width="100" />
                 <wj-flex-grid-column-group :binding="'code'" header="품목코드" :width="100" />
-                <wj-flex-grid-column-group :binding="'orderItemQuantity'" header="주문수량" :width="63" />
+                <wj-flex-grid-column-group :binding="'orderItemqty'" header="주문수량" :width="63" />
                 <wj-flex-grid-column-group :binding="'pickingQty'" header="피킹수량" :width="63" />
                 <wj-flex-grid-column-group :binding="'releaseInspectionQuantity'" header="검수수량" :width="63" >
                   <!-- <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">-->
@@ -307,7 +307,7 @@
 import { ref, reactive, toRefs, watch, toRaw, onMounted } from 'vue';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 import releaseInspectionApi from '@/api/releaseInspectionApi';
-
+//import OwGrid2 from '@/components/grid/new/OwGrid2';
 export default {
 
   setup() {
@@ -324,7 +324,6 @@ export default {
         mergedColumns: [0, 1, 2, 3, 4, 5, 'releasePrintDate', 'boxQty', 14, 15, 16],
       };
       grid.mergeManager = new SimpleMergeManager(config);
-
       grid.selectionMode = 4 //RowRange
     };
 
@@ -337,7 +336,7 @@ export default {
       totalPickingQty: null,      //피킹완료건
       commonPickingQty: null,     //피킹완료건 -> 일반
       emergencyPickingQty: null,  //피킹완료건 -> 긴급
-      totalRlsQty: null,          //출고검수/패킹건
+      totalRlsQty: null,          //출고검수/패킹
       commonRlsQty: null,         //출고검수/패킹건 -> 일반
       emergencyRlsQty: null,      //출고검수/패킹건 -> 긴급
     });
@@ -361,8 +360,8 @@ export default {
 
     //검수 버튼 이벤트 함수
     async function inspection(releaseCode) {
+      console.log("검수처리 버튼 클릭 >>", releaseCode)
       const result = await releaseInspectionApi.releaseInspectionQtyUpdate(releaseCode);
-      
       return result;
     }
 
@@ -378,54 +377,51 @@ export default {
     // 스캔 버튼 이벤트 함수
     // 출고번호(releaseCode) or 바코드(barCode)
     async function scan(code, kind) {
-
+      //스캔해서 총검수수량과 같은 정보를 가져온다.
       const result = await releaseInspectionApi.scan(code, kind);
 
       tally.clientName = result.client.clientName;
-      tally.totalPickingQty = result.picking.pickingQty;
-      tally.totalInspectionQty = result.releaseInspectionQuantity;
-      tally.unRelease = result.unReleased;
+      tally.totalPickingQty = result.picking.pickingQty;            //총피킹수량
+      tally.totalInspectionQty = result.releaseInspectionQuantity;  //총검수수량
+      tally.totalUnRelease = result.unReleased;                     //총미출고수량
       tally.orderNo = result.order.orderNo;
       tally.category = result.order.shippingCategory;
-      tally.barCode = result.release.releaseBarCode;  //바코드
-      tally.releaseCode = result.release.releaseCode; //출고번호
+      tally.barCode = result.release.releaseBarCode;                //바코드
+      tally.releaseCode = result.release.releaseCode;               //출고번호
+      //tally.releaseDone = result.release.releaseDone;               //출고검수여부
 
-      //스캔 버튼 누르면 box테이블 데이터 생성
-      boxItemData.value = [];
-
-      console.log("rIData.value>>", rIData.value);
-      console.log("result>>", result);
-
-      for (let i = 0; i < rIData.value.length; i++) {
-        if (rIData.value[i].orderNo === tally.orderNo) {
-          boxItemData.value.push(rIData.value[i]);
-        }
+      console.log("scan result>>", result);
+ 
+      // 1) 출고검수 이전일 때, releaseDone = 0
+      if(result.release.releaseDone == 0 ){
+        //스캔 버튼 누르면 box테이블 데이터 생성
+        boxItemData.value = await releaseInspectionApi.getBoxInfo(tally.releaseCode);
       }
-
-      console.log('boxItemData', boxItemData.value);
+    
+      console.log('boxItemData >>', boxItemData);
       return result;
     }
 
     //박스 개수
     var boxNum = 0;
 
-    //ow-tab에서 사용하는 item
+    //ow-tab에서 사용하는 item ex) 박스1, 박스2, 박스3...
     let boxArrays = ref([]);
 
-    //ow-tab에 넘겨줄 index
+    //ow-tab의 model에 넘겨줄 index
     var index = ref(0);
 
     //박스 추가 버튼 -> boxArrays에 추가
     function addBox() {
-      boxNum = boxNum + 1;
       //박스는 8개까지 만들 수 있다.
-      if (boxNum < 9) {
+      if (boxNum < 8) {
+        boxNum = boxNum + 1;
         boxArrays.value.push(`박스${boxNum}`);
       }
     }
 
     //박스들(list)의 정보를 포함하는 list
-    const boxlist = ref([]);
+    const boxItemDataList = ref([]);
 
     //n번째 박스 패킹처리
     async function oneBoxPacking(index) {
@@ -439,11 +435,6 @@ export default {
         
         apiArray.push({"releaseCode": boxItemData.value[i].releaseCode,
                       "boxNumber": index+1, 
-                      "itemCode": boxItemData.value[i].code,
-                      "itemName": boxItemData.value[i].itemName,
-                      "releaseInspectionQty": parseInt(boxItemData.value[i].note),
-                      "pickingQty": boxItemData.value[i].pickingQty,
-                      "orderItemQuantity": boxItemData.value[i].orderItemQuantity,
                       "orderItemNo" : boxItemData.value[i].orderItemNo});
 
         boxItemData.value[i].note = null;
@@ -454,11 +445,16 @@ export default {
       console.log("패킹패킹");
       console.log(apiArray);
       
-      //boxlist에 push
-      boxlist.value.push(apiArray);
+      //몇번째 박스인지 정보 넣어줌.
+      boxItemData.value.push({"boxNumber": index+1});
+
+      //boxItemDataList에 push
+      boxItemDataList.value.push(boxItemData.value);
+
+      console.log("boxItemDataList.value >> ", boxItemDataList.value);
 
       //api통신
-      const result = await releaseInspectionApi.packing(apiArray);
+      // const result = await releaseInspectionApi.packing(apiArray);
       return result;
     }
 
@@ -504,7 +500,6 @@ export default {
       const apiData = {"emptyGroup": toRaw(emptyGroup.value), "pageNo":pageNo, "pageSize":pageSize};
       console.log("apiData >> ",apiData);
 
-
       //통신하고 받아온 값 => DB데이터&totalCount
       const list = await releaseInspectionApi.getFilterList(apiData);
       console.log("list >>", list);
@@ -534,8 +529,6 @@ export default {
       return {"data":list.data, "pageNo":list.pageNo, pageSize, "totalCount":list.totalCount};
     }
 
-
-
     //Barcode
     const scannedBarcode = ref();
 
@@ -555,7 +548,13 @@ export default {
     //   console.log('oldScannedBarcode:', oldScannedBarcode);
     // });
 
+    //ow-tab의 index 감시 (몇 번째 탭 클릭)
+    watch(index, (newIndex, oldIndex)=>{
 
+    })
+
+
+    //오른쪽 위 정보 ex)거래처명, 총검수수량
     const tally = reactive({
       clientName: '',
       category: '',
@@ -563,8 +562,9 @@ export default {
       totalInspectionQty: 0,
       releaseCode: 0,
       orderNo: 0,
-      unRelease: 0,
+      totalUnRelease: 0,
       barCode: 0,
+      releaseDone: ''
     });
 
     const SelectionChanged = async (grid, e) => {
@@ -586,7 +586,6 @@ export default {
       tally.totalInspectionQty = 0;
 
       aggregateRange(tally, grid, ranges);
-
     };
 
     function aggregateRange(tally, grid, ranges) {
@@ -605,7 +604,7 @@ export default {
             let data = grid.getCellData(r, c, false);
             if (r === grid.selectedRanges[0]._row) {
               if (c === 1) {
-                tally.unRelease = '-';
+                tally.totalUnRelease = '-';
                 tally.clientName = data;
               } else if (c === 2) {
                 tally.category = data;

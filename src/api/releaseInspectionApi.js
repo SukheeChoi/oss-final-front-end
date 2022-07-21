@@ -15,12 +15,18 @@ async function getReleaseInspectionList(){
 };
 
 //필터링된 데이터 가져오기
-async function getFilterList(newGroup){
-  console.log("보내는 데이터", newGroup);
+/*
+  작성자: 신현주
+  메소드 기능: 필터링된 정보를 서버로부터 가져오기 위한 axios 통신 수행
+  return: 필터링된 정보(JSON)을 담는 JSON
+  parameter: 필터 조건(긴급/일반)과 페이저 정보(pageNo,pageSize)
+*/
+async function getFilterList(apiData){
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/getFilterList`, newGroup);
-    console.log("getFilterList 통신성공", response);
+    response = await axios.post(`/releaseInspection/getFilterList`, apiData);
+    console.log("=========================================================");
+    console.log(response);
   }catch(error){
     console.log("#######/releaseInspection/getFilterList 통신 실패######")
     console.log(error);
@@ -30,12 +36,10 @@ async function getFilterList(newGroup){
 
 // codes 내용: {"releaseCode":xxx, "scannedBarcode":xxx}
 // 검수처리
-async function releaseInspectionQtyUpdate(releaseCode){
+async function releaseInspectionQtyUpdate(releaseCode, barCode){
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/RIQtyUpdate`, releaseCode);
-    console.log("releaseInspectionQtyUpdate >> 일단 통신은 됐다.");
-    console.log(response);
+    response = await axios.get(`/releaseInspection/RIQtyUpdate?releaseCode=${releaseCode}&barCode=${barCode}`);
   }catch(error){
     console.log("#######/releaseInspection/releaseInspectionQtyUpdate 통신 실패######")
     console.log(error);
@@ -45,12 +49,10 @@ async function releaseInspectionQtyUpdate(releaseCode){
 
 // codes 내용: {"releaseCode":xxx, "scannedBarcode":xxx}
 // 미출고처리
-async function unReleaseQtyUpdate(releaseCode) {
+async function unReleaseQtyUpdate(releaseCode, barCode) {
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/unRleaseQtyUpdate`, releaseCode);
-    console.log("unRleaseQtyUpdate >> 일단 통신은 됐다.");
-    console.log(response);
+    response = await axios.get(`/releaseInspection/unRleaseQtyUpdate?releaseCode=${releaseCode}&barCode=${barCode}`);
   }catch(error){
     console.log("#######/releaseInspection/unRleaseQtyUpdate 통신 실패######");
     console.log(error);
@@ -59,13 +61,16 @@ async function unReleaseQtyUpdate(releaseCode) {
 }
 
 //스캔 버튼 눌렀을 때,
+/*
+  작성자: 신현주
+  메소드 기능: 출고번호 혹은 바코드를 스캔시, 스캔된 물품에 대한 정보를 서버로부터 가져오기 위한 axios 통신 수행
+  return: 스캔된 물품에 대한 정보를 담는 JSON
+  parameter
+*/
 async function scan(code, kind) {
   let response = null;
-  console.log("code", code);
-  console.log("kind", kind);
   try{
     response = await axios.get(`/releaseInspection/scanBtnClick?code=${code}&&kind=${kind}`);
-    console.log("scanBtnClick >> 일단 통신은 됐다.");
   }catch(error){
     console.log("#######/releaseInspection/scanBtnClick 통신 실패######")
     console.log(error);
@@ -74,7 +79,13 @@ async function scan(code, kind) {
 }
 
 //맨 위에 현황 (주문건: 1360건 | 피킹완료건: 530건(긴급5건/일반525건) | 출고검수/패킹건: 0건(긴급3건/일반125건))
-async function getTotal() {
+/*
+  작성자: 신현주
+  메소드 기능: '출고검수/패킹' 페이지의 현황 정보를 서버로부터 가져오기 위한 axios 통신 수행
+  return: 현황 정보(JSON)을 담는 JSON
+  parameter: 불필요.
+*/
+async function getSummary() {
   let response = null;
   try {
     response = await axios.get("/releaseInspection/releaseInspectionStatus");
@@ -84,11 +95,23 @@ async function getTotal() {
   return response.data;
 }
 
-// n번째 박스 패킹 완료 버튼 클릭
-async function packing(boxItemData) {
+// n번째 박스 패킹 완료 버튼 클릭 -> update
+async function updateBoxTable(boxItemData) {
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/packing`, boxItemData);
+    response = await axios.post(`/releaseInspection/updateBoxTable`, boxItemData);
+  }catch(error){
+    console.log("#######/releaseInspection/updateBoxTable 통신 실패######")
+    console.log(error);
+  }
+  return response;
+}
+
+// n번째 박스 추가 버튼 클릭 -> insert
+async function insertToBoxTable(boxItemData) {
+  let response = null;
+  try{
+    response = await axios.post(`/releaseInspection/insertToBoxTable`, boxItemData);
   }catch(error){
     console.log("#######/releaseInspection/packing 통신 실패######")
     console.log(error);
@@ -97,10 +120,10 @@ async function packing(boxItemData) {
 }
 
 // 패킹 최종 완료
-async function packingDone(packingDoneInfo) {
+async function packingDone(orderNo) {
   let response = null;
   try{
-    response = await axios.post(`/releaseInspection/packingDone`, packingDoneInfo);
+    response = await axios.get(`/releaseInspection/packingDone?orderNo=${orderNo}`);
   }catch(error){
     console.log("#######/releaseInspection/packingDone 통신 실패######")
     console.log(error);
@@ -108,6 +131,29 @@ async function packingDone(packingDoneInfo) {
   return response;
 }
 
+//박스품목별정보 (releaseInspectionView에서 조회)
+// async function getBoxInfo(releaseCode) {
+//   let response = null;
+//   try{
+//     response = await axios.get(`/releaseInspection/selectByReleaseCode?releaseCode=${releaseCode}`);
+//   }catch(error){
+//     console.log("#######/releaseInspection/getBoxInfo 통신 실패######")
+//     console.log(error);
+//   }
+//   return response.data;
+// }
+
+//ord_sts가 5,6일 때 박스별 품목정보 가져오기
+async function getBoxInfobyOrderNo(orderNo, index) {
+  let response = null;
+  try{
+    response = await axios.get(`/releaseInspection/getBoxInfobyOrdNo?orderNo=${orderNo}&&index=${index}`);
+  }catch(error){
+    console.log("#######/releaseInspection/getBoxInfobyOrdNo 통신 실패######")
+    console.log(error);
+  }
+  return response.data;
+}
 
 export default{
   getReleaseInspectionList,
@@ -115,7 +161,9 @@ export default{
   releaseInspectionQtyUpdate,
   unReleaseQtyUpdate,
   scan,
-  getTotal,
-  packing,
-  packingDone
+  getSummary,
+  updateBoxTable,
+  packingDone,
+  getBoxInfobyOrderNo,
+  insertToBoxTable
 };

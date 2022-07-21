@@ -44,24 +44,26 @@ export default {
     before: Object,
     after: Object,
     modelValue: String,
+    min: String,
+    max: String,
   },
   setup(props, { emit }) {
     const root = ref(null);
-    console.log(props);
-
     const state = reactive({
       control: {
         text: props.modelValue,
       },
       format: 'HH:mm',
-      min: '09:00',
-      max: '18:00',
+      min: props.min,
+      max: props.max,
       step: 30,
     });
 
     const initialized = (timer) => {
       console.log(timer);
       timer.text = state.control.text || state.min;
+      timer.min = state.min;
+      timer.max = state.max;
       state.control = timer;
     };
 
@@ -84,6 +86,7 @@ export default {
     watch(
       () => props.before && props.before.modelValue,
       () => {
+        console.log(props);
         const before = Globalize.parseDate(props.before.modelValue, state.format);
         const after = Globalize.parseDate(props.modelValue, state.format);
         if (after < before) {

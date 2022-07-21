@@ -83,6 +83,16 @@ export default [
         name: 'DISTSub7',
         component: () => import('@@/edu/views/Copy'),
       },
+      {
+        path: 'Copy2',
+        name: 'DISTSub8',
+        component: () => import('@@/edu/views/Copy2'),
+      },
+      {
+        path: 'Copy3',
+        name: 'DISTSub9',
+        component: () => import('@@/edu/views/Copy3'),
+      },
     ],
   },
 ];

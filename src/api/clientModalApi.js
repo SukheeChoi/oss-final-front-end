@@ -1,8 +1,8 @@
 import axios from 'axios';
 import qs from 'qs';
 axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
-// http://localhost:8080/client/modal?clientNo=1&orderNo=2207280000
-//맨 위에 현황 List(전체: 1360건 | 오스템: 530건 | 협력사직배송: 470건 | 미출고: 2건)
+
+//모달에 띄울 데이터() 가져오기
 async function getModal(clientNo, orderNo) {
   let response = null;
   try {
@@ -16,7 +16,7 @@ async function getModal(clientNo, orderNo) {
   return response.data;
 }
 
-//담당자 이름 기준으로 작업 세부사항 api 요청
+//모달의 주문이력 상세 보기 데이터 가져오기
 async function getModalDetail(orderNo) {
   let response = null;
   try {

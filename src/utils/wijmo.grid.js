@@ -563,10 +563,12 @@ class TreeMergeManager extends MergeManager {
 
   getMergedRange(p, r, c) {
     const range = new CellRange(r, c);
+    console.log(p);
+    console.log(p.getCellData(r, c));
+    console.log(typeof p.getCellData(r, c));
+    console.log(r);
+    console.log(c);
     switch (p.cellType) {
-      case CellType.ColumnHeader:
-        this.colMergedRange(p, range);
-        break;
       case CellType.Cell:
         if (this.isMerged(p, c) && p.getCellData(r, c) === "dd") {
           this.colMergedRange(p, range);
@@ -635,8 +637,8 @@ class SimMergeManager extends MergeManager {
   }
 
   colMergedRange(p, r) {
-    console.log(p);
-    console.log(r);
+    // console.log(p);
+    // console.log(r);
     for (let i = r.col; i > 0; i -= 1) {
       if (this.equals(p, r.row, i, 'col_prev')) {
         r.col = i - 1;
@@ -723,7 +725,7 @@ class SimMergeManager extends MergeManager {
         break;
         case CellType.Cell:
           if (this.isMerged(p, c)) {
-            this.rowMergedRange(p, range);
+            this.rowMergedRange(p, rng);
         }
         break;
     }

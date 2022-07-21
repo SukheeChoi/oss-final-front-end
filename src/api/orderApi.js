@@ -6,19 +6,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
 async function getStatus() {
   let response = null;
   try {
-    response = await axios.get('/order/orderStatus');
-  } catch (error) {
-    console.log(error);
-  }
-  return response.data;
-}
-
-//회사 전체 List()
-async function getAllList() {
-  let response = null;
-  try {
-    response = await axios.get('/order/orderview');
-    console.log(response);
+    response = await axios.get('/order/status');
   } catch (error) {
     console.log(error);
   }
@@ -32,7 +20,7 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
   let unreleasedURI = encodeURI(unreleased);
   if (company.length != 0 || shippingway.length != 0) {
     try {
-      response = await axios.get('/order/orderFilter', {
+      response = await axios.get('/order/orderList', {
         params: {
           company: companyURI,
           shippingway: shippingwayURI,
@@ -80,6 +68,5 @@ async function getFilterList(company, shippingway, unreleased, searchSelected, s
 
 export default {
   getStatus,
-  getAllList,
   getFilterList,
 };

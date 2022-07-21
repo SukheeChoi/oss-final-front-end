@@ -19,8 +19,8 @@
     </div>
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <button type="button" class="ow-button type-icon mr-5"><i class="fas fa-cog fa-fw" /></button>
-        <ow-select :items="pageSizeList" v-model="pageSize" style="--width: 80px"></ow-select>
+        <!-- <button type="button" class="ow-button type-icon mr-5"><i class="fas fa-cog fa-fw" /></button>
+        <ow-select :items="pageSizeList" v-model="pageSize" style="--width: 80px"></ow-select> -->
       </div>
       <div>
         <b-pagination
@@ -35,7 +35,9 @@
           v-model="pageNo"
         ></b-pagination>
       </div>
-      <div>전체 {{ totalCount }} 건</div>
+      <div>
+        <!-- 전체 {{ totalCount }} 건 -->
+      </div>
     </div>
     <ow-flex-grid-editor v-if="editable" :src="[grid]" :type="editorSize">
       <template #default="item">
@@ -100,6 +102,7 @@ export default {
   },
   inheritAttrs: false,
   props: {
+    pageSize: Number,
     initialized: Function,
     query: Object,
     read: Function,
@@ -116,7 +119,7 @@ export default {
       grid: null,
       query: Object.assign({}, props.query),
       pageNo: 1,
-      pageSize: 10,
+      pageSize: props.pageSize,
       pageSizeList: [],
       totalCount: 0,
       api: {

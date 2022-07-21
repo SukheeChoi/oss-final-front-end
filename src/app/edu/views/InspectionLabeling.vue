@@ -20,8 +20,8 @@
     <hr />
     <div class="d-flex">
       <!-- 왼쪽 화면 -->
-      <div class="parent">
-        <div class="d-flex flex-grow-1 justify-content-end mt-5 mb-5">
+      <div class="left">
+        <div class="d-flex justify-content-end mt-5 mb-5">
           <button class="ow-btn type-util" @click="openUpdateModal" :disabled="!updateDate">예정시간수정</button>
           <button class="ow-btn type-util" @click="openAddModal" :disabled="!addDate">추가</button>
         </div>
@@ -30,7 +30,7 @@
           :childItemsPath="['child', 'childrennn']"
           :selectionChanged="onSelectionChanged"
           :initialized="treeInitialized"
-          :visibleRowsCount="20"
+          :visibleRowsCount="18"
           :key="treeKeyData"
         >
           <wj-flex-grid-column header="담당자/업체명" binding="title" :width="130" align="left"></wj-flex-grid-column>
@@ -84,7 +84,7 @@
         </ow-tree-grid>
       </div>
       <!-- 오른쪽 화면 -->
-      <div class="parent flex-grow-1">
+      <div class="right flex-grow-1 ml-5">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <div class="item align-to-right" style="--gap-item: 6px">
             <div class="title-field">검색</div>
@@ -103,7 +103,7 @@
             </div>
           </div>
         </div>
-        <div class="ow-panel">
+        <div class="ow-panel1">
           <div class="ow-panel-header">
             <div class="ow-panel-title">
               ■ <span v-if="title">[{{ title }}]</span>검품검수 및 라벨링 내역
@@ -423,25 +423,28 @@ const onSelectionChanged = (grid, target) => {
 
       getGrid.value = async function (query, pageNo, pageSize) {
         //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
-        const lee = await inspectionLabelingApi.getListByLWTNo(
+
+        const myPageSize = 15;
+
+        const list = await inspectionLabelingApi.getListByLWTNo(
           labelingWorkTimeNo.value,
           searchSelected.value,
           searchContent.value,
           pageNo,
-          pageSize
+          myPageSize
         );
 
         const result = {
-          ...lee,
+          ...list,
           pageNo,
-          pageSize,
+          pageSize: myPageSize,
         };
         return result;
       };
       keyData.value++;
     }
 
-    if (!grid.selectedItem.childrennn && !grid.selectedItem.child && !grid.selectedItem.startTime) {
+    if (!grid.selectedItem.childrennn && !grid.selectedItem.child && !grid.selectedItem.status) {
       updateDate.value = true;
 
       modalUpdateData.title = grid.selectedItem.title;
@@ -459,7 +462,6 @@ const onSelectionChanged = (grid, target) => {
           labelingWorkTimeNo.value = data.labelingWorkTimeNo;
 
           //선택한 발주번호가 상위 배열의 어떤 인덱스에 있는지
-
           const index = data.childrennn.findIndex((i) => i.placingOrderNo === grid.selectedItem.placingOrderNo);
 
           placingOrderNo.value = grid.selectedItem.placingOrderNo;
@@ -566,7 +568,7 @@ const treeInitialized = (grid) => {
             '<div class="{progress}">' +
             '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{paramsColor}" style="width: {params}%"/>' +
             '{params%}</div>' +
-            '<div class="normal-text">{params}%</div></td>';
+            '<div class="red-text">{params}%</div></td>';
 
           //진행률 수치에 따라서 색 넣기
           if (params <= 50) {
@@ -585,7 +587,7 @@ const treeInitialized = (grid) => {
             html = html.replace('{params%}', '');
           } else {
             html = html.replace('{params%}', params + '%');
-            html = html.replace('<div class="normal-text">{params}%</div>', '');
+            html = html.replace('<div class="red-text">{params}%</div>', '');
           }
           html = html.replaceAll('{params}', params);
 
@@ -599,7 +601,7 @@ const treeInitialized = (grid) => {
         }
 
         //최종 html 산출물
-        let html =
+        let finalHtml =
           '<div class="lee">' +
           '<div class="leeStatus">' +
           '<div class="item">' +
@@ -631,14 +633,14 @@ const treeInitialized = (grid) => {
           '</table>' +
           '</div>';
 
-        html = html.replace('{receiveItemQuantity}', receiveQuantity);
-        html = html.replace('{currentQuantity}', currentQuantity);
-        html = html.replaceAll('{progressQuantity}', progressQuantity);
-        html = html.replace('{receivePercent}', receivePercent);
-        html = html.replace('{currentPercent}', currentPercent);
+        finalHtml = finalHtml.replace('{receiveItemQuantity}', receiveQuantity);
+        finalHtml = finalHtml.replace('{currentQuantity}', currentQuantity);
+        finalHtml = finalHtml.replaceAll('{progressQuantity}', progressQuantity);
+        finalHtml = finalHtml.replace('{receivePercent}', receivePercent);
+        finalHtml = finalHtml.replace('{currentPercent}', currentPercent);
 
-        html = html.replaceAll('null%', '');
-        e.cell.innerHTML = html;
+        finalHtml = finalHtml.replaceAll('null%', '');
+        e.cell.innerHTML = finalHtml;
       }
     }
   });
@@ -664,17 +666,30 @@ const onInitialized = (grid) => {
 
 <style scoped lang="scss">
 ::v-deep {
-  .parent {
-    position: relative;
-  }
-  .parent .ow-panel {
-    display: flex;
+  .ow-panel1 {
     width: 100%;
-    flex: 1 1 var(--size-panel, 0);
-    height: auto;
     min-height: 0;
-    flex-direction: column;
-    margin-left: 1em;
+    height: 644.5px;
+  }
+  .ow-panel1 .ow-panel-header {
+    display: flex;
+    height: 26px;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 0 12px;
+    background-color: #284077;
+    border-radius: 4px 4px 0 0;
+    color: #fff;
+    font-size: 13px;
+  }
+  .ow-panel1 .ow-panel-body1 {
+    // flex-direction: column;
+    // flex: 1;
+    border: 2px solid #6980af;
+    border-top: 0;
+    background-color: #fff;
+    padding: var(--ow-gutter);
+    height: inherit;
   }
 
   .wj-cell.wj-header {
@@ -749,7 +764,7 @@ const onInitialized = (grid) => {
     transition: width 0.6s ease;
   }
 
-  .normal-text {
+  .red-text {
     display: flex;
     flex-direction: column;
     justify-content: center;
