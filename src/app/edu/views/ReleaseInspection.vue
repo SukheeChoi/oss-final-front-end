@@ -380,8 +380,8 @@ export default {
     });
 
     //전체 데이터 가져오는 함수
-    async function getTotal() {
-      const result = await releaseInspectionApi.getTotal()
+    async function getSummary() {
+      const result = await releaseInspectionApi.getSummary()
       .then((data) => {
         statusBar.total               = data.count;
         statusBar.totalPickingQty     = data.pickingDoneCount;
@@ -393,14 +393,13 @@ export default {
       });
     }
 
-    getTotal();
+    getSummary();
 
     //검수 버튼 이벤트 함수
     async function inspection(releaseCode, barCode) {
       console.log("검수처리 버튼 클릭 >>", releaseCode)
-      const result = await releaseInspectionApi.releaseInspectionQtyUpdate(releaseCode, barCode);
+      await releaseInspectionApi.releaseInspectionQtyUpdate(releaseCode, barCode);
       keyData.value++;
-      return result;
     }
 
     //미출고 버튼 이벤트 함수
