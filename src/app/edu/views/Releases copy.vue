@@ -95,11 +95,13 @@
     </div>
   </div>
 
-  <div class="ow-grid-wrap">
+  <div>
+  <!-- <div class="ow-flex-wrap ow-grid-wrap"> -->
     <ow-grid
       headersVisibility="Column"
       allowSorting="None"
       selectionMode="RowRange"
+      :visibleRowsCount="18"
       :autoGenerateColumns="false"
       class="ow-grid type-header-group"
       :read="getAfterPickingList"
@@ -360,7 +362,7 @@ async function getAssigneeList() {
 // 리스트 전체 조회.
 const getAfterPickingList = async (query, pageNo, pageSize) => {
   console.log('@@ const getAfterPickingList - pageNo : ', pageNo);
-  const result = await afterPickingApi.getAfterPickingList(filterList, pageNo, pageSize);
+  const result = await afterPickingApi.getAfterPickingList(filterList, pageNo, pageSize=18);
   // .then((result) => {
   //   if(result != null && result.list != null) {
   //     afterPickingList.value = result.list;
