@@ -7,19 +7,19 @@
       <div class="item">
         <div class="state">
           <div class="state-item">
-            주문 : <strong>{{ summaryList.status.progressOrderNo }}</strong
+            주문 : <strong>{{ summaryList.status.progressOrderNum }}</strong
             >건
           </div>
           <div class="state-item">
-            피킹지시 : <strong>{{ summaryList.status.pickingDirectionNo }}</strong
+            피킹지시 : <strong>{{ summaryList.status.pickingDirectionNum }}</strong
             >건
           </div>
           <div class="state-item">
-            출고검수/패킹 : <strong>{{ summaryList.status.releaseInspectionNo }}</strong
+            출고검수/패킹 : <strong>{{ summaryList.status.releaseInspectionNum }}</strong
             >건
           </div>
           <div class="state-item color-type-1" style="color: red">
-            미출고 : <strong class="color-type-1">{{ summaryList.delivery.unreleasedNo }}</strong
+            미출고 : <strong class="color-type-1">{{ summaryList.delivery.unreleasedNum }}</strong
             >건
           </div>
         </div>
@@ -32,11 +32,11 @@
         <div class="state">
           <div class="state-item">
             출고검수(긴급/일반) :
-            <strong>{{ summaryList.status.releaseInspectionNo }}</strong>
+            <strong>{{ summaryList.status.releaseInspectionNum }}</strong>
             건 (
-            <strong>{{ summaryList.delivery.expressShippingNo }}</strong>
+            <strong>{{ summaryList.delivery.expressShippingNum }}</strong>
             건/
-            <strong>{{ summaryList.delivery.normalShippingNo }}</strong>
+            <strong>{{ summaryList.delivery.normalShippingNum }}</strong>
             건)
           </div>
         </div>
@@ -310,14 +310,14 @@ const filterList = reactive({
 });
 const summaryList = reactive({
   status: {
-    progressOrderNo: null,
-    pickingDirectionNo: null,
-    releaseInspectionNo: null,
+    progressOrderNum: null,
+    pickingDirectionNum: null,
+    releaseInspectionNum: null,
   },
   delivery: {
-    unreleasedNo: null,
-    expressShippingNo: null,
-    normalShippingNo: null,
+    unreleasedNum: null,
+    expressShippingNum: null,
+    normalShippingNum: null,
   },
 });
 // 통신을 통한 데이터 바인딩.
@@ -327,12 +327,14 @@ const afterPickingKey = ref(1);
 // 현황/배송구분 정보 불러오기.(새로고침 시에만 통신.)
 const getSummary = async () => {
   const result = await afterPickingApi.getSummary().then((result) => {
-    summaryList.status.progressOrderNo = result.summaryMap.progressOrderNo;
-    summaryList.status.pickingDirectionNo = result.summaryMap.pickingDirectionNo;
-    summaryList.status.releaseInspectionNo = result.summaryMap.releaseInspectionNo;
-    summaryList.delivery.unreleasedNo = result.summaryMap.unreleasedNo;
-    summaryList.delivery.expressShippingNo = result.summaryMap.expressShippingNo;
-    summaryList.delivery.normalShippingNo = result.summaryMap.normalShippingNo;
+    summaryList.status.progressOrderNum = result.summaryMap.progressOrderNum;
+    summaryList.status.pickingDirectionNum = result.summaryMap.pickingDirectionNum;
+    summaryList.status.releaseInspectionNum = result.summaryMap.releaseInspectionNum;
+    summaryList.delivery.unreleasedNum = result.summaryMap.unreleasedNum;
+    summaryList.delivery.expressShippingNum = result.summaryMap.expressShippingNum;
+    summaryList.delivery.normalShippingNum = result.summaryMap.normalShippingNum;
+
+    
   });
 };
 getSummary();

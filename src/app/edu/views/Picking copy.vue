@@ -120,7 +120,9 @@
     </wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="orderItem.orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
-        <button class="ow-btn type-icon check-state" @click="handleDeliveryCheckBtn($event, cell.item.orderItem.orderItemNo)"></button>
+        <button class="ow-btn type-icon check-state"
+          @click="handleDeliveryCheckBtn($event, cell.item.orderItem.orderItemNo)">
+        </button>
         <!-- <button type="button" class="ow-btn type-flat ml-5" @click="lookup(cell.item.~)">선택</button> -->
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>

@@ -16,7 +16,14 @@
       <!-- 전달 담당자 이름 filter -->
       <div v-if="!showReceipt && assigneeList != null && assigneeList.length > 0" class="item size-fix" style="--gap-item: 6px">
         <div class="ow-filter" style="width: 270px;">
-          <ow-filter-radio id="assignee-filter-radio" :items="assigneeList" :step="4" v-model="selectedAssignee" @update="selectedAssignee = value('assignee-filter-radio')" :key="assigneeKey"/>
+          <ow-filter-radio
+          id="assignee-filter-radio"
+          :items="assigneeList"
+          :step="4"
+          v-model="selectedAssignee"
+          @update="selectedAssignee = value('assignee-filter-radio')"
+          :key="assigneeKey"
+        />
         </div>
       </div>
 
@@ -37,8 +44,10 @@
         <div>
           <!-- 조회 -->
           <button class="ow-btn type-util" @click="handleClickSearch">조회</button>
+          <!-- 품목수령(선택된 갯수) -->
+          <!-- <button v-if="showReceipt && toDo===1" class="ow-btn type-util" @click="updateReceiptList()">품목수령({{checkedReceiptCount}})</button>   -->
+          <button v-if="showReceipt && toDo===1" class="ow-btn type-util" @click="checkBeforeUpdateReceipt()">품목수령({{checkedReceiptCount}})</button>  
           <!-- 품목전달(선택된 갯수) -->
-          <button v-if="showReceipt && toDo===1" class="ow-btn type-util" @click="updateReceiptList()">품목수령({{checkedReceiptCount}})</button>  
           <button v-if="!showReceipt && toDo===1" class="ow-btn type-util" @click="updateDeliveryList()">품목전달({{checkedDeliveryCount}})</button>  
         </div>
       </div>
@@ -76,7 +85,7 @@
           <input id="receiptUnreleaseInput" type="text"
             style="text-align: right"
             v-model="cell.item.receiveUnreleaseQuantity"
-            @input="checkNaturalNumber($event, cell.item.rownum)"
+            @input="checkReceiptUnreleaseInput($event, cell.item.rownum)"
             @change="changeReceiptUnrelease($event, cell.item.orderItem.orderItemNo, cell.item.receiveUnreleaseQuantity)"
           />
             <!-- :value="naturalNumber" -->
@@ -125,6 +134,49 @@
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
   </ow-n-grid>
+
+  <!-- 수령 미출고 유효성 검사 후 알림 모달 -->
+  <ow-modal type="XS" title="알 림"  ref="modalRef" :cancelButton="true" style="font-size: 130%;" >
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100px; max-height: calc(100vh - 36px - 62px) !important;">
+      <span>미출고 수량은 출고 수량보다 클 수 없습니다!</span>
+    </div>
+  </ow-modal>
+  <!-- 수령 미출고 존재하는 update에 대한 내용확인 및 미출고 사유 메모 작성 모달 -->
+  <ow-modal v-if="receiptedList" type="XXXXL" title="수령확인 및 미출고 사유 입력"  ref="receiptCheckModalRef" :acceptButton="true" :cancelButton="true" style="font-size: 130%;" >
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100px; max-height: calc(100vh - 36px - 62px) !important;">
+      <wj-flex-grid
+        headersVisibility="Column"
+        allowSorting="None"
+        selectionMode="None"
+        class="ow-grid type-header-group"
+        :loadedRows="onloadedRows"
+        :itemsSource="receiptedList">
+        <!-- <wj-flex-grid-column-group binding="rownum" header="No" width="*" /> -->
+        <wj-flex-grid-column header="주문물품번호" binding="orderItemNo" align="center" width="*"></wj-flex-grid-column>
+        <!-- <wj-flex-grid-column header="No" binding="rownum" align="center" :width="40"></wj-flex-grid-column>
+        <wj-flex-grid-column header="주문/출고번호" binding="orderItem.orderNo" align="center" width="2*">
+          <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+            <span>{{cell.item.orderItem.orderNo}}/{{cell.item.release.releaseCode}}</span>
+          </wj-flex-grid-cell-template>
+        </wj-flex-grid-column>
+        <wj-flex-grid-column header="품목명" binding="item.itemName" align="left" width="3*"></wj-flex-grid-column>
+        <wj-flex-grid-column header="품목코드" binding="item.itemCode" align="center" width="*" wordWrap="true"></wj-flex-grid-column>
+        <wj-flex-grid-column v-if="showReceipt==false && toDo==1" header="수령수량" binding="receiveQuantity" align="right" :width="70"></wj-flex-grid-column>
+        <wj-flex-grid-column v-if="showReceipt==false && toDo==0" header="전달수량" binding="deliveryQuantity" align="right" :width="70"></wj-flex-grid-column>
+        <wj-flex-grid-column header="미출고" binding="orderItem.unreleaseQuantity" align="right" :width="60">
+          <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+            <span>{{cell.item.orderItem.unreleaseQuantity || 0}}</span>
+          </wj-flex-grid-cell-template>
+        </wj-flex-grid-column>
+        <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="orderItem.orderItemNo" align="center" :width="70" wordWrap="true">
+          <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
+            <button class="ow-btn type-icon check-state" @click="handleDeliveryCheckBtn($event, cell.item.orderItem.orderItemNo)"></button>
+          </wj-flex-grid-cell-template>
+        </wj-flex-grid-column> -->
+      </wj-flex-grid>
+    </div>
+  </ow-modal>
+
 </template>
 
 <script setup>
@@ -174,6 +226,10 @@
 
   const vendorKey = ref(1);
   const assigneeKey = ref(1);
+
+  // 모달
+  const modalRef = ref(null);
+  const receiptCheckModalRef = ref(null);
 
   //수령 탭
   // 선택된 날짜 || 당일의 수령 대상 업체명 조회.
@@ -416,15 +472,16 @@
   // getVendorList();
 
   // 수령 Update.
-  console.log('before updateReceiptList');
-  const updateReceiptList = async () => {
+  async function updateReceiptList() {
     console.log('++ receiptedList.value : ', receiptedList.value);
+
     const result = await combineShippingApi.updateReceiptList(Array.from(receiptedList.value))
       .then((result) => {
-        console.log('updateReceiptList - result : ' + result);
+        console.log('++ updateReceiptList - result : ' + result);
         checkedReceiptCount.value = 0;
         // 수령 update한 결과를 보여주기.
         getReceiptList();
+        receiptKey.value++;
       });
   };
 
@@ -495,15 +552,41 @@
   //   }
   // );
 
-  const updateDeliveryList = async () => {
+  async function updateDeliveryList() {
     const result = await combineShippingApi.updateDeliveryList(deliveredList.value)
       .then(() => {
         checkedDeliveryCount.value = 0;
         // 전달 update한 결과를 보여주기.
         getDeliveryList(toDo.value, '', dateList.value);
+        deliveryKey.value++;
       });
     // return result;
-  };
+  }
+
+  // 모달 이용하기 위한 함수
+  async function openModal() {
+    const config = {
+      data: {},
+      cancelButtonText: '확인',
+    };
+    const childRefData = await modalRef.value.open('accept', config);
+  }
+
+  // 수령 업데이트 전에 선택된 목록 확인 및 메모 작성 위한 모달창 띄움.
+  async function openReceiptCheckModal() {
+    const config = {
+      data: {}
+      , acceptButtonText: '수령 완료'
+      , cancelButtonText: '취소'
+    };
+    await receiptCheckModalRef.value.open('accept', config);
+  }
+
+  // 수령 전달 전, 수령목록과 미출고값 확인 및 물품별 메모 작성 가능.
+  async function checkBeforeUpdateReceipt() {
+    openReceiptCheckModal();
+  }
+
   //수령/전달 탭 전환 관리.
   watch(() => showReceipt.value
   , (newShowReceipt, oldShowReceipt) => {
@@ -693,8 +776,8 @@
     clickSearch.value = true;
   }
 
-  //
-  function checkNaturalNumber(event, rownum) {
+  // 사용자로부터 입력받는 수령 미출고 값에 대한 유효성 검사.
+  function checkReceiptUnreleaseInput(event, rownum) {
     console.log('@@ function checkNaturalNumber(event)');
     console.log('@@ checkNaturalNumber - event : ', event);
     console.log('@@ checkNaturalNumber - event.target : ', event.target);
@@ -703,25 +786,27 @@
     console.log('@@ checkNaturalNumber - rownum : ', rownum);
     // 사용자로부터 입력된 미출고값.
     // 문자나 특수기호 등 잘못된 입력이 존재할 수 있으므로 정규식을 이용해서 자연수만 입력가능하도록.
-    // ================== 수령갯수 기준으로 유효성검사 추가로 필요함!!! ==================
+    // 수령갯수 기준으로 유효성검사 함.
     // inputUnreleasedQuantity : 사용자로부터 입력받은 미출고값.
     let inputUnreleasedQuantity = event.target.value;
     // 미출고값에 자연수만 입력받을 수 있도록 정규식을 이용. 문자나 특수기호가 입력 불가능하게 만듦.
     inputUnreleasedQuantity = inputUnreleasedQuantity.replace(/[^0-9]/g, '') ;
     console.log('@@ checkNaturalNumber - inputUnreleasedQuantity : ', inputUnreleasedQuantity);
-    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["receiveUnreleaseQuantity"] - before: ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
-    receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = inputUnreleasedQuantity;
-    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["receiveUnreleaseQuantity"] - after : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+    console.log('@@ checkNaturalNumber - receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]["receiveUnreleaseQuantity"] - before: ', receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]['receiveUnreleaseQuantity']);
+
+    receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]['receiveUnreleaseQuantity'] = inputUnreleasedQuantity;
+    console.log('@@ checkNaturalNumber - receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]["receiveUnreleaseQuantity"] - after : ', receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]['receiveUnreleaseQuantity']);
     // 미출고 수량은 출고 수량(주문수량과 같거나 작음)보다 커질 수 없음.
-    if(parseInt(inputUnreleasedQuantity) > parseInt(receiptList.value[rownum-1]['informationPartner']['releaseQuantity'])) {
-      console.log('@@ checkNaturalNumber - if(inputUnreleasedQuantity > receiptList.value[rownum-1]["receiveUnreleaseQuantity"]) : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
+    if(parseInt(inputUnreleasedQuantity) > parseInt(receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]['informationPartner']['releaseQuantity'])) {
+      console.log('@@ checkNaturalNumber - if(inputUnreleasedQuantity > receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]["receiveUnreleaseQuantity"]) : ', receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]['receiveUnreleaseQuantity']);
       // 입력된 미출고 수량이 출고 수량보다 큰 경우, 해당 미출고값을 0으로 초기화 하고, alert 띄움.
       receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = 0;
       event.target.value = 0;
-      console.log('@@ checkNaturalNumber - inside - if(inputUnreleasedQuantity > receiptList.value[rownum-1]["receiveUnreleaseQuantity"]) : ', receiptList.value[rownum-1]['receiveUnreleaseQuantity']);
-      alert('미출고 수량은 출고수량보다 클 수 없습니다.');
+      console.log('@@ checkNaturalNumber - inside - if(inputUnreleasedQuantity > receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]["receiveUnreleaseQuantity"]) : ', receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]['receiveUnreleaseQuantity']);
+      // 모달 열어서 '미출고 수량은 출고 수량 보다 클 수 없습니다!'라는 알림을 띄움.
+      openModal();
     }
-    console.log('@@ checkNaturalNumber - receiptList.value[rownum-1]["informationPartner"]["releaseQuantity"] - after : ', receiptList.value[rownum-1]['informationPartner']['releaseQuantity']);
+    console.log('@@ checkNaturalNumber - receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]["informationPartner"]["releaseQuantity"] - after : ', receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]['informationPartner']['releaseQuantity']);
     // console.log('@@ checkNaturalNumber - rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex) : ', rownum - (pager.pageSize * flexGridNum.value * pager.pageIndex));
     // 미출고값이 입력되고 있는 행의 receiptList 내부 index는 (rownum-1) 과 같음.
 
@@ -739,12 +824,13 @@
     console.log('++ unreleased : ', unreleased);
     if(btnTag.classList.contains('active')) { // 수령여부 체크된 상태. -> 수정.
       for(let i=0; i<receiptedList.value.length; i++) {
-        console.log('++ receiptedList.value[i] : ', receiptedList.value[i]);
-        console.log('++ receiptedList.value[i]["orderItemNo"] : ', receiptedList.value[i]['orderItemNo']);
+        console.log('++ receiptedList.value[' + i + '] : ', receiptedList.value[i]);
+        console.log('++ receiptedList.value[' + i + ']["orderItemNo"] : ', receiptedList.value[i]['orderItemNo']);
         if(receiptedList.value[i]['orderItemNo'] === orderItemNo) {
           console.log('++ inside if(receiptedList.value[i]["orderItemNo"] === orderItemNo) : ', receiptedList.value[i]['orderItemNo']);
-          receiptedList.value[i]['receiveUnrelease'] = parseInt(unreleased);
-          console.log('++ inside if(receiptedList.value[i]["orderItemNo"] === orderItemNo) : ', receiptedList.value[i]['receiveUnrelease']);
+          receiptedList.value[i]['receiveUnreleaseQuantity'] = parseInt(unreleased);
+          console.log('++ inside if(receiptedList.value[i]["orderItemNo"] === orderItemNo) : ', receiptedList.value[i]['receiveUnreleaseQuantity']);
+          console.log('++ receiptedList.value[' + i + '] - after : ', receiptedList.value[i]);
           
           break;
         }
@@ -763,7 +849,7 @@
     let unreleaedTarget = targetTag.querySelector("input");
     let targetObject = {
       orderItemNo: orderItemNo
-      , receiveUnrelease: unreleaedTarget.value
+      , receiveUnreleaseQuantity: unreleaedTarget.value
     };
     // 수령여부 체크해제.
     if(event.target.classList.contains('active')) {
