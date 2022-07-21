@@ -5,7 +5,7 @@
       <div class="item size-fix" style="--gap-item: 6px">
         <div class="ow-flex-wrap">
           <div class="item size-fix" style="--gap-item: 6px">
-            <ow-status-bar label="현황" :items="orderStatus"></ow-status-bar>
+            <ow-status-bar label="현황" :items="itemStatus"></ow-status-bar>
           </div>
         </div>
       </div>
@@ -20,7 +20,7 @@
     <hr />
     <div class="d-flex">
       <!-- 왼쪽 화면 -->
-      <div class="left h-100">
+      <div class="left">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <button class="ow-btn type-util" @click="openUpdateModal" :disabled="!updateDate">예정시간수정</button>
           <button class="ow-btn type-util" @click="openAddModal" :disabled="!addDate">추가</button>
@@ -30,7 +30,7 @@
           :childItemsPath="['child', 'childrennn']"
           :selectionChanged="onSelectionChanged"
           :initialized="treeInitialized"
-          :visibleRowsCount="20"
+          :visibleRowsCount="18"
           :key="treeKeyData"
         >
           <wj-flex-grid-column header="담당자/업체명" binding="title" :width="130" align="left"></wj-flex-grid-column>
@@ -84,7 +84,7 @@
         </ow-tree-grid>
       </div>
       <!-- 오른쪽 화면 -->
-      <div class="right flex-fill">
+      <div class="right flex-grow-1 ml-5">
         <div class="d-flex justify-content-end mt-5 mb-5">
           <div class="item align-to-right" style="--gap-item: 6px">
             <div class="title-field">검색</div>
@@ -103,7 +103,7 @@
             </div>
           </div>
         </div>
-        <div class="ow-panel">
+        <div class="ow-panel1">
           <div class="ow-panel-header">
             <div class="ow-panel-title">
               ■ <span v-if="title">[{{ title }}]</span>검품검수 및 라벨링 내역
@@ -146,6 +146,7 @@
     ref="childUpdateRef"
     v-if="modalUpdateData"
     :acceptButton="true"
+    style="font-size: 14px"
   >
     <div>사원명 - {{ modalUpdateData.employeeName }}</div>
     <div>업체명 - {{ modalUpdateData.title }}</div>
@@ -159,6 +160,7 @@
         :max="modalUpdateData.max"
         style="width: 100px"
       ></ow-input-time>
+
       <ow-input-time
         ref="endInputTime"
         v-if="modalUpdateData.scheduledEndTime"
@@ -177,6 +179,7 @@
     ref="childAddRef"
     v-if="modalAddData"
     :acceptButton="true"
+    style="font-size: 14px"
   >
     <div>사원명 - {{ modalAddData.title }}</div>
     <table>
@@ -210,16 +213,16 @@ import { TreeMergeManager, SimpleMergeManager } from '@/utils/wijmo.grid';
 
 const childItemsPath = ['child', 'childrennn']; //트리그리드 자식 경로 설정
 
-const getTree = ref([]);    //트리그리드 데이터가 저장되는 ref 객체
-const getGrid = ref([]);    //그리드 데이터가 저장되는 ref 객체
-const keyData = ref(0);     //그리드 리렌더링을 위한 ref 객체
+const getTree = ref([]); //트리그리드 데이터가 저장되는 ref 객체
+const getGrid = ref([]); //그리드 데이터가 저장되는 ref 객체
+const keyData = ref(0); //그리드 리렌더링을 위한 ref 객체
 const treeKeyData = ref(0); //트리그리드 리렌더링을 위한 ref 객체
 
 /*
-* 작성자: 이동현
-* 기능: 트리그리드에 띄워질 데이터(담당자별 작업, 업체별 작업)들을 가져오는 기능
-* 리턴 값: data: Array
-*/
+ * 작성자: 이동현
+ * 기능: 트리그리드에 띄워질 데이터(담당자별 작업, 업체별 작업)들을 가져오는 기능
+ * 리턴 값: data: Array
+ */
 getTree.value = async function () {
   const treeList = await inspectionLabelingApi.getTreeList();
 
@@ -230,12 +233,12 @@ getTree.value = async function () {
   return result;
 };
 
-const title = ref(null);          //모달이나 판넬에 띄워질 담당자가 저장되는 ref 객체
+const title = ref(null); //모달이나 판넬에 띄워질 담당자가 저장되는 ref 객체
 const searchSelected = ref(null); //검색조건이 저장되는 ref 객체
-const searchContent = ref(null);  //검색내용이 저장되는 ref 객체
+const searchContent = ref(null); //검색내용이 저장되는 ref 객체
 
 //주문현황이 저장되는 ref 객체
-const orderStatus = ref([
+const itemStatus = ref([
   { name: '물품수령 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '검품검수 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
   { name: '라벨링 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
@@ -254,14 +257,14 @@ const inspectionStatus = ref([
 */
 async function getStatus() {
   const result = await inspectionLabelingApi.getStatus().then((data) => {
-    orderStatus.value[0].value = data.receiveItem;
-    orderStatus.value[0].plusValue = data.receiveItemQuantity;
+    itemStatus.value[0].value = data.receiveItem;
+    itemStatus.value[0].plusValue = data.receiveItemQuantity;
 
-    orderStatus.value[1].value = data.inspectionItem;
-    orderStatus.value[1].plusValue = data.inspectionItemQuantity;
+    itemStatus.value[1].value = data.inspectionItem;
+    itemStatus.value[1].plusValue = data.inspectionItemQuantity;
 
-    orderStatus.value[2].value = data.labelingItem;
-    orderStatus.value[2].plusValue = data.labelingItemQuantity;
+    itemStatus.value[2].value = data.labelingItem;
+    itemStatus.value[2].plusValue = data.labelingItemQuantity;
 
     inspectionStatus.value[0].value = data.passedItem;
     inspectionStatus.value[0].plusValue = data.passedItemQuantity;
@@ -276,12 +279,12 @@ async function getStatus() {
 getStatus();
 
 // --------------------------------------- 추가 모달에 띄울 잔업 -------------------------------------------------------
-const childAddRef = ref(null);        //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
-const modalAddData = ref(null);       //모달에 띄울 데이터를 저장하는 ref 객체
-const addDate = ref(false);           //추가버튼을 제어하는 ref 객체
-const picked = ref(null);             //추가 모달에서 선택한 잔업을 저장하는 ref 객체
+const childAddRef = ref(null); //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
+const modalAddData = ref(null); //모달에 띄울 데이터를 저장하는 ref 객체
+const addDate = ref(false); //추가버튼을 제어하는 ref 객체
+const picked = ref(null); //추가 모달에서 선택한 잔업을 저장하는 ref 객체
 const labelingWorkTimeNo = ref(null); //담당자의 작업번호를 저장하는 ref 객체
-const lastStartTime = ref(null);      //잔업의 시작시간(마지막 작업의 끝 시간)을 저장하는 ref 객체
+const lastStartTime = ref(null); //잔업의 시작시간(마지막 작업의 끝 시간)을 저장하는 ref 객체
 
 /*
   작성자: 이동현
@@ -298,12 +301,11 @@ const getOvertime = async function () {
   기능: 추가 모달화면을 띄우는 기능, 자식컴포넌트인 owModal의 open 메소드를 실행시킨다.
 */
 const openAddModal = async function () {
-  picked.value = null;  //선택한 잔업을 초기화
+  picked.value = null; //선택한 잔업을 초기화
   const childAddRefData = await childAddRef.value.open();
-  
+
   //모달의 확인을 클릭할 때 실행
   if (childAddRefData.ok === true) {
-    
     const requestData = {
       receiveItem: picked.value.receiveItem,
       receiveQuantity: picked.value.receiveQuantity,
@@ -327,11 +329,10 @@ const openAddModal = async function () {
       리턴 값: String
     */
     const result = await inspectionLabelingApi.updateOvertime(requestData).then((result) => {
-      console.log('updateReceiptList - result : ' + result);
-      if(result === "success") {
-        alert("잔업이 추가되었습니다!");
+      if (result === 'success') {
+        alert('잔업이 추가되었습니다!');
       } else {
-        alert("오류가 발생했습니다.");
+        alert('오류가 발생했습니다.');
       }
       treeKeyData.value++;
     });
@@ -342,12 +343,13 @@ const openAddModal = async function () {
 
 // --------------------------------------- 수정 모달 update -------------------------------------------------------
 const childUpdateRef = ref(null); //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
-const updateDate = ref(false);    //수정버튼을 제어하는 ref 객체
+const updateDate = ref(false); //수정버튼을 제어하는 ref 객체
 const startInputTime = ref(null); //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 앞쪽 / 시작 owInputTime
-const endInputTime = ref(null);   //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 뒷쪽 / 끝 owInputTime
+const endInputTime = ref(null); //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 뒷쪽 / 끝 owInputTime
 const placingOrderNo = ref(null); //작업의 발주번호를 저장하는 ref 객체
 
-let modalUpdateData = reactive({  //모달에 띄울 데이터를 저장하는 reactive 객체
+let modalUpdateData = reactive({
+  //모달에 띄울 데이터를 저장하는 reactive 객체
   title: '',
   employeeName: '',
   scheduledStartTime: '',
@@ -366,7 +368,6 @@ const openUpdateModal = async function () {
 
   //모달의 확인을 클릭할 때 실행
   if (childUpdateRefData.ok === true) {
-
     const requestData = {
       placingOrderNo: placingOrderNo.value,
       labelingWorkTimeNo: labelingWorkTimeNo.value,
@@ -385,7 +386,11 @@ const openUpdateModal = async function () {
       리턴 값: String
     */
     const result = await inspectionLabelingApi.updateWorktime(requestData).then((result) => {
-      console.log('updateReceiptList - result : ' + result);
+      if (result === 'success') {
+        alert('시간이 수정되었습니다!');
+      } else {
+        alert('오류가 발생했습니다.');
+      }
       treeKeyData.value++;
     });
   }
@@ -393,20 +398,18 @@ const openUpdateModal = async function () {
 
 //트리 그리드 셀렉션 핸들러
 const onSelectionChanged = (grid, target) => {
-
   //ref 객체 세팅(검색 조건 리셋)
-  searchSelected.value = '';  //검색조건 리셋
-  searchContent.value = '';   //검색내용 리셋
-  addDate.value = false;      //버튼 비활성화
-  updateDate.value = false;   //버튼 비활성화
+  searchSelected.value = ''; //검색조건 리셋
+  searchContent.value = ''; //검색내용 리셋
+  addDate.value = false; //버튼 비활성화
+  updateDate.value = false; //버튼 비활성화
 
   //컴포넌트가 destroy될때도 실행되기 때문에 row가 -1일때는 실행하지 않도록 막는 설정
   if (target.row !== -1) {
-
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
     if (grid.selectedItem.childrennn != null) {
-      addDate.value = true;   //추가 버튼 활성화
-      title.value = grid.selectedItem.title;  //모달에 띄울 제목 설정
+      addDate.value = true; //추가 버튼 활성화
+      title.value = grid.selectedItem.title; //모달에 띄울 제목 설정
       labelingWorkTimeNo.value = grid.selectedItem.labelingWorkTimeNo; //잔업 추가요청 파라미터 / 작업번호 설정
       lastStartTime.value = grid.selectedItem.childrennn.at(-1).scheduledEndTime; //잔업 추가요청 파라미터 / 마지막 작업의 끝 시간을 추가할 잔업의 시작시간으로 설정
 
@@ -420,25 +423,28 @@ const onSelectionChanged = (grid, target) => {
 
       getGrid.value = async function (query, pageNo, pageSize) {
         //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
-        const lee = await inspectionLabelingApi.getListByLWTNo(
+
+        const myPageSize = 15;
+
+        const list = await inspectionLabelingApi.getListByLWTNo(
           labelingWorkTimeNo.value,
           searchSelected.value,
           searchContent.value,
           pageNo,
-          pageSize
+          myPageSize
         );
 
         const result = {
-          ...lee,
+          ...list,
           pageNo,
-          pageSize,
+          pageSize: myPageSize,
         };
         return result;
       };
       keyData.value++;
     }
 
-    if (!grid.selectedItem.childrennn && !grid.selectedItem.child && !grid.selectedItem.startTime) {
+    if (!grid.selectedItem.childrennn && !grid.selectedItem.child && !grid.selectedItem.status) {
       updateDate.value = true;
 
       modalUpdateData.title = grid.selectedItem.title;
@@ -453,23 +459,23 @@ const onSelectionChanged = (grid, target) => {
           console.log(data.childrennn);
           console.log(grid.selectedItem.placingOrderNo);
           console.log(data.childrennn.length);
-          labelingWorkTimeNo.value =data.labelingWorkTimeNo;
-          
+          labelingWorkTimeNo.value = data.labelingWorkTimeNo;
+
           //선택한 발주번호가 상위 배열의 어떤 인덱스에 있는지
           const index = data.childrennn.findIndex((i) => i.placingOrderNo === grid.selectedItem.placingOrderNo);
+
           placingOrderNo.value = grid.selectedItem.placingOrderNo;
           //인덱스가 0인 경우
           if (index === 0) {
             modalUpdateData.min = '09:00';
-            
+
             // 작업이 하나만 있을 경우에는 18:00시, 작업이 2개 이상 있을 시에는 뒷 작업의 시작시간
-            if(data.childrennn.length === 1) {
-              modalUpdateData.max = "18:00";
+            if (data.childrennn.length === 1) {
+              modalUpdateData.max = '18:00';
             } else {
               const afterArray = data.childrennn[index + 1];
               modalUpdateData.max = afterArray.scheduledStartTime;
             }
-            
           } else if (index === data.childrennn.length - 1) {
             // 인덱스가 마지막(인덱스 == 배열길이)인 경우
             const beforeArray = data.childrennn[index - 1];
@@ -562,7 +568,7 @@ const treeInitialized = (grid) => {
             '<div class="{progress}">' +
             '<div role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" class="progress-bar progress-bar-{paramsColor}" style="width: {params}%"/>' +
             '{params%}</div>' +
-            '<div class="normal-text">{params}%</div></td>';
+            '<div class="red-text">{params}%</div></td>';
 
           //진행률 수치에 따라서 색 넣기
           if (params <= 50) {
@@ -581,7 +587,7 @@ const treeInitialized = (grid) => {
             html = html.replace('{params%}', '');
           } else {
             html = html.replace('{params%}', params + '%');
-            html = html.replace('<div class="normal-text">{params}%</div>', '');
+            html = html.replace('<div class="red-text">{params}%</div>', '');
           }
           html = html.replaceAll('{params}', params);
 
@@ -595,7 +601,7 @@ const treeInitialized = (grid) => {
         }
 
         //최종 html 산출물
-        let html =
+        let finalHtml =
           '<div class="lee">' +
           '<div class="leeStatus">' +
           '<div class="item">' +
@@ -627,14 +633,14 @@ const treeInitialized = (grid) => {
           '</table>' +
           '</div>';
 
-        html = html.replace('{receiveItemQuantity}', receiveQuantity);
-        html = html.replace('{currentQuantity}', currentQuantity);
-        html = html.replaceAll('{progressQuantity}', progressQuantity);
-        html = html.replace('{receivePercent}', receivePercent);
-        html = html.replace('{currentPercent}', currentPercent);
+        finalHtml = finalHtml.replace('{receiveItemQuantity}', receiveQuantity);
+        finalHtml = finalHtml.replace('{currentQuantity}', currentQuantity);
+        finalHtml = finalHtml.replaceAll('{progressQuantity}', progressQuantity);
+        finalHtml = finalHtml.replace('{receivePercent}', receivePercent);
+        finalHtml = finalHtml.replace('{currentPercent}', currentPercent);
 
-        html = html.replaceAll('null%', '');
-        e.cell.innerHTML = html;
+        finalHtml = finalHtml.replaceAll('null%', '');
+        e.cell.innerHTML = finalHtml;
       }
     }
   });
@@ -660,15 +666,30 @@ const onInitialized = (grid) => {
 
 <style scoped lang="scss">
 ::v-deep {
-  .ow-panel .ow-panel-body {
+  .ow-panel1 {
+    width: 100%;
+    min-height: 0;
+    height: 644.5px;
+  }
+  .ow-panel1 .ow-panel-header {
     display: flex;
-    flex-direction: column;
-    flex: 1;
+    height: 26px;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 0 12px;
+    background-color: #284077;
+    border-radius: 4px 4px 0 0;
+    color: #fff;
+    font-size: 13px;
+  }
+  .ow-panel1 .ow-panel-body1 {
+    // flex-direction: column;
+    // flex: 1;
     border: 2px solid #6980af;
     border-top: 0;
     background-color: #fff;
     padding: var(--ow-gutter);
-    margin-bottom: 10%;
+    height: inherit;
   }
 
   .wj-cell.wj-header {
@@ -743,7 +764,7 @@ const onInitialized = (grid) => {
     transition: width 0.6s ease;
   }
 
-  .normal-text {
+  .red-text {
     display: flex;
     flex-direction: column;
     justify-content: center;

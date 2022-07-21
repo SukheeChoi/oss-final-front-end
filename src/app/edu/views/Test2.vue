@@ -739,8 +739,8 @@ function getPastOrderDetail(orderNo) {
   }
 
   .hoverTable tr:hover td {
-  background-color: #d4ecff;
-  cursor: pointer;
-}
+    background-color: #d4ecff;
+    cursor: pointer;
+  }
 }
 </style>

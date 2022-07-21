@@ -10,7 +10,7 @@
     <hr />
     <!-- 배열을 이용한 동적 헤더  -->
     <div class="ow-flex-wrap item-size-content mt-5" style="--gap: 10px">
-      <ow-filter-checkbox :items="companyCheckbox" v-model:modelValue="selectCompany" label="회사" />
+      <ow-filter-checkbox :items="companyCheckbox" v-model="selectCompany" label="회사" />
       <ow-filter-checkbox :items="shippingCheckbox" v-model="selectShipping" label="배송구분" />
       <ow-filter-checkbox :items="unreleaseCheckbox" v-model="selectUnrelease" label="미출고" />
 
@@ -33,7 +33,7 @@
 
   <!-- 그리드 부분 -->
   <b-row>
-    <ow-grid :allowMerging="'Cells'" :key="keyData" :read="getData" :visibleRowsCount="15" :initialized="onInitialized">
+    <ow-grid :allowMerging="'Cells'" :key="keyData" :read="getData" :visibleRowsCount="16" :initialized="onInitialized">
       <template #left>&nbsp;</template>
       <wj-flex-grid-column-group header="주문">
         <wj-flex-grid-column-group
@@ -76,21 +76,21 @@
       <wj-flex-grid-column-group header="피킹지시">
         <wj-flex-grid-column-group binding="pickingDirectionAttempt" header="차수" :width="30" align="center" />
         <wj-flex-grid-column-group binding="pickingDirectionDate" header="지시일시" :width="90" align="center" />
-        <wj-flex-grid-column-group binding="pickingDirectionQuantity" header="지시수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingDirectionQuantity" header="지시수량" :width="50" align="right" />
         <wj-flex-grid-column-group binding="pickingDirectionUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="피킹">
-        <wj-flex-grid-column-group binding="pickingEmployee" header="담당자" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="pickingQuantity" header="피킹수량" :width="50" align="center" />
-        <wj-flex-grid-column-group binding="pickingDate" header="피킹일시" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="pickingEmployee" header="담당자" :width="60" align="center" />
+        <wj-flex-grid-column-group binding="pickingQuantity" header="피킹수량" :width="50" align="right" />
+        <wj-flex-grid-column-group binding="pickingDate" header="피킹일시" :width="90" align="center" />
         <wj-flex-grid-column-group binding="pickingUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="협력사">
         <wj-flex-grid-column-group binding="orderShippingWay" header="배송방식" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="orderCheckDate" header="주문확인<br>일시" :width="100" align="center" />
-        <wj-flex-grid-column-group binding="releaseQuantity" header="출고수량" :width="50" align="center" />
+        <wj-flex-grid-column-group binding="orderCheckDate" header="주문확인<br>일시" :width="80" align="center" />
+        <wj-flex-grid-column-group binding="releaseQuantity" header="출고수량" :width="50" align="right" />
         <wj-flex-grid-column-group binding="releaseScheduleDate" header="출고예정<br>일자" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="100" align="center" />
+        <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="80" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="출고검수/패킹">
         <wj-flex-grid-column-group binding="packingInspectionEmployee" header="담당자" :width="50" align="center" />
@@ -149,8 +149,6 @@ const keyData = ref(0);
 const searchSelected = ref(null);
 const searchContent = ref(null);
 
-const dummy = ref(null);
-
 //현황 가져오는 함수
 async function getStatus() {
   //현황 api 호출
@@ -172,6 +170,8 @@ getData.value = async function (query, pageNo, pageSize) {
   //pageSize = "한페이지 몇 행"
   //totalCount = "전체 행 수"
 
+  const myPageSize = 16;
+
   //그리드 데이터 api 호출
   const list = await orderApi.getFilterList(
     selectCompany.value,
@@ -180,14 +180,13 @@ getData.value = async function (query, pageNo, pageSize) {
     searchSelected.value,
     searchContent.value,
     pageNo,
-    pageSize
+    myPageSize
   );
-
-  const page = { pageNo, pageSize: 20 };
 
   const result = {
     ...list,
     pageNo,
+    pageSize: myPageSize
   };
 
   return result;
@@ -214,6 +213,7 @@ watch(
   () => [selectCompany, selectShipping, selectUnrelease],
   (newGroup, oldGroup) => {
     keyData.value++;
+    console.log(getData);
   },
   { deep: true }
 );

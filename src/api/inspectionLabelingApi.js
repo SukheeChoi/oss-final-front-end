@@ -6,7 +6,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
 async function getStatus() {
   let response = null;
   try {
-    response = await axios.get('/label/getStatus');
+    response = await axios.get('/label/status');
     console.log(response);
   } catch (error) {
     console.log(error);
@@ -18,7 +18,7 @@ async function getStatus() {
 async function getTreeList() {
   let response = null;
   try {
-    response = await axios.get('/label/getTreeList');
+    response = await axios.get('/label/treeList');
     console.log(response.data.data);
 
     response.data.data.map((i) => {
@@ -62,7 +62,7 @@ async function getTreeList() {
 async function getOvertime() {
   let response = null;
   try {
-    response = await axios.get('/label/getOverTime');
+    response = await axios.get('/label/overTime');
     console.log(response);
   } catch (error) {
     console.log(error);
@@ -75,7 +75,7 @@ async function updateOvertime(requestData) {
   console.log(requestData);
   let response = null;
   try {
-    response = await axios.put('/label/updateOvertime', requestData);
+    response = await axios.put('/label/overtime', requestData);
     console.log(response);
   } catch (error) {
     console.log(error);
@@ -88,11 +88,12 @@ async function updateWorktime(requestData) {
   console.log(requestData);
   let response = null;
   try {
-    response = await axios.put('/label/updateWorktime', requestData);
+    response = await axios.put('/label/worktime', requestData);
     console.log(response);
   } catch (error) {
     console.log(error);
   }
+  
   return response.data;
 }
 
@@ -100,7 +101,7 @@ async function updateWorktime(requestData) {
 async function getListByLWTNo(labelingWorkTimeNo, searchSelected, searchContent, pageNo, pageSize) {
   let response = null;
   try {
-    response = await axios.get('/label/getListByLWTNo', {
+    response = await axios.get('/label/workDetail', {
       params: { labelingWorkTimeNo, searchSelected, searchContent, pageNo, pageSize },
     }); 
     response.data.data.map((data) => {

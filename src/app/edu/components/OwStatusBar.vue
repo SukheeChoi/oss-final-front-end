@@ -4,10 +4,10 @@
   </template>
   <div class="item">
     <div class="state">
-      <template v-for="({ name, value, end, plusValue, plusend, color }, index) in items" :key="index">
-        <div class="state-item" :style="{ color: color }">
-          {{ name }}<strong>{{ value }}</strong>{{ end }}
-          <span v-if="plusValue">/<strong>{{ plusValue }}</strong>{{ plusend }}</span>
+      <template v-for="(item, index) in items" :key="index">
+        <div class="state-item" :style="{ color: item.color }">
+          {{ item.name }}<strong>{{ item.value }}</strong>{{ item.end }}
+          <span v-if="item.plusValue">/<strong>{{ item.plusValue }}</strong>{{ item.plusend }}</span>
         </div>
       </template>
     </div>

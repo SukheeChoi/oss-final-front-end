@@ -563,10 +563,12 @@ class TreeMergeManager extends MergeManager {
 
   getMergedRange(p, r, c) {
     const range = new CellRange(r, c);
+    console.log(p);
+    console.log(p.getCellData(r, c));
+    console.log(typeof p.getCellData(r, c));
+    console.log(r);
+    console.log(c);
     switch (p.cellType) {
-      case CellType.ColumnHeader:
-        this.colMergedRange(p, range);
-        break;
       case CellType.Cell:
         if (this.isMerged(p, c) && p.getCellData(r, c) === "dd") {
           this.colMergedRange(p, range);
