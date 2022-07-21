@@ -10,6 +10,12 @@ import axios from "axios";
   return : 현황 정보(JSON)를 담은 JSON.
   parameter : 불필요.
 */
+/**
+ * 현황 정보를 반환.
+ * 
+ * @author 최숙희
+ * @returns {Object} 주문 건수, 피킹지시 건수, 출고검수/패킹 건수, 출고검수 긴급/일반 건수
+ */
 async function getSummary() {
   let summaryList = null;
   try {
@@ -31,6 +37,13 @@ async function getSummary() {
   parameter : 목록 조회시 적용하기 위한 필터값들
     (배송구분, 배송방식, 미출고, 부분일치 검색용 키워드(주문번호/거래처/배송지/업체명)).
 */
+/**
+ * 담당자 필터링을 위해 OwSelect component에 바인딩 할 정보를 반환함.
+ * 
+ * @author 최숙희
+ * @param {Object} filterList 목록 조회시 적용할 필터값
+ * @returns {Array} 담당자 목록
+ */
 async function getAssigneeList(filterList) {
   let assigneeList = null;
   try {
@@ -75,6 +88,8 @@ async function getAssigneeList(filterList) {
   parameter : 다중 필터링용 필터값/담당자/부분일치 검색 키워드/페이지네이션 위한 페이지 번호, 페이지 별 행 개수.
 */
 /**
+ * Grid에 바인딩 할 목록을 서버로부터 가져오기 위한 axios 통신
+ * 필터값 변경 시점과 페이지 변경 시점마다 수행.
  * 
  * @author 최숙희
  * @param {Object} filterList 
