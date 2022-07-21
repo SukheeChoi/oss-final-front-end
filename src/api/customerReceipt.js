@@ -11,19 +11,14 @@ async function getFilterList(filterList) {
     params.append('orderUnrelease',filterList.unrelease);
     params.append('orderNo',filterList.orderNo);
     params.append('clientName',filterList.clientName);
-    // params.append('pageSize',filterList.pageSize);
-    // params.append('startRowIndex',filterList.startRowIndex);
+    params.append('pageNo',filterList.pageNo);
+    params.append('perPage',filterList.perPage);
 
-    console.log("api - filterList.shippingCategory : " + filterList.shippingCategory);
-    console.log("api - filterList.status : " + filterList.status);
-    console.log("api - filterList.unrelease : " + filterList.unrelease);
-    console.log("api - filterList.orderNo : " + filterList.orderNo);
-    console.log("api - filterList.clientName : " + filterList.clientName);
-    // console.log("api - filterList.pageSize : " + filterList.pageSize);
-    // console.log("api - filterList.startRowIndex : " + filterList.startRowIndex);
+    console.log("api - pageNo : " + filterList.pageNo);
+    console.log("api - perPage : " + filterList.perPage);
+
     const response = await axios.post(`/client/getFilterList`, filterList);
     receiptList = response.data;
-    // console.log("api - receiptList : " + receiptList[0]['orderItem']['unreleaseQuantity']);
   } catch (error) {
     console.log(error);
   }

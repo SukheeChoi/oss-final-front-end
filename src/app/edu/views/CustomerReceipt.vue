@@ -294,8 +294,8 @@ const filterList = ref({
   unrelease: '',
   orderNo: '',
   clientName: '',
-  // pageSize: 320,
-  // startRowIndex:0
+  pageNo: 1,
+  perPage: 200
 });
 
 //보여지는 행 수
@@ -366,12 +366,15 @@ const keyData = ref(0);
 watch(
   [checkboxGroup2, checkboxGroup4, checkbox1],
   ([new1, new2, new3], [old1, old2, old3]) => {
+    //new1.length가 2일 때 : 전체 선택
     if (new1.length == 2) {
       filterList.value.shippingCategory = ['긴급', '일반'];
     } else {
       filterList.value.shippingCategory = new1;
     }
 
+    //new2 값이 -1일 때 : 전체 선택
+    //new2 값이 2일 때 : 피킹, 피킹 지시
     if (new2 == '-1') {
       filterList.value.status = '-1';
     } else if (new2 == '2') {
@@ -382,12 +385,6 @@ watch(
 
     filterList.value.unrelease = new3;
 
-    console.log('watch - new1 : ' + new1);
-    console.log('watch - new2 : ' + new2);
-    console.log('watch - new3 : ' + new3);
-    console.log('watch - filterList.shippingCategory : ' + filterList.value.shippingCategory);
-    console.log('watch - filterList.status : ' + filterList.value.status);
-    console.log('watch - filterList.unrelease : ' + filterList.value.unrelease);
     keyData.value++;
     getFilterList(filterList.value);
   },
@@ -402,22 +399,14 @@ function search() {
     filterList.value.orderNo = '';
     filterList.value.clientName = searchCategoryContent.value;
   }
-  console.log('search - searchCategory.value : ', searchCategory.value);
-  console.log('search - searchCategoryContent.value : ', searchCategoryContent.value);
-  console.log('search - filterList.value.orderNo : ', filterList.value.orderNo);
-  console.log('search - filterList.value.clientName : ', filterList.value.clientName);
   keyData.value++;
   getFilterList(filterList.value);
 }
 
 async function getFilterList(afterFilterList) {
   const result = await clientApi.getFilterList(afterFilterList).then((data) => {
-    console.log('getFilterList - JSON.stringify(result) : ' + JSON.stringify(data));
-    // receiptList.value = result.list;
-    console.log('result.length : ' + data.length);
-    console.log('result : ', data);
-    console.log('Array.isArray(result) : ' + Array.isArray(data));
     receiptList.value = [];
+    //미출고 출력
     for (let i = 0; i < data.list2.length; i++) {
       receiptList.value.push({
         client: data['list2'][i]['client']['clientName'],
@@ -427,6 +416,7 @@ async function getFilterList(afterFilterList) {
         clientNo: data['list2'][i]['client']['clientNo'],
       });
     }
+    //출고 출력
     for (let i = 0; i < data.list1.length; i++) {
       receiptList.value.push({
         client: data['list1'][i]['client']['clientName'],
