@@ -372,8 +372,10 @@ watch(
       filterList.value.shippingCategory = new1;
     }
 
-    if (new2 == 0) {
-      filterList.value.status = 0;
+    if (new2 == '-1') {
+      filterList.value.status = '-1';
+    } else if (new2 == '2') {
+      filterList.value.status = '2';
     } else {
       filterList.value.status = new2;
     }
