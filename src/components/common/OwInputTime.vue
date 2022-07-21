@@ -49,7 +49,6 @@ export default {
   },
   setup(props, { emit }) {
     const root = ref(null);
-    console.log(props);
     const state = reactive({
       control: {
         text: props.modelValue,

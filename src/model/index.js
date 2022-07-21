@@ -443,7 +443,6 @@ export class GridRestCollectionView extends RestCollectionView {
   }
 
   lookup(query) {
-    console.log('@@ GridRestCollectionView - lookup(query) - 실행');
     this._query = query;
     this._pgIdx = 0;
     this._pgSz = 10;
@@ -451,7 +450,6 @@ export class GridRestCollectionView extends RestCollectionView {
   }
 
   async getItems() {
-    console.log('@@ GridRestCollectionView - async getItems() - 실행');
     if (!isFunction(this._getItems)) {
       console.error('조회 API가 없거나 함수 형태가 아닙니다.');
       return;
