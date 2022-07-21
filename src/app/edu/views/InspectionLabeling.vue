@@ -255,6 +255,7 @@ const inspectionStatus = ref([
   작성자: 이동현
   기능: 현황을 가져오는 기능
 */
+
 async function getStatus() {
   const result = await inspectionLabelingApi.getStatus().then((data) => {
     itemStatus.value[0].value = data.receiveItem;
@@ -420,7 +421,7 @@ const onSelectionChanged = (grid, target) => {
           title: title.value,
         };
       });
-
+      
       getGrid.value = async function (query, pageNo, pageSize) {
         //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
 

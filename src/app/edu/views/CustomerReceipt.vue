@@ -481,10 +481,12 @@ let selectedOrder = ref(null);  //선택된 주문 정보가 저장되는 ref �
 let clientOrder = ref(null);    //주문 이력 정보가 저장되는 ref 객체
 let clientOrderDetail = ref([{},{},{}]);  //주문 이력 상세 정보가 저장되는 ref 객체
 
-/*
-  작성자: 이동현
-  기능: 모달화면을 띄우는 기능, 자식컴포넌트인 owModal의 open 메소드를 실행시킨다.
-*/
+
+/**
+ * 모달화면을 띄우는 기능
+ * 
+ * @author 이동현
+ */
 const openModal = async function () {
   //모달 설정값 제공
   const config = {
@@ -509,6 +511,15 @@ const openModal = async function () {
     selectedOrder: Array,
   }
 */
+
+/**
+ * clientModalApi의 getModal
+ * 
+ * @author 이동현
+ * @param {number} clientNo 고객번호
+ * @param {number} orderNo 주문번호
+ * @return {Object} 거래처정보, 진행 주문 정보, 주문 이력을 반환함
+ */
 const getModal = async function (clientNo, orderNo) {
   const modal = await clientModalApi.getModal(clientNo, orderNo);
   return modal;
@@ -546,6 +557,7 @@ function selectModal(cell) {
   기능: 모달에서 주문이력을 클릭했을 경우, 해당 주문이력에 맞는 세부정보를 가져오는 getModalDetail()을 실행시키는 기능 
   매개변수: orderNo(주문번호)
 */
+
 function getclientOrderDetail(orderNo) {
   const response = getModalDetail(orderNo).then((data) => {
     clientOrderDetail.value = data.clientOrderDetail;
