@@ -41,7 +41,7 @@
         ></b-pagination>
       </div>
       <div></div>
-      <div>전체 {{ totalCount }} 건</div>
+      <!-- <div>전체 {{ totalCount }} 건</div> -->
     </div>
     <ow-flex-grid-editor v-if="editable" :src="[...grids]" :type="editorSize">
       <template #default="item">
