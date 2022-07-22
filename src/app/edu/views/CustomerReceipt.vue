@@ -55,43 +55,21 @@
           <div>
             <!-- hover 했을 때 범례 띄워줌 -->
             <button type="button" class="ow-btn type-icon arrow_down">
-              <img
-                src="@/assets/images/icon/ico_list.svg"
+              <img src="@/assets/images/icon/ico_list.svg"
                 style="border: 0.8px solid gray; width: 20px; padding: 2px"
               />
             </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
-              <div>
-                <span class="ow-tag type-category"><i class="o">주</i></span
-                >피킹지시 내려야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="p">피</i></span
-                >피킹해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="i">검</i></span
-                >출고검수/패킹해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="r">출</i></span
-                >출고(송장번호 생성)해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="t">인</i></span
-                >택배사로 인계해야할 건
-              </div>
+              <div><span class="ow-tag type-category"><i class="o">주</i></span>피킹지시 내려야할 건</div>
+              <div><span class="ow-tag type-category"><i class="p">피</i></span>피킹해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="i">검</i></span>출고검수/패킹해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="r">출</i></span>출고(송장번호 생성)해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="t">인</i></span>택배사로 인계해야할 건</div>
               <br />
               <h3>주문번호 범례</h3>
-              <div>
-                <span class="ow-tag type-category"><i class="u">미</i></span
-                >주문품목 중 미출고품목이 존재하는 주문
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="n">처</i></span
-                >처리하지 않은 단계
-              </div>
+              <div><span class="ow-tag type-category"><i class="u">미</i></span>주문품목 중 미출고품목이 존재하는 주문</div>
+              <div><span class="ow-tag type-category"><i class="n">처</i></span>처리하지 않은 단계</div>
             </div>
           </div>
           <div class="title-field">검색</div>
@@ -118,7 +96,7 @@
         <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
-            <!-- 행 스타일을 미출고 값에 따라 다르게 적용 -->
+            <!-- 거래처명 앞 아이콘을 미출고 값에 따라 적용 -->
             <p v-if="cell.item.unrelease >= 1" class="ow-tag type-category">
               <i class="u">미</i>
             </p>
@@ -131,8 +109,6 @@
             </span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
-        <!-- <wj-flex-grid-column v-if="!unrelease" binding="client" header="거래처" width="*">
-        </wj-flex-grid-column> -->
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 주문 단계에 따라 아이콘 적용 -->
@@ -250,12 +226,11 @@
 
 <script setup>
 import OwNGrid from '@/components/grid/new/OwNGrid';
-import StatusProgressBar from '@/components/progress/StatusProgressBar';
+import StatusProgressBar from '@/app/edu/components/StatusProgressBar';
 import clientModalApi from '@/api/clientModalApi';
 import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
 
-// const items = ref([]);
 const orderPlan = ref(300);
 const leftoverCnt = ref(null);
 const statusOrd = ref(null);
@@ -283,8 +258,8 @@ const filterList = ref({
   unrelease: '',
   orderNo: '',
   clientName: '',
-  // pageSize: 320,
-  // startRowIndex:0
+  pageNo: 1,
+  perPage: 200
 });
 
 //보여지는 행 수
@@ -355,26 +330,25 @@ const keyData = ref(0);
 watch(
   [checkboxGroup2, checkboxGroup4, checkbox1],
   ([new1, new2, new3], [old1, old2, old3]) => {
+    //new1.length가 2일 때 : 전체 선택
     if (new1.length == 2) {
       filterList.value.shippingCategory = ['긴급', '일반'];
     } else {
       filterList.value.shippingCategory = new1;
     }
 
-    if (new2 == 0) {
-      filterList.value.status = 0;
+    //new2 값이 -1일 때 : 전체 선택
+    //new2 값이 2일 때 : 피킹, 피킹 지시
+    if (new2 == '-1') {
+      filterList.value.status = '-1';
+    } else if (new2 == '2') {
+      filterList.value.status = '2';
     } else {
       filterList.value.status = new2;
     }
 
     filterList.value.unrelease = new3;
 
-    console.log('watch - new1 : ' + new1);
-    console.log('watch - new2 : ' + new2);
-    console.log('watch - new3 : ' + new3);
-    console.log('watch - filterList.shippingCategory : ' + filterList.value.shippingCategory);
-    console.log('watch - filterList.status : ' + filterList.value.status);
-    console.log('watch - filterList.unrelease : ' + filterList.value.unrelease);
     keyData.value++;
     getFilterList(filterList.value);
   },
@@ -389,22 +363,14 @@ function search() {
     filterList.value.orderNo = '';
     filterList.value.clientName = searchCategoryContent.value;
   }
-  console.log('search - searchCategory.value : ', searchCategory.value);
-  console.log('search - searchCategoryContent.value : ', searchCategoryContent.value);
-  console.log('search - filterList.value.orderNo : ', filterList.value.orderNo);
-  console.log('search - filterList.value.clientName : ', filterList.value.clientName);
   keyData.value++;
   getFilterList(filterList.value);
 }
 
 async function getFilterList(afterFilterList) {
   const result = await clientApi.getFilterList(afterFilterList).then((data) => {
-    console.log('getFilterList - JSON.stringify(result) : ' + JSON.stringify(data));
-    // receiptList.value = result.list;
-    console.log('result.length : ' + data.length);
-    console.log('result : ', data);
-    console.log('Array.isArray(result) : ' + Array.isArray(data));
     receiptList.value = [];
+    //미출고 출력
     for (let i = 0; i < data.list2.length; i++) {
       receiptList.value.push({
         client: data['list2'][i]['client']['clientName'],
@@ -414,6 +380,7 @@ async function getFilterList(afterFilterList) {
         clientNo: data['list2'][i]['client']['clientNo'],
       });
     }
+    //출고 출력
     for (let i = 0; i < data.list1.length; i++) {
       receiptList.value.push({
         client: data['list1'][i]['client']['clientName'],
@@ -437,7 +404,7 @@ const initialize = (s) => {
     let row = panel.rows[r];
     //헤더가 아닌 경우
     if (row._idxData !== -1) {
-      //미출고 값이 true인 경우
+      //미출고 값이 1 이상인 경우
       if (row._data.unrelease >= 1) {
         //적용되어 있는 cssClass가 없을 때
         if (row.cssClass === null) {
@@ -568,8 +535,7 @@ function getclientOrderDetail(orderNo) {
   }
 
   .arrow_down {
-    display: block; /* 줄바꿈 */
-    // height: auto;
+    display: block; 
     transition: 0.5s ease; /* 속도 조절 */
   }
 
