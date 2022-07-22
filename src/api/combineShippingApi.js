@@ -18,7 +18,7 @@ import axios from "axios";
  * @author 최숙희
  * @param {Number} toDo 할일/한일 상태값.
  * @param {Array} dateList [검색 시작일, 검색 종료일] 기간.
- * @returns {Object} 협력사 목록
+ * @returns {Object} 협력사 목록(Array)을 담은 JSON.
  */
 async function getVendorList(toDo=1, dateList=Array.from([])) {
   let vendorList = null;
@@ -164,13 +164,15 @@ async function getDeliveryList(
  * 합배송 품목들의 수령상태를 업데이트하고, 결과값을 반환.
  * 
  * @author 최숙희
- * @param {Array} receiptedList 수령 버튼이 체크된 행을 식별할 PK(OI_NO)와 미출고 수량을 담은 객체를 담은 Array
+ * @param {Array} receiptedList 수령 버튼이 체크된 행을 식별할 PK(OI_NO)와
+*                              미출고 수량을 담은 객체를 담은 Array
  * @returns {String} 업데이트 성공/실패 여부
  */
 async function updateReceiptList(receiptedList) {
   let result = null;
   try {
-    const response = await axios.put(`/combineShipping/receipt`, Array.from(receiptedList));
+    const response = await axios.put(`/combineShipping/receipt`
+                                    , Array.from(receiptedList));
     result = response.data.result;
   } catch(error) {
     console.log(error);
@@ -194,13 +196,14 @@ async function updateReceiptList(receiptedList) {
  * '품목전달'버튼 클릭 시점 마다 수행.
  * 
  * @author 최숙희
- * @param {Array} deliveredList 전달 버튼이 체크된 행을 식별할 PK(OI_NO)를 담은 Arra
+ * @param {Array} deliveredList 전달 버튼이 체크된 행을 식별할 PK(OI_NO)를 담은 Array
  * @returns {String} 업데이트 성공/실패 여부
  */
 async function updateDeliveryList(deliveredList) {
   let result = null;
   try {
-    const response = await axios.put(`/combineShipping/delivery`, Array.from(deliveredList));
+    const response = await axios.put(`/combineShipping/delivery`
+                                    , Array.from(deliveredList));
     result = response.data.result;
   } catch(error) {
     console.log(error);

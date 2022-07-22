@@ -95,7 +95,8 @@ async function getAssigneeList(filterList) {
  * @param {Object} filterList 
  * @param {Number} pageNo 
  * @param {Number} pageSize 
- * @returns 
+ * @returns {Object} 페이지네이션을 위한 Pager 객체와
+ *                  Grid에 바인딩 할 목록(Array)을 담은 JSON.
  */
 async function getAfterPickingList(filterList, pageNo=1, pageSize=10) {
   let afterPickingList = null;
