@@ -11,12 +11,8 @@ async function getFilterList(filterList) {
     params.append('orderUnrelease',filterList.unrelease);
     params.append('orderNo',filterList.orderNo);
     params.append('clientName',filterList.clientName);
-    params.append('pageNo',filterList.pageNo);
-    params.append('perPage',filterList.perPage);
-
-    console.log("api - pageNo : " + filterList.pageNo);
-    console.log("api - perPage : " + filterList.perPage);
-
+    // params.append('pageNo',filterList.pageNo);
+    // params.append('perPage',filterList.perPage);
     const response = await axios.post(`/client/getFilterList`, filterList);
     receiptList = response.data;
   } catch (error) {
@@ -31,19 +27,18 @@ async function getStatusCnt() {
   try {
     const response = await axios.get(`/client/sts`);
     status = response.data.statusCnt;
-    console.log('status : ' + status);
   } catch (error) {
     console.log(error);
   }
   return status;
 }
 
+//미출고 건수 요청
 async function getUnreleaseCnt() {
   let unreleaseCnt = [];
   try{
     const response = await axios.get(`/client/unreleaseCnt`);
     unreleaseCnt = response.data;
-    console.log('unreleaseCnt : ' + unreleaseCnt);
   } catch (error) {
     console.log(error);
   }

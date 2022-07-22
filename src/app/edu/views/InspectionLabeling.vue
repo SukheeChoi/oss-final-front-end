@@ -109,7 +109,7 @@
               ■ <span v-if="title">[{{ title }}]</span>검품검수 및 라벨링 내역
             </div>
           </div>
-          <div class="ow-panel-body">
+          <div class="ow-panel-body1">
             <b-row>
               <div v-if="!title" style="font-size: 20px">담당자를 선택해주세요!</div>
               <ow-grid v-if="title" :read="getGrid" :key="keyData" :initialized="onInitialized" :visibleRowsCount="15">

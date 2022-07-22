@@ -55,43 +55,21 @@
           <div>
             <!-- hover 했을 때 범례 띄워줌 -->
             <button type="button" class="ow-btn type-icon arrow_down">
-              <img
-                src="@/assets/images/icon/ico_list.svg"
+              <img src="@/assets/images/icon/ico_list.svg"
                 style="border: 0.8px solid gray; width: 20px; padding: 2px"
               />
             </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
-              <div>
-                <span class="ow-tag type-category"><i class="o">주</i></span
-                >피킹지시 내려야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="p">피</i></span
-                >피킹해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="i">검</i></span
-                >출고검수/패킹해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="r">출</i></span
-                >출고(송장번호 생성)해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="t">인</i></span
-                >택배사로 인계해야할 건
-              </div>
+              <div><span class="ow-tag type-category"><i class="o">주</i></span>피킹지시 내려야할 건</div>
+              <div><span class="ow-tag type-category"><i class="p">피</i></span>피킹해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="i">검</i></span>출고검수/패킹해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="r">출</i></span>출고(송장번호 생성)해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="t">인</i></span>택배사로 인계해야할 건</div>
               <br />
               <h3>주문번호 범례</h3>
-              <div>
-                <span class="ow-tag type-category"><i class="u">미</i></span
-                >주문품목 중 미출고품목이 존재하는 주문
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="n">처</i></span
-                >처리하지 않은 단계
-              </div>
+              <div><span class="ow-tag type-category"><i class="u">미</i></span>주문품목 중 미출고품목이 존재하는 주문</div>
+              <div><span class="ow-tag type-category"><i class="n">처</i></span>처리하지 않은 단계</div>
             </div>
           </div>
           <div class="title-field">검색</div>
@@ -118,7 +96,7 @@
         <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
-            <!-- 행 스타일을 미출고 값에 따라 다르게 적용 -->
+            <!-- 거래처명 앞 아이콘을 미출고 값에 따라 적용 -->
             <p v-if="cell.item.unrelease >= 1" class="ow-tag type-category">
               <i class="u">미</i>
             </p>
@@ -131,8 +109,6 @@
             </span>
           </wj-flex-grid-cell-template>
         </wj-flex-grid-column>
-        <!-- <wj-flex-grid-column v-if="!unrelease" binding="client" header="거래처" width="*">
-        </wj-flex-grid-column> -->
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 주문 단계에 따라 아이콘 적용 -->
@@ -250,12 +226,11 @@
 
 <script setup>
 import OwNGrid from '@/components/grid/new/OwNGrid';
-import StatusProgressBar from '@/components/progress/StatusProgressBar';
+import StatusProgressBar from '@/app/edu/components/StatusProgressBar';
 import clientModalApi from '@/api/clientModalApi';
 import { reactive, ref, watch } from 'vue';
 import clientApi from '@/api/customerReceipt';
 
-// const items = ref([]);
 const orderPlan = ref(300);
 const leftoverCnt = ref(null);
 const statusOrd = ref(null);
@@ -429,7 +404,7 @@ const initialize = (s) => {
     let row = panel.rows[r];
     //헤더가 아닌 경우
     if (row._idxData !== -1) {
-      //미출고 값이 true인 경우
+      //미출고 값이 1 이상인 경우
       if (row._data.unrelease >= 1) {
         //적용되어 있는 cssClass가 없을 때
         if (row.cssClass === null) {
@@ -560,8 +535,7 @@ function getclientOrderDetail(orderNo) {
   }
 
   .arrow_down {
-    display: block; /* 줄바꿈 */
-    // height: auto;
+    display: block; 
     transition: 0.5s ease; /* 속도 조절 */
   }
 
