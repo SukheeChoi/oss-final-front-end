@@ -33,28 +33,6 @@ async function getTreeList() {
   try {
     response = await axios.get('/label/treeList');
     console.log(response.data.data);
-
-    response.data.data.map((i) => {
-      i.startTime = "dd";
-      i.workTime = "dd";
-      i.progressRate = "dd";
-      i.status = "dd";
-      i.lateTime = "dd";
-      i.passItemQuantity = "dd";
-      i.inspectionQuantity = "dd";
-      i.labelingItemQuantity = "dd";
-
-      i.child.map((k) => {
-        k.startTime = "dd";
-        k.workTime = "dd";
-        k.progressRate = "dd";
-        k.status = "dd";
-        k.lateTime = "dd";
-        k.passItemQuantity = "dd";
-        k.inspectionQuantity = "dd";
-        k.labelingItemQuantity = "dd";
-      });
-    });
   } catch (error) {
     console.log(error);
   }
@@ -66,7 +44,7 @@ async function getTreeList() {
 // 바인딩 할 데이터를 서버로부터 가져오기 위한 axios 통신 수행 
 
 /**
- * 작업 가져오기
+ * 잔업 가져오기
  * 
  * @author 이동현
  * @return {Object} 담당자가 정해져 있지 않은 작업목록을 JSON형태로 반환
@@ -102,7 +80,7 @@ async function updateOvertime(requestData) {
 }
 
 /**
- * 잔업 수정하기
+ * 예정시간 수정하기
  * 
  * @author 이동현
  * @param {Object} requestData 발주번호, 작업번호, 작업 예정 시작시간, 끝시간
@@ -118,7 +96,7 @@ async function updateWorktime(requestData) {
     console.log(error);
   }
   
-  return response.data;
+  return response.data.result;
 }
 
 /**

@@ -387,6 +387,7 @@ const openUpdateModal = async function () {
       리턴 값: String
     */
     const result = await inspectionLabelingApi.updateWorktime(requestData).then((result) => {
+      console.log(result);
       if (result === 'success') {
         alert('시간이 수정되었습니다!');
       } else {
@@ -456,10 +457,6 @@ const onSelectionChanged = (grid, target) => {
       const testGrid = grid.itemsSource.items[0].child;
       testGrid.map((data) => {
         if (data.title === grid.selectedItem.employeeName) {
-          console.log(data);
-          console.log(data.childrennn);
-          console.log(grid.selectedItem.placingOrderNo);
-          console.log(data.childrennn.length);
           labelingWorkTimeNo.value = data.labelingWorkTimeNo;
 
           //선택한 발주번호가 상위 배열의 어떤 인덱스에 있는지

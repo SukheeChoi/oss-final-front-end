@@ -538,9 +538,9 @@ class TreeMergeManager extends MergeManager {
         col_next += 1;
         break;
     }
-    const data1 = panel.getCellData(row_prev, col_prev, false) || '';
-    const data2 = panel.getCellData(row_next, col_next, false) || '';
-    return data1 !== '' && data2 !== '' && data1 === data2;
+    const data1 = panel.getCellData(row_prev, col_prev) || '';
+    const data2 = panel.getCellData(row_next, col_next) || '';
+    return data1 === data2;
   }
 
   colMergedRange(p, r) {
@@ -563,14 +563,9 @@ class TreeMergeManager extends MergeManager {
 
   getMergedRange(p, r, c) {
     const range = new CellRange(r, c);
-    console.log(p);
-    console.log(p.getCellData(r, c));
-    console.log(typeof p.getCellData(r, c));
-    console.log(r);
-    console.log(c);
     switch (p.cellType) {
       case CellType.Cell:
-        if (this.isMerged(p, c) && p.getCellData(r, c) === "dd") {
+        if (this.isMerged(p, c) && p.getCellData(r, c) === undefined) {
           this.colMergedRange(p, range);
         }
         break;
