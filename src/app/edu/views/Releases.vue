@@ -328,12 +328,13 @@ const afterPickingKey = ref(1);
 // 현황/배송구분 정보 불러오기.(새로고침 시에만 통신.)
 const getSummary = async () => {
   const result = await afterPickingApi.getSummary().then((result) => {
-    summaryList.status.progressOrderNum = result.summaryMap.progressOrderNum;
-    summaryList.status.pickingDirectionNum = result.summaryMap.pickingDirectionNum;
-    summaryList.status.releaseInspectionNum = result.summaryMap.releaseInspectionNum;
-    summaryList.delivery.unreleasedNum = result.summaryMap.unreleasedNum;
-    summaryList.delivery.expressShippingNum = result.summaryMap.expressShippingNum;
-    summaryList.delivery.normalShippingNum = result.summaryMap.normalShippingNum;
+    console.log('## await afterPickingApi.getSummary()', result);
+    summaryList.status.progressOrderNum = result.ORD_NUM;
+    summaryList.status.pickingDirectionNum = result.PIC_DIR_NUM;
+    summaryList.status.releaseInspectionNum = result.RLS_INSP_NUM;
+    summaryList.delivery.unreleasedNum = result.URLS_NUM;
+    summaryList.delivery.expressShippingNum = result.EX_NUM;
+    summaryList.delivery.normalShippingNum = result.NM_NUM;
 
     
   });
