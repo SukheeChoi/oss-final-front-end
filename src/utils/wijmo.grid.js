@@ -177,7 +177,7 @@ class SimpleMergeManager extends MergeManager {
          * Cells, ColumnnHeaders 병합이 가능하도록.
          * @author 최숙희
          */
-        if (p.cellType == CellType.ColumnHeader) {
+        if (p.cellType == CellType.ColumnHeader) {//컬럼헤더인 경우
           var rng = new CellRange(r, c);
           for (var i = rng.col; i < p.columns.length - 1; i++) {
             if (
