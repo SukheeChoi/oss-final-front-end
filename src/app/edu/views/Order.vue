@@ -219,14 +219,6 @@ const onInitialized = (grid) => {
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
     }
-    if (e.panel == grid.cells) {
-      var col = grid.columns[e.col];
-      var row = grid.rows[e.row];
-      if (e.cell.innerHTML === "-") {
-        console.log(e);
-        console.log(e.cell);
-      }
-    }
   });
 };
 
