@@ -70,14 +70,14 @@
           cssClassAll="border-left"
         />
         <wj-flex-grid-column-group binding="itemCode" header="품목코드" :width="110" align="left" />
-        <wj-flex-grid-column-group binding="orderItemQuantity" header="주문수량" :width="50" align="right"/>
+        <wj-flex-grid-column-group binding="orderItemQuantity" header="주문수량" :width="50" align="right" />
         <wj-flex-grid-column-group binding="shippingCategory" header="배송구분" :width="50" align="center" />
         <wj-flex-grid-column-group binding="vendorName" header="업체명" :width="90" align="left" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="피킹지시">
         <wj-flex-grid-column-group binding="pickingDirectionAttempt" header="차수" :width="30" align="center" />
         <wj-flex-grid-column-group binding="pickingDirectionDate" header="지시일시" :width="90" align="center" />
-        <wj-flex-grid-column-group binding="pickingDirectionQuantity" header="지시수량" :width="50" align="right"/>
+        <wj-flex-grid-column-group binding="pickingDirectionQuantity" header="지시수량" :width="50" align="right" />
         <wj-flex-grid-column-group binding="pickingDirectionUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="피킹">
@@ -219,6 +219,14 @@ const onInitialized = (grid) => {
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
     }
+    if (e.panel == grid.cells) {
+      var col = grid.columns[e.col];
+      var row = grid.rows[e.row];
+      if (e.cell.innerHTML === "-") {
+        console.log(e);
+        console.log(e.cell);
+      }
+    }
   });
 };
 
@@ -254,5 +262,16 @@ function getSearchList() {
     background-color: #e9ecef;
   }
 
+  .wj-cell.border-left {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
+
+  .wj-cell.border-center {
+    display: flex;
+    align-items: center;
+    line-height: inherit;
+  }
 }
 </style>
