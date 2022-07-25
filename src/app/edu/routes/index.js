@@ -34,9 +34,9 @@ export default [
         component: () => import('@@/edu/views/ReleaseInspection'),
       },
       {
-        path: 'Releases',
+        path: 'AfterPicking',
         name: 'DISTSub4',
-        component: () => import('@@/edu/views/Releases'),
+        component: () => import('@@/edu/views/AfterPicking'),
       },
       {
         path: 'Picking',
