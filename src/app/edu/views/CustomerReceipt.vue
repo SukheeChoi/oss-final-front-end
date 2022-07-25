@@ -5,36 +5,41 @@
       <status-progress-bar
         :title="'주문'"
         :link="'Order'"
+        :percentNum="percentOrd"
         :planNum="orderPlan"
         :resultNum="statusOrd"
         :leftoverNum="leftoverCnt"
         :unreleaseNum="unreleaseCnt"
-        :percentNum="percentOrd"
       />
 
-      <status-progress-bar :title="'피킹'" :planNum="statusOrd" :resultNum="statusPick" :percentNum="percentPick" />
+      <status-progress-bar 
+      :title="'피킹'" 
+      :percentNum="percentPick" 
+      :planNum="statusOrd" 
+      :resultNum="statusPick" 
+      />
 
       <status-progress-bar
         :title="'출고검수/패킹'"
         :link="'ReleaseInspection'"
+        :percentNum="percentPack"
         :planNum="statusPick"
         :resultNum="statusPack"
-        :percentNum="percentPack"
       />
 
       <status-progress-bar
         :title="'출고'"
         :link="'Releases'"
+        :percentNum="percentRls"
         :planNum="statusPack"
         :resultNum="statusRls"
-        :percentNum="percentRls"
       />
 
       <status-progress-bar
         :title="'택배사 인계'"
+        :percentNum="percentTrf"
         :planNum="statusRls"
         :resultNum="statusTrf"
-        :percentNum="percentTrf"
       />
     </div>
     <hr />
@@ -55,21 +60,43 @@
           <div>
             <!-- hover 했을 때 범례 띄워줌 -->
             <button type="button" class="ow-btn type-icon arrow_down">
-              <img src="@/assets/images/icon/ico_list.svg"
+              <img
+                src="@/assets/images/icon/ico_list.svg"
                 style="border: 0.8px solid gray; width: 20px; padding: 2px"
               />
             </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
-              <div><span class="ow-tag type-category"><i class="o">주</i></span>피킹지시 내려야할 건</div>
-              <div><span class="ow-tag type-category"><i class="p">피</i></span>피킹해야할 건</div>
-              <div><span class="ow-tag type-category"><i class="i">검</i></span>출고검수/패킹해야할 건</div>
-              <div><span class="ow-tag type-category"><i class="r">출</i></span>출고(송장번호 생성)해야할 건</div>
-              <div><span class="ow-tag type-category"><i class="t">인</i></span>택배사로 인계해야할 건</div>
+              <div>
+                <span class="ow-tag type-category"><i class="o">주</i></span
+                >피킹지시 내려야할 건
+              </div>
+              <div>
+                <span class="ow-tag type-category"><i class="p">피</i></span
+                >피킹해야할 건
+              </div>
+              <div>
+                <span class="ow-tag type-category"><i class="i">검</i></span
+                >출고검수/패킹해야할 건
+              </div>
+              <div>
+                <span class="ow-tag type-category"><i class="r">출</i></span
+                >출고(송장번호 생성)해야할 건
+              </div>
+              <div>
+                <span class="ow-tag type-category"><i class="t">인</i></span
+                >택배사로 인계해야할 건
+              </div>
               <br />
               <h3>주문번호 범례</h3>
-              <div><span class="ow-tag type-category"><i class="u">미</i></span>주문품목 중 미출고품목이 존재하는 주문</div>
-              <div><span class="ow-tag type-category"><i class="n">처</i></span>처리하지 않은 단계</div>
+              <div>
+                <span class="ow-tag type-category"><i class="u">미</i></span
+                >주문품목 중 미출고품목이 존재하는 주문
+              </div>
+              <div>
+                <span class="ow-tag type-category"><i class="n">처</i></span
+                >처리하지 않은 단계
+              </div>
             </div>
           </div>
           <div class="title-field">검색</div>
@@ -123,105 +150,116 @@
     </div>
   </div>
   <!-- 이동현 -->
-<ow-modal type="XXXL" title="주문이력 보기" ref="childRef" :cancelButton="true">
-      <div v-if="clientDetail">■ 거래처 정보
-        <table>
+  <ow-modal type="XXXL" title="주문이력 보기" ref="childRef" :cancelButton="true">
+    <div v-if="clientDetail">
+      ■ 거래처 정보
+      <table>
+        <tr>
+          <td class="table-title" style="width: 7%">거래처 정보</td>
+          <td style="width: 15%">{{ clientDetail.clientName }}</td>
+          <td class="table-title" style="width: 7%">대표자</td>
+          <td style="width: 15%">{{ clientDetail.representative }}</td>
+          <td class="table-title" style="width: 7%">연락처</td>
+          <td style="width: 15%">{{ clientDetail.representativeContact }}</td>
+          <td class="table-title" style="width: 7%">대표주소</td>
+          <td style="width: 15%">{{ clientDetail.clientAddress }}</td>
+        </tr>
+        <tr>
+          <td class="table-title">담당지점</td>
+          <td>{{ clientDetail.branchName }}</td>
+          <td class="table-title">영업사원</td>
+          <td>{{ clientDetail.employeeName }}</td>
+          <td class="table-title">영업사원 연락처</td>
+          <td>{{ clientDetail.employeeContact }}</td>
+          <td class="table-title">대표 배송지</td>
+          <td>{{ clientDetail.clientDestination }}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="mt-5" v-if="selectedOrder">
+      ■ 진행 주문 정보
+      <table>
+        <tr>
+          <th class="table-title" style="width: 7%">주문번호</th>
+          <th class="table-title" style="width: 5%">배송구분</th>
+          <th class="table-title" style="width: 7%">주문일시</th>
+          <th class="table-title" style="width: 30%">품목명</th>
+          <th class="table-title" style="width: 10%">품목코드</th>
+          <th class="table-title" style="width: 15%">업체명</th>
+          <th class="table-title" style="width: 5%">주문수량</th>
+          <th class="table-title" style="width: 5%">피킹수량</th>
+          <th class="table-title" style="width: 5%">검수/패킹</th>
+          <th class="table-title" style="width: 10%">송장번호</th>
+        </tr>
+        <tr v-for="(order, index) in selectedOrder" :key="index">
+          <td class="table-body-center" v-if="index === 0" :rowspan="selectedOrder.length">{{ order.orderNo }}</td>
+          <td class="table-body-center" v-if="index === 0" :rowspan="selectedOrder.length">
+            {{ order.orderShippingWay }}
+          </td>
+          <td class="table-body-center" v-if="index === 0" :rowspan="selectedOrder.length">{{ order.orderDate }}</td>
+          <td>{{ order.itemName }}</td>
+          <td>{{ order.itemCode }}</td>
+          <td>{{ order.venderName }}</td>
+          <td class="table-body-right">{{ order.orderQuantity }}</td>
+          <td class="table-body-right">{{ order.pickingQuantity }}</td>
+          <td class="table-body-center">{{ order.inspectionPacking }}</td>
+          <td class="table-body-center" v-if="index === 0" :rowspan="selectedOrder.length">{{ order.invoiceCode }}</td>
+        </tr>
+        <tr>
+          <th class="table-title">배송지</th>
+          <td colspan="9" style="color: red">
+            {{ selectedOrder[0].shippingAddress }}
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="d-flex mt-5" v-if="clientOrder">
+      <div class="mr-5" style="width: 60%; height: 200px; overflow: auto">
+        ■ 주문 이력
+        <table class="hoverTable">
           <tr>
-            <td class="table-title" style="width: 7%">거래처 정보</td>
-            <td style="width: 15%">{{clientDetail.clientName}}</td>
-            <td class="table-title" style="width: 7%">대표자</td>
-            <td style="width: 15%">{{clientDetail.representative}}</td>
-            <td class="table-title" style="width: 7%">연락처</td>
-            <td style="width: 15%">{{clientDetail.representativeContact}}</td>
-            <td class="table-title" style="width: 7%">대표주소</td>
-            <td style="width: 15%">{{clientDetail.clientAddress}}</td>
-          </tr>
-          <tr>
-            <td class="table-title">담당지점</td>
-            <td>{{clientDetail.branchName}}</td>
-            <td class="table-title">영업사원</td>
-            <td>{{clientDetail.employeeName}}</td>
-            <td class="table-title">영업사원 연락처</td>
-            <td>{{clientDetail.employeeContact}}</td>
-            <td class="table-title">대표 배송지</td>
-            <td>{{clientDetail.clientDestination}}</td>
-          </tr>
-          </table>
-      </div>
-      <div class="mt-5" v-if="selectedOrder">■ 진행 주문 정보
-        <table>
-          <tr>
-            <th class="table-title" style="width: 7%">주문번호</th>
-            <th class="table-title" style="width: 5%">배송구분</th>
-            <th class="table-title" style="width: 7%">주문일시</th>
+            <th class="table-title" style="width: 15%">주문일자</th>
             <th class="table-title" style="width: 30%">품목명</th>
-            <th class="table-title" style="width: 10%">품목코드</th>
-            <th class="table-title" style="width: 15%">업체명</th>
-            <th class="table-title" style="width: 5%">주문수량</th>
-            <th class="table-title" style="width: 5%">피킹수량</th>
-            <th class="table-title" style="width: 5%">검수/패킹</th>
-            <th class="table-title" style="width: 10%">송장번호</th>
+            <th class="table-title" style="width: 10%">수량</th>
+            <th class="table-title" style="width: 15%">주문번호</th>
+            <th class="table-title" style="width: 15%">주문방법</th>
+            <th class="table-title" style="width: 15%">출고일</th>
           </tr>
-          <tr v-for="(order, index) in selectedOrder" :key="index"> 
-            <td class="table-body-center" v-if="index === 0" :rowspan="selectedOrder.length">{{order.orderNo}}</td>
-            <td class="table-body-center" v-if="index === 0" :rowspan="selectedOrder.length">{{order.orderShippingWay}}</td>
-            <td class="table-body-center" v-if="index === 0" :rowspan="selectedOrder.length">{{order.orderDate}}</td>
-            <td>{{order.itemName}}</td>
-            <td>{{order.itemCode}}</td>
-            <td>{{order.venderName}}</td>
-            <td class="table-body-right">{{order.orderQuantity}}</td>
-            <td class="table-body-right">{{order.pickingQuantity}}</td>
-            <td class="table-body-center">{{order.inspectionPacking}}</td>
-            <td class="table-body-center" v-if="index === 0" :rowspan="selectedOrder.length">{{order.invoiceCode}}</td>
-          </tr>
-          <tr>
-            <th class="table-title">
-              배송지
-            </th>
-            <td colspan="9" style="color:red;">
-              {{selectedOrder[0].shippingAddress}}
+          <div v-if="clientOrder.length === 0">주문 이력이 없습니다.</div>
+          <tr
+            v-for="(order, index) in clientOrder"
+            :key="index"
+            :id="order.orderNo"
+            @click="getclientOrderDetail(order.orderNo)"
+          >
+            <td class="table-body-center">{{ order.orderDate }}</td>
+            <td>
+              {{ order.itemName }}<span class="pl-0" v-if="order.itemCount">외 {{ order.itemCount }} 건</span>
             </td>
+            <td class="table-body-right">{{ order.itemQuantity }}</td>
+            <td class="table-body-center">{{ order.orderNo }}</td>
+            <td class="table-body-center">{{ order.orderWay }}</td>
+            <td class="table-body-center">{{ order.releaseDate }}</td>
           </tr>
-          </table>
+        </table>
       </div>
-      <div class="d-flex mt-5" v-if="clientOrder">
-        <div class="mr-5" style="width: 60%; height:200px; overflow:auto;">■ 주문 이력
-          <table class="hoverTable">
-            <tr>
-              <th class="table-title" style="width: 15%">주문일자</th>
-              <th class="table-title" style="width: 30%">품목명</th>
-              <th class="table-title" style="width: 10%">수량</th>
-              <th class="table-title" style="width: 15%">주문번호</th>
-              <th class="table-title" style="width: 15%">주문방법</th>
-              <th class="table-title" style="width: 15%">출고일</th>
-            </tr>
-            <div v-if="clientOrder.length === 0">주문 이력이 없습니다.</div>
-            <tr v-for="(order, index) in clientOrder" :key="index" :id="order.orderNo" @click="getclientOrderDetail(order.orderNo)"> 
-              <td class="table-body-center">{{order.orderDate}}</td>
-              <td>{{order.itemName}}<span class="pl-0" v-if="order.itemCount">외 {{order.itemCount}} 건</span></td>
-              <td class="table-body-right">{{order.itemQuantity}}</td>
-              <td class="table-body-center">{{order.orderNo}}</td>
-              <td class="table-body-center">{{order.orderWay}}</td>
-              <td class="table-body-center">{{order.releaseDate}}</td>
-            </tr>
-          </table>
-        </div>
-        <div style="width: 40%; height:200px; overflow:auto;">■ 상세 내역
-          <table>
-            <tr>
-              <th class="table-title" style="width: 60%">품목명</th>
-              <th class="table-title" style="width: 30%">품목코드</th>
-              <th class="table-title" style="width: 10%">수량</th>
-            </tr>
-            <tr v-for="(order, index) in clientOrderDetail" :key="index"> 
-              <td>{{order.itemName}}</td>
-              <td>{{order.itemCode}}</td>
-              <td class="table-body-right">{{order.itemQuantity}}</td>
-            </tr>
-          </table>
-        </div>
+      <div style="width: 40%; height: 200px; overflow: auto">
+        ■ 상세 내역
+        <table>
+          <tr>
+            <th class="table-title" style="width: 60%">품목명</th>
+            <th class="table-title" style="width: 30%">품목코드</th>
+            <th class="table-title" style="width: 10%">수량</th>
+          </tr>
+          <tr v-for="(order, index) in clientOrderDetail" :key="index">
+            <td>{{ order.itemName }}</td>
+            <td>{{ order.itemCode }}</td>
+            <td class="table-body-right">{{ order.itemQuantity }}</td>
+          </tr>
+        </table>
       </div>
-    </ow-modal>
+    </div>
+  </ow-modal>
 </template>
 
 <script setup>
@@ -258,8 +296,6 @@ const filterList = ref({
   unrelease: '',
   orderNo: '',
   clientName: '',
-  pageNo: 1,
-  perPage: 200
 });
 
 //보여지는 행 수
@@ -283,9 +319,9 @@ const retrieve = (param) => {
 
   return Promise.resolve({
     data: filteredItems,
-    status: 200,
-    code: 'OK',
-    message: 'Success',
+    // status: 200,
+    // code: 'OK',
+    // message: 'Success',
     totalCount,
   });
 };
@@ -299,13 +335,13 @@ async function read(query, pageNo, pageSize) {
   return result;
 }
 
-//배송구분
+//배송구분 필터
 const checkboxGroup1 = ref([
   { name: '긴급', value: '긴급' },
   { name: '일반', value: '일반' },
 ]);
 
-//주문 단계
+//주문 단계 필터
 const checkboxGroup3 = ref([
   { name: '전체', value: '-1' },
   { name: '주문확인', value: '1' },
@@ -315,6 +351,7 @@ const checkboxGroup3 = ref([
   { name: '택배사 인계', value: '6' },
 ]);
 
+//검색 필터
 const searchCategoryList = [
   { name: '주문번호', value: '주문번호' },
   { name: '거래처', value: '거래처' },
@@ -367,6 +404,19 @@ function search() {
   getFilterList(filterList.value);
 }
 
+/**
+ * nGrid에 거래처 이름, 처리 단계 데이터를 표시함
+ * 미출고 수량에 따라 css를 다르게 적용
+ * 주문 번호, 거래처 이름으로 검색 필터링
+ *
+ * @author 김예원
+ * @param {string} client 거래처 이름
+ * @param {number} level 처리 단계
+ * @param {number} unrelease 미출고 수량
+ * @param {number} orderNo 주문 번호
+ * @param {number} clientNo 거래처 번호
+ * @return {object} 각각의 데이터 반환
+ */
 async function getFilterList(afterFilterList) {
   const result = await clientApi.getFilterList(afterFilterList).then((data) => {
     receiptList.value = [];
@@ -444,9 +494,9 @@ getStsCnt();
 const childRef = ref(null); //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
 
 let clientDetail = ref(null); //거래처 정보가 저장되는 ref 객체
-let selectedOrder = ref(null);  //선택된 주문 정보가 저장되는 ref 객체
-let clientOrder = ref(null);    //주문 이력 정보가 저장되는 ref 객체
-let clientOrderDetail = ref([{},{},{}]);  //주문 이력 상세 정보가 저장되는 ref 객체
+let selectedOrder = ref(null); //선택된 주문 정보가 저장되는 ref 객체
+let clientOrder = ref(null); //주문 이력 정보가 저장되는 ref 객체
+let clientOrderDetail = ref([{}, {}, {}]); //주문 이력 상세 정보가 저장되는 ref 객체
 
 /*
   작성자: 이동현
@@ -456,13 +506,13 @@ const openModal = async function () {
   //모달 설정값 제공
   const config = {
     cancelButtonText: '확인',
-  }
+  };
 
-  const childRefData = await childRef.value.open("accept", config);
+  const childRefData = await childRef.value.open('accept', config);
 
   //X나 확인 버튼을 눌렀을 경우에 Detail에 담긴 값을 초기화 시켜준다.
-  if(childRefData.ok === false) {
-    clientOrderDetail.value = [{},{},{}];
+  if (childRefData.ok === false) {
+    clientOrderDetail.value = [{}, {}, {}];
   }
 };
 
@@ -500,13 +550,13 @@ const getModalDetail = async function (orderNo) {
   매개변수: cell => grid의 cell정보를 입력받는다.
 */
 function selectModal(cell) {
- getModal(cell.item.clientNo, cell.item.orderNo).then((data) => {
-        clientDetail.value = data.clientDetail;
-        selectedOrder.value = data.selectedOrder;
-        clientOrder.value = data.clientOrder;
-        openModal();
-      });
-};
+  getModal(cell.item.clientNo, cell.item.orderNo).then((data) => {
+    clientDetail.value = data.clientDetail;
+    selectedOrder.value = data.selectedOrder;
+    clientOrder.value = data.clientOrder;
+    openModal();
+  });
+}
 
 /*
   작성자: 이동현
@@ -517,8 +567,7 @@ function getclientOrderDetail(orderNo) {
   const response = getModalDetail(orderNo).then((data) => {
     clientOrderDetail.value = data.clientOrderDetail;
   });
-};
-
+}
 </script>
 
 <style scoped lang="scss">
@@ -535,7 +584,7 @@ function getclientOrderDetail(orderNo) {
   }
 
   .arrow_down {
-    display: block; 
+    display: block;
     transition: 0.5s ease; /* 속도 조절 */
   }
 
