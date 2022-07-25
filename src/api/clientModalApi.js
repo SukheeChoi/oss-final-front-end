@@ -7,7 +7,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
  * 
  * @author 이동현
  * @param {number} clientNo 고객번호
- * @param {number} orderNo 주문번호
+ * @param {string} orderNo 주문번호
  * @return {Object} 거래처정보, 진행 주문 정보, 주문 이력을 JSON형태로 반환함
  */
 async function getModal(clientNo, orderNo) {
@@ -16,7 +16,6 @@ async function getModal(clientNo, orderNo) {
     response = await axios.get('/client/modal', {
       params: { clientNo, orderNo },
     });
-    console.log(response);
   } catch (error) {
     console.log(error);
   }
@@ -27,7 +26,7 @@ async function getModal(clientNo, orderNo) {
  * 업체 주문이력의 상세 정보를 반환함
  * 
  * @author 이동현
- * @param {number} orderNo 주문번호
+ * @param {string} orderNo 주문번호
  * @return {Object} 주문 이력 상세정보 목록을 JSON형태로 반환함
  */
 async function getModalDetail(orderNo) {
@@ -36,7 +35,6 @@ async function getModalDetail(orderNo) {
     response = await axios.get('/client/modalDetail', {
       params: { orderNo },
     });
-    console.log(response);
   } catch (error) {
     console.log(error);
   }

@@ -218,10 +218,11 @@ const getGrid = ref([]); //그리드 데이터가 저장되는 ref 객체
 const keyData = ref(0); //그리드 리렌더링을 위한 ref 객체
 const treeKeyData = ref(0); //트리그리드 리렌더링을 위한 ref 객체
 
-/*
- * 작성자: 이동현
- * 기능: 트리그리드에 띄워질 데이터(담당자별 작업, 업체별 작업)들을 가져오는 기능
- * 리턴 값: data: Array
+/**
+ * treeGrid에 바인딩할 데이터 반환
+ *
+ * @author 이동현
+ * @return {Object} 담당자별 작업, 업체별 작업 데이터 반환
  */
 getTree.value = async function () {
   const treeList = await inspectionLabelingApi.getTreeList();
@@ -251,11 +252,11 @@ const inspectionStatus = ref([
   { name: '파손 : ', value: '', end: '품목', plusValue: '', plusend: '개' },
 ]);
 
-/*
-  작성자: 이동현
-  기능: 현황을 가져오는 기능
-*/
-
+/**
+ * 현황 컴포넌트에 데이터 바인딩
+ *
+ * @author 이동현
+ */
 async function getStatus() {
   const result = await inspectionLabelingApi.getStatus().then((data) => {
     itemStatus.value[0].value = data.receiveItem;
@@ -279,7 +280,7 @@ async function getStatus() {
 }
 getStatus();
 
-// --------------------------------------- 추가 모달에 띄울 잔업 -------------------------------------------------------
+// --------------------------------------- 추가 모달 -------------------------------------------------------
 const childAddRef = ref(null); //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
 const modalAddData = ref(null); //모달에 띄울 데이터를 저장하는 ref 객체
 const addDate = ref(false); //추가버튼을 제어하는 ref 객체
@@ -287,25 +288,27 @@ const picked = ref(null); //추가 모달에서 선택한 잔업을 저장하는
 const labelingWorkTimeNo = ref(null); //담당자의 작업번호를 저장하는 ref 객체
 const lastStartTime = ref(null); //잔업의 시작시간(마지막 작업의 끝 시간)을 저장하는 ref 객체
 
-/*
-  작성자: 이동현
-  기능: 모달에 띄워질 잔업을 가져오는 기능
-  리턴 값: Array
-*/
+/**
+ * 잔업 가져오기
+ *
+ * @author 이동현
+ * @return {Object} 담당자가 지정되어 있지 않은 작업 데이터 반환
+ */
 const getOvertime = async function () {
   const overtime = await inspectionLabelingApi.getOvertime();
   return overtime;
 };
 
-/*
-  작성자: 이동현
-  기능: 추가 모달화면을 띄우는 기능, 자식컴포넌트인 owModal의 open 메소드를 실행시킨다.
-*/
+/**
+ * 추가 모달화면을 띄우는 기능
+ *
+ * @author 이동현
+ */
 const openAddModal = async function () {
   picked.value = null; //선택한 잔업을 초기화
   const childAddRefData = await childAddRef.value.open();
 
-  //모달의 확인을 클릭할 때 실행
+  //추가 모달의 확인을 클릭할 때 실행
   if (childAddRefData.ok === true) {
     const requestData = {
       receiveItem: picked.value.receiveItem,
@@ -316,19 +319,12 @@ const openAddModal = async function () {
       endTime: '18:00',
     };
 
-    /*
-      작성자: 이동현
-      기능: 해당 담당자에게 잔업을 추가하는 기능
-      매개변수: requestData {
-        receiveItem: 수령 품목 개수
-        receiveQuantity: 수령 수량
-        placingOrderNo: 발주번호
-        labelingWorkTimeNo: 작업번호
-        startTime: 시작시간
-        endTime: '18:00',
-      }
-      리턴 값: String
-    */
+    /**
+     * 해당 담당자에게 잔업을 추가하는 기능
+     *
+     * @author 이동현
+     * @param {Object} requestData 작업에 대한 정보(발주번호, 작업번호, 시작시간, 끝시간)
+     */
     const result = await inspectionLabelingApi.updateOvertime(requestData).then((result) => {
       if (result === 'success') {
         alert('잔업이 추가되었습니다!');
@@ -340,17 +336,15 @@ const openAddModal = async function () {
   }
 };
 
-// ----------------------------------------------------------------------------------------------------
-
-// --------------------------------------- 수정 모달 update -------------------------------------------------------
+// --------------------------------------- 수정 모달 -------------------------------------------------------
 const childUpdateRef = ref(null); //자식 컴포넌트인 owModal에 접근하여 엘리먼트를 저장하는 ref 객체
 const updateDate = ref(false); //수정버튼을 제어하는 ref 객체
 const startInputTime = ref(null); //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 앞쪽 / 시작 owInputTime
 const endInputTime = ref(null); //자식 컴포넌트인 owinputTime에 접근하여 엘리먼트를 저장하는 ref 객체, 뒷쪽 / 끝 owInputTime
 const placingOrderNo = ref(null); //작업의 발주번호를 저장하는 ref 객체
 
+//모달에 띄울 데이터를 저장하는 reactive 객체
 let modalUpdateData = reactive({
-  //모달에 띄울 데이터를 저장하는 reactive 객체
   title: '',
   employeeName: '',
   scheduledStartTime: '',
@@ -359,15 +353,16 @@ let modalUpdateData = reactive({
   max: '',
 });
 
-/*
-  작성자: 이동현
-  기능: 수정 모달화면을 띄우는 기능, 자식컴포넌트인 owModal의 open 메소드를 실행시킨다.
-*/
+/**
+ * 수정 모달화면을 띄우는 기능
+ *
+ * @author 이동현
+ */
 const openUpdateModal = async function () {
   picked.value = null;
   const childUpdateRefData = await childUpdateRef.value.open();
 
-  //모달의 확인을 클릭할 때 실행
+  //수정 모달의 확인을 클릭할 때 실행
   if (childUpdateRefData.ok === true) {
     const requestData = {
       placingOrderNo: placingOrderNo.value,
@@ -375,17 +370,13 @@ const openUpdateModal = async function () {
       startTime: modalUpdateData.scheduledStartTime,
       endTime: modalUpdateData.scheduledEndTime,
     };
-    /*
-      작성자: 이동현
-      기능: 해당 담당자에게 잔업을 추가하는 기능
-      매개변수: requestData {
-        placingOrderNo: 발주번호
-        labelingWorkTimeNo: 작업번호
-        startTime: 시작시간
-        endTime: '18:00',
-      }
-      리턴 값: String
-    */
+
+    /**
+     * 해당 작업의 예정시간을 수정하는 기능
+     *
+     * @author 이동현
+     * @param {Object} requestData 작업에 대한 정보(발주번호, 작업번호, 시작시간, 끝시간)
+     */
     const result = await inspectionLabelingApi.updateWorktime(requestData).then((result) => {
       console.log(result);
       if (result === 'success') {
@@ -398,7 +389,13 @@ const openUpdateModal = async function () {
   }
 };
 
-//트리 그리드 셀렉션 핸들러
+/**
+ * 그리드의 selection을 설정하는 기능
+ *
+ * @author 이동현
+ * @param {Object} grid Grid 정보
+ * @param {Object} target 선택한 행 정보
+ */
 const onSelectionChanged = (grid, target) => {
   //ref 객체 세팅(검색 조건 리셋)
   searchSelected.value = ''; //검색조건 리셋
@@ -410,7 +407,12 @@ const onSelectionChanged = (grid, target) => {
   if (target.row !== -1) {
     //childrenn이라는 key가 있으면 담당자이므로 api통신으로 오른쪽 그리드 띄우기
     if (grid.selectedItem.childrennn != null) {
-      addDate.value = true; //추가 버튼 활성화
+
+      //작업이 18:00시까지 있을 경우 추가하지 못하도록 설정
+      if(grid.selectedItem.scheduledEndTime !== '18:00') {
+        addDate.value = true; //추가 버튼 활성화
+      }
+      
       title.value = grid.selectedItem.title; //모달에 띄울 제목 설정
       labelingWorkTimeNo.value = grid.selectedItem.labelingWorkTimeNo; //잔업 추가요청 파라미터 / 작업번호 설정
       lastStartTime.value = grid.selectedItem.childrennn.at(-1).scheduledEndTime; //잔업 추가요청 파라미터 / 마지막 작업의 끝 시간을 추가할 잔업의 시작시간으로 설정
@@ -422,11 +424,18 @@ const onSelectionChanged = (grid, target) => {
           title: title.value,
         };
       });
-      
-      getGrid.value = async function (query, pageNo, pageSize) {
-        //pageNo => "페이지번호" pageSize => "한페이지 몇 행" totalCount => "전체 행 수"
 
-        const myPageSize = 15;
+      /**
+       * 담당자의 세부 작업 정보를 가져오는 기능
+       *
+       * @author 이동현
+       * @param {Object} query
+       * @param {number} pageNo 페이지 번호
+       * @param {number} pageSize 한 페이지당 몇 행
+       * @return {Object} 그리드에 바인딩할 세부 작업 정보를 반환함
+       */
+      getGrid.value = async function (query, pageNo, pageSize) {
+        const myPageSize = 15;  //한 페이지에 나올 행 수 설정
 
         const list = await inspectionLabelingApi.getListByLWTNo(
           labelingWorkTimeNo.value,
@@ -443,11 +452,12 @@ const onSelectionChanged = (grid, target) => {
         };
         return result;
       };
-      keyData.value++;
+      keyData.value++; //그리드 리렌더링
     }
 
+    //업체별 작업 중에서 시작하지 않은 작업만 선택
     if (!grid.selectedItem.childrennn && !grid.selectedItem.child && !grid.selectedItem.status) {
-      updateDate.value = true;
+      updateDate.value = true; //수정버튼 활성화
 
       modalUpdateData.title = grid.selectedItem.title;
       modalUpdateData.employeeName = grid.selectedItem.employeeName;
@@ -462,8 +472,9 @@ const onSelectionChanged = (grid, target) => {
           //선택한 발주번호가 상위 배열의 어떤 인덱스에 있는지
           const index = data.childrennn.findIndex((i) => i.placingOrderNo === grid.selectedItem.placingOrderNo);
 
-          placingOrderNo.value = grid.selectedItem.placingOrderNo;
-          //인덱스가 0인 경우
+          placingOrderNo.value = grid.selectedItem.placingOrderNo; //선택된 아이템의 발주번호 세팅
+
+          //인덱스가 0인 경우(앞의 작업이 없는 경우)
           if (index === 0) {
             modalUpdateData.min = '09:00';
 
@@ -471,33 +482,37 @@ const onSelectionChanged = (grid, target) => {
             if (data.childrennn.length === 1) {
               modalUpdateData.max = '18:00';
             } else {
-              const afterArray = data.childrennn[index + 1];
-              modalUpdateData.max = afterArray.scheduledStartTime;
+              const afterArray = data.childrennn[index + 1]; //뒷 작업
+              modalUpdateData.max = afterArray.scheduledStartTime; //뒷 작업의 시작시간
             }
           } else if (index === data.childrennn.length - 1) {
             // 인덱스가 마지막(인덱스 == 배열길이)인 경우
-            const beforeArray = data.childrennn[index - 1];
-            modalUpdateData.min = beforeArray.scheduledEndTime;
+            const beforeArray = data.childrennn[index - 1]; //앞 작업
+            modalUpdateData.min = beforeArray.scheduledEndTime; //앞 작업의 끝시간
             modalUpdateData.max = '18:00';
           } else {
             //나머지 일반 경우
-            const beforeArray = data.childrennn[index - 1];
-            const afterArray = data.childrennn[index + 1];
-            modalUpdateData.min = beforeArray.scheduledEndTime;
-            modalUpdateData.max = afterArray.scheduledStartTime;
+            const beforeArray = data.childrennn[index - 1]; //앞 작업
+            const afterArray = data.childrennn[index + 1]; //뒷 작업
+            modalUpdateData.min = beforeArray.scheduledEndTime; //앞 작업의 끝시간
+            modalUpdateData.max = afterArray.scheduledStartTime; //뒷 작업의 시작시간
           }
         }
       });
-      console.log(testGrid);
     }
   }
 };
 
+/**
+ * 검색버튼을 클릭시 그리드를 리렌더링
+ *
+ * @author 이동현
+ */
 function searchData() {
   keyData.value++;
 }
 
-//트리 그리드 설정
+//트리 그리드 초기 설정
 const treeInitialized = (grid) => {
   grid.autoSizeRow(0, true);
 
@@ -515,6 +530,7 @@ const treeInitialized = (grid) => {
     ],
   };
 
+  //MergeManager를 재정의 한 TreeMergeManager로 담당자에 해당하는 행만 열병합
   grid.mergeManager = new TreeMergeManager(config);
 
   grid.formatItem.addHandler((grid, e) => {
@@ -527,6 +543,7 @@ const treeInitialized = (grid) => {
       var col = grid.columns[e.col];
       var row = grid.rows[e.row];
 
+      //병합된 행 중 맨 처음인 startTime에 데이터가 들어있다면, startTime에 새로 생성한 html을 innerHtml을 이용해 변경
       if ((e.row < 1 || row.dataItem.childrennn) && col.binding == 'startTime') {
         const receiveQuantity = row.dataItem.receiveQuantity; //진행률 전체 작업량
         const currentQuantity = row.dataItem.currentQuantity; //현재 달성률 전체 작업량
@@ -548,7 +565,13 @@ const treeInitialized = (grid) => {
         const startTime = row.dataItem.scheduledStartTime.slice(0, 2); //예정 시작 시간
         const endTime = row.dataItem.scheduledEndTime.slice(0, 2); //예정 완료 시간
 
-        // 예정시간안에 있는 시간인지 체크하는 메소드(배경색 흰색, 회색 설정)
+        /**
+         * 예정시간안에 있는 시간인지 체크하는 메소드(배경색 흰색, 회색 설정)
+         *
+         * @author 이동현
+         * @param {number} paramTime 시간
+         * @return {boolean} 예정시간 안에 있으면 true(흰색)
+         */
         function timeCheckFunc(paramTime) {
           let timeCheck = false;
 
@@ -558,9 +581,18 @@ const treeInitialized = (grid) => {
           return timeCheck;
         }
 
-        //진행률 progress bar html 생성하는 메소드
+        //
+
+        /**
+         * 진행률 progress bar html 생성하고 바인딩하는 메소드
+         *
+         * @author 이동현
+         * @param {number} params 진행률
+         * @param {number} paramTime 시간
+         */
         function createTag(params, paramTime) {
           const timeCheck = timeCheckFunc(paramTime);
+
           let html =
             '<td>' +
             '<div class="{progress}">' +
@@ -579,8 +611,8 @@ const treeInitialized = (grid) => {
             html = html.replace('{paramsColor}', 'done');
           }
 
-          //50%이하이면 빨간색 글씨로 바꾸고 progress div태그에 글씨 넣기
-          //50%이상이면 하얀색 글씨로 바꾸고 progress-bar div태그에 글씨 넣기
+          //진행률 50% 이하이면 빨간색 글씨로 바꾸고 progress div태그에 글씨 넣기
+          //진행률 50% 이상이면 하얀색 글씨로 바꾸고 progress-bar div태그에 글씨 넣기
           if (params < 50) {
             html = html.replace('{params%}', '');
           } else {
@@ -631,14 +663,14 @@ const treeInitialized = (grid) => {
           '</table>' +
           '</div>';
 
-        finalHtml = finalHtml.replace('{receiveItemQuantity}', receiveQuantity);
-        finalHtml = finalHtml.replace('{currentQuantity}', currentQuantity);
-        finalHtml = finalHtml.replaceAll('{progressQuantity}', progressQuantity);
-        finalHtml = finalHtml.replace('{receivePercent}', receivePercent);
-        finalHtml = finalHtml.replace('{currentPercent}', currentPercent);
+        finalHtml = finalHtml.replace('{receiveItemQuantity}', receiveQuantity);  //전체 수령수량
+        finalHtml = finalHtml.replace('{currentQuantity}', currentQuantity);      //현재 목표수량
+        finalHtml = finalHtml.replaceAll('{progressQuantity}', progressQuantity); //현재 진행수량
+        finalHtml = finalHtml.replace('{receivePercent}', receivePercent);        //진행률
+        finalHtml = finalHtml.replace('{currentPercent}', currentPercent);        //현재 달성률
 
         finalHtml = finalHtml.replaceAll('null%', '');
-        e.cell.innerHTML = finalHtml;
+        e.cell.innerHTML = finalHtml; //cell 내부의 innerHtml을 변경
       }
     }
   });

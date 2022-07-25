@@ -468,23 +468,12 @@ const openModal = async function () {
   }
 };
 
-/*
-  작성자: 이동현
-  기능: 모달에 띄워질 데이터(거래처 정보, 진행주문 정보, 주문이력)들을 가져오는 기능
-  매개변수: clientNo(거래처 번호), orderNo(주문번호)
-  리턴 값: data: {
-    clientDetail: Object,
-    clientOrder: Array,
-    selectedOrder: Array,
-  }
-*/
-
 /**
- * clientModalApi의 getModal
+ * clientModalApi의 getModal 실행
  * 
  * @author 이동현
  * @param {number} clientNo 고객번호
- * @param {number} orderNo 주문번호
+ * @param {string} orderNo 주문번호
  * @return {Object} 거래처정보, 진행 주문 정보, 주문 이력을 반환함
  */
 const getModal = async function (clientNo, orderNo) {
@@ -492,24 +481,25 @@ const getModal = async function (clientNo, orderNo) {
   return modal;
 };
 
-/*
-  작성자: 이동현
-  기능: 주문이력에 맞는 세부정보를 가져오는 기능
-  매개변수: orderNo(주문번호)
-  리턴 값: data: {
-    clientOrderDetail: Object,
-  }
-*/
+/**
+ * clientModalApi의 getModalDetail 실행
+ * 
+ * @author 이동현
+ * @param {number} clientNo 고객번호
+ * @param {string} orderNo 주문번호
+ * @return {Object} 주문이력에 맞는 세부정보를 반환함
+ */
 const getModalDetail = async function (orderNo) {
   const modalDetail = await clientModalApi.getModalDetail(orderNo);
   return modalDetail;
 };
 
-/*
-  작성자: 이동현
-  기능: 화면에서 업체명을 클릭했을 경우, 모달에 띄워질 데이터를 가져오는 getModal()를 실행시키고, 모달을 띄우는 openModal()을 실행시키는 기능
-  매개변수: cell => grid의 cell정보를 입력받는다.
-*/
+/**
+ * 업체명을 클릭하였을때 getModal로 데이터를 모달에 바인딩하고, openModal 메소드를 실행
+ * 
+ * @author 이동현
+ * @param {Object} cell 그리드 cell
+ */
 function selectModal(cell) {
  getModal(cell.item.clientNo, cell.item.orderNo).then((data) => {
         clientDetail.value = data.clientDetail;
@@ -519,12 +509,12 @@ function selectModal(cell) {
       });
 };
 
-/*
-  작성자: 이동현
-  기능: 모달에서 주문이력을 클릭했을 경우, 해당 주문이력에 맞는 세부정보를 가져오는 getModalDetail()을 실행시키는 기능 
-  매개변수: orderNo(주문번호)
-*/
-
+/**
+ * 주문이력을 클릭했을 때, 해당 주문이력 세부정보 바인딩
+ * 
+ * @author 이동현
+ * @param {string} orderNo 주문번호
+ */
 function getclientOrderDetail(orderNo) {
   const response = getModalDetail(orderNo).then((data) => {
     clientOrderDetail.value = data.clientOrderDetail;

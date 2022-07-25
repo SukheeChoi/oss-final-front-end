@@ -23,7 +23,7 @@ async function getStatus() {
 // 데이터를 서버로부터 가져오기 위한 axios 통신 수행 
 
 /**
- * 트리그리드 목록을 반환함
+ * 담당 작업 및 작업 트리그리드 목록을 반환함
  * 
  * @author 이동현
  * @return {Object} 전체 / 담당자별 / 업체별 내역을 JSON형태로 반환함
@@ -52,7 +52,7 @@ async function getTreeList() {
 async function getOvertime() {
   let response = null;
   try {
-    response = await axios.get('/label/overTime');
+    response = await axios.get('/label/overtime');
     console.log(response);
   } catch (error) {
     console.log(error);
