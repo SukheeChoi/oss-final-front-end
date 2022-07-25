@@ -298,57 +298,9 @@
     console.log('param.label : ' + param.label);
     console.log('@@@@ param.pageNo : ' + param.pageNo);
     let items = _.cloneDeep(param.items);
-    // let filteredItems = [];
     let filteredItems = items;
-    // back-end : 데이터 정제해서 보낼 것.
-    // if(param.label === 'receipt') {
-    //   for(let i=0; i<items.length; i++) {
-    //     filteredItems.push({
-    //       'rownum': receiptList.value[i]["rownum"]
-    //       , 'itemName': receiptList.value[i]["item"]["itemName"]
-    //       , 'itemCode': receiptList.value[i]["item"]["itemCode"]
-    //       , 'releaseQuantity': receiptList.value[i]["releaseQuantity"]
-    //       , 'receiveQuantity': receiptList.value[i]["receiveQuantity"]
-    //       , 'unreleased': receiptList.value[i]["receiveUnrelease"]
-    //       , 'receipted': receiptList.value[i]["receiveCheck"]
-
-    //       , 'orderItemNo': receiptList.value[i]["orderItemNo"]
-    //     });
-    //   }
-    // } else {
-    //   console.log('#### deliveryList.value', deliveryList.value);
-    //   console.log('#### deliveryList.value.length', deliveryList.value.length);
-    //   for(let i=0; i<items.length; i++) {
-    //     filteredItems.push({
-    //       // ROWNUM 사용할 것.
-    //       'rownum': deliveryList.value[i]["rownum"]
-    //       // 주문번호/출고번호
-    //       , 'order_release_no': deliveryList.value[i]["orderItem"]["orderNo"] + '/' + deliveryList.value[i]["release"]["releaseNo"]
-    //       // 품목명
-    //       , 'itemName': deliveryList.value[i]["item"]["itemName"]
-    //       // 품목코드
-    //       , 'itemCode': deliveryList.value[i]["item"]["itemCode"]
-    //       // 수령수량
-    //       , 'receiveQuantity': deliveryList.value[i]["receiveQuantity"]
-    //       // 전달수량
-    //       , 'deliveryQuantity': deliveryList.value[i]["deliveryQuantity"]
-    //       // 미출고
-    //       , 'unreleased': deliveryList.value[i]["deliveryUnrelease"]
-    //       // PK용 orderItemNo
-    //       , 'orderItemNo': deliveryList.value[i]["orderItemNo"]
-    //     });
-    //   }
-    // }
-    // const totalCount = filteredItems.length;
     const totalCount = pager.totalCount;
     const perPage = pager.rowsPerPage;
-
-    // if (param.sort) {
-    //   filteredItems = _.sortBy(filteredItems, param.sort);
-    //   if (['desc', 'DESC'].includes(param.direction)) {
-    //     filteredItems = filteredItems.reverse();
-    //   }
-    // }
  
     if (param.pageNo) {
       // 한 페이지에 한 개의 그리드만 채워질 경우.
@@ -377,13 +329,10 @@
   };
 
   async function read(query, pageNo, pageSize) {
-    let label = '';
     let items = [];
     if(showReceipt.value === true) {
-      label = 'receipt';
       items = receiptList.value;
     } else {
-      label = 'delivery';
       items = deliveryList.value;
     }
     const result = await retrieve({
@@ -391,8 +340,6 @@
       // parameter로 넘어오는 pageNo은 NGrid 내부의 FlexGrid의 번호이므로 선언해둔 상수가 아닌 parameter를 이용.
       pageNo,
       pageSize: pager.pageSize,
-      // pageSize: 20,
-      // label: label,
       items: items,
     });
     console.log('@@ async function read(query, pageNo, pageSize) - result :', result);
