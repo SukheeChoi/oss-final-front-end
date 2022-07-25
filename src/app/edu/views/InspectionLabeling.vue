@@ -516,6 +516,7 @@ function searchData() {
 const treeInitialized = (grid) => {
   grid.autoSizeRow(0, true);
 
+  //병합 기준 컬럼과, 병합 컬럼 설정
   const config = {
     groupingColumns: [],
     mergedColumns: [
@@ -696,31 +697,6 @@ const onInitialized = (grid) => {
 
 <style scoped lang="scss">
 ::v-deep {
-  .ow-panel1 {
-    width: 100%;
-    min-height: 0;
-    height: 644.5px;
-  }
-  .ow-panel1 .ow-panel-header {
-    display: flex;
-    height: 26px;
-    flex-shrink: 0;
-    align-items: center;
-    padding: 0 12px;
-    background-color: #284077;
-    border-radius: 4px 4px 0 0;
-    color: #fff;
-    font-size: 13px;
-  }
-  .ow-panel1 .ow-panel-body1 {
-    // flex-direction: column;
-    // flex: 1;
-    border: 2px solid #6980af;
-    border-top: 0;
-    background-color: #fff;
-    padding: var(--ow-gutter);
-    height: inherit;
-  }
 
   .wj-cell.wj-header {
     display: flex;
@@ -802,6 +778,29 @@ const onInitialized = (grid) => {
     color: red;
     text-align: center;
     white-space: nowrap;
+  }
+  .ow-panel1 {
+    width: 100%;
+    min-height: 0;
+    height: 644.5px;
+  }
+  .ow-panel1 .ow-panel-header {
+    display: flex;
+    height: 26px;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 0 12px;
+    background-color: #284077;
+    border-radius: 4px 4px 0 0;
+    color: #fff;
+    font-size: 13px;
+  }
+  .ow-panel1 .ow-panel-body1 {
+    border: 2px solid #6980af;
+    border-top: 0;
+    background-color: #fff;
+    padding: var(--ow-gutter);
+    height: inherit;
   }
 
   // 모달
