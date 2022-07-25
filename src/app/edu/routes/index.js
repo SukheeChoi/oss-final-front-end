@@ -39,9 +39,9 @@ export default [
         component: () => import('@@/edu/views/AfterPicking'),
       },
       {
-        path: 'Picking',
+        path: 'CombineShipping',
         name: 'DISTSub5',
-        component: () => import('@@/edu/views/Picking'),
+        component: () => import('@@/edu/views/CombineShipping'),
       },
       {
         path: 'InspectionLabeling',
