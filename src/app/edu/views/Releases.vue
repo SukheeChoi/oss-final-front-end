@@ -285,7 +285,8 @@
 <script setup>
 import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
-import { SimMergeManager } from '@/utils/wijmo.grid';
+import { SimpleMergeManager } from '@/utils/wijmo.grid';
+// import { SimMergeManager } from '@/utils/wijmo.grid';
 import { ref, reactive, watch } from 'vue';
 
 const dropboxAssigneeLabel = '출고검수/패킹담당자';
@@ -410,7 +411,8 @@ const onInitialized = (flex) => {
     mergedColumns: [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
   };
 
-  flex.mergeManager = new SimMergeManager(config);
+  flex.mergeManager = new SimpleMergeManager(config);
+  // flex.mergeManager = new SimMergeManager(config);
 
 };
 
