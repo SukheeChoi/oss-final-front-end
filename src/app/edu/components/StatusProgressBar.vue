@@ -20,6 +20,7 @@
       <div class="item txt-dot-square">계획</div>
       <div class="align-to-right">
         {{ planNum }}건
+        <!-- 잔여, 미출고 값이 vue에서 넘어와 true일 때(주문일 때만 띄워줌)-->
         <span v-if="leftoverNum && unreleaseNum">
           <strong style="color: rgb(103, 146, 226)">(잔여 {{ leftoverNum }}건 / </strong>
           <strong style="color: rgb(210, 57, 46)">미출고 {{ unreleaseNum }}건)</strong>
@@ -63,22 +64,10 @@ const props = defineProps({
     default: 0,
   },
 });
-
-console.log('component - props.title : ' + props.title);
-console.log('component - props.link : ' + props.link);
-console.log('component - props.planNum : ' + props.planNum);
-console.log('component - props.resultNum : ' + props.resultNum);
-console.log('component - props.unreleaseNum : ' + props.unreleaseNum);
-console.log('component - props.percentNum : ' + props.percentNum);
 </script>
 
 <style scoped lang="scss">
 ::v-deep {
-  .ow-panel .ow-panel-header .ow-panel-title {
-    justify-content: center;
-    font-weight: 800;
-  }
-
   .low,
   .mid,
   .high {

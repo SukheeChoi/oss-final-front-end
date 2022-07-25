@@ -2,6 +2,7 @@
 <template>
   <div>
     <div class="row mb-4">
+      <!-- 주문 단계 별 수치 : StatusProgressBar Component 사용 -->
       <status-progress-bar
         :title="'주문'"
         :link="'Order'"
@@ -67,38 +68,18 @@
             </button>
             <div class="explain">
               <h3>처리단계 범례</h3>
-              <div>
-                <span class="ow-tag type-category"><i class="o">주</i></span
-                >피킹지시 내려야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="p">피</i></span
-                >피킹해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="i">검</i></span
-                >출고검수/패킹해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="r">출</i></span
-                >출고(송장번호 생성)해야할 건
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="t">인</i></span
-                >택배사로 인계해야할 건
-              </div>
+              <div><span class="ow-tag type-category"><i class="o">주</i></span>피킹지시 내려야할 건</div>
+              <div><span class="ow-tag type-category"><i class="p">피</i></span>피킹해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="i">검</i></span>출고검수/패킹해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="r">출</i></span>출고(송장번호 생성)해야할 건</div>
+              <div><span class="ow-tag type-category"><i class="t">인</i></span>택배사로 인계해야할 건</div>
               <br />
               <h3>주문번호 범례</h3>
-              <div>
-                <span class="ow-tag type-category"><i class="u">미</i></span
-                >주문품목 중 미출고품목이 존재하는 주문
-              </div>
-              <div>
-                <span class="ow-tag type-category"><i class="n">처</i></span
-                >처리하지 않은 단계
-              </div>
+              <div><span class="ow-tag type-category"><i class="u">미</i></span>주문품목 중 미출고품목이 존재하는 주문</div>
+              <div><span class="ow-tag type-category"><i class="n">처</i></span>처리하지 않은 단계</div>
             </div>
           </div>
+          <!-- 검색 필터링 : 주문번호, 거래처 중 하나의 검색어를 입력해 필터링 -->
           <div class="title-field">검색</div>
           <div style="--width: 97px">
             <ow-select :items="searchCategoryList" v-model="searchCategory"></ow-select>
@@ -114,13 +95,12 @@
       <ow-n-grid
         :n="10"
         :visible-rows-count="state.visibleRowsCount"
-        :initialized="initialize"
+        :initialized="initialized"
         :key="keyData"
         :read="read"
         :autoRowHeights="true"
       >
         <template #left>&nbsp;</template>
-        <!-- formatitem-->
         <wj-flex-grid-column binding="client" header="거래처" width="*">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
             <!-- 거래처명 앞 아이콘을 미출고 값에 따라 적용 -->
@@ -138,7 +118,7 @@
         </wj-flex-grid-column>
         <wj-flex-grid-column binding="level" header="처리단계" width="1.5*" align="center">
           <wj-flex-grid-cell-template cellType="Cell" let-cell="cell" v-slot="cell">
-            <!-- 주문 단계에 따라 아이콘 적용 -->
+            <!-- 주문 처리 단계에 따라 태그 적용 : 바인딩한 level의 값에 따라 태그를 다르게 적용 -->
             <span class="ow-tag type-category"><i class="o">주</i></span>
             <span class="ow-tag type-category"><i :class="cell.item.level >= 2 ? 'p' : 'n'">피</i></span>
             <span class="ow-tag type-category"><i :class="cell.item.level >= 4 ? 'i' : 'n'">검</i></span>
@@ -306,23 +286,15 @@ const state = reactive({
 //ngrid 페이지 설정
 const retrieve = (param) => {
   let filteredItems = _.cloneDeep(receiptList.value); //cloneDeep : 객체 복사
-  const totalCount = filteredItems.length;
-  if (param.sort) {
-    filteredItems = _.sortBy(filteredItems, param.sort);
-    if (['desc', 'DESC'].includes(param.direction)) {
-      filteredItems = filteredItems.reverse();
-    }
-  }
   if (param.pageNo) {
     filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 16, param.pageSize ?? 16);
   }
 
   return Promise.resolve({
     data: filteredItems,
-    // status: 200,
-    // code: 'OK',
-    // message: 'Success',
-    totalCount,
+    status: 200,
+    code: 'OK',
+    message: 'Success',
   });
 };
 
@@ -389,9 +361,22 @@ watch(
     keyData.value++;
     getFilterList(filterList.value);
   },
+  //immediate : 최초 렌더링됐을 때 watch 실행
+  //deep : 오브젝트 안에 있는 프로퍼티 변화 감지
   { immediate: true, deep: true }
 );
 
+
+/**
+ * 주문번호, 거래처 이름으로 검색 필터링
+ * 기본값은 null
+ * 주문번호로 검색을 할 때 거래처 이름에는 다시 null값 대입
+ *
+ * @author 김예원
+ * @param {number} orderNo 주문 번호
+ * @param {string} clientName 거래처 이름
+ * @return {object} 각각의 데이터 반환
+ */
 function search() {
   if (searchCategory.value === '주문번호') {
     filterList.value.clientName = '';
@@ -443,8 +428,12 @@ async function getFilterList(afterFilterList) {
   });
 }
 
-//초기화
-const initialize = (s) => {
+/**
+ * 그리드 설정
+ *
+ * @param {FlexGrid} s
+ */
+const initialized = (s) => {
   //flexGrid 선택 모드 설정 => 선택 안되도록
   s.selectionMode = 0;
 
@@ -465,21 +454,45 @@ const initialize = (s) => {
   };
 };
 
+/**
+ * get 방식을 통해 controller에서 읽어온 미출고 건수 api에서 읽어옴
+ *
+ * @author 김예원
+ * @param {number} unrlsCnt 미출고
+ * @return {number} 미출고 건수
+ */
 async function getunrlsCnt() {
   const unrlsCnt = await clientApi.getUnreleaseCnt();
   unreleaseCnt.value = unrlsCnt;
-  console.log('unreleaseCnt : ' + unreleaseCnt.value);
 }
 getunrlsCnt();
 
-//주문 단계 별 건수 요청
+/**
+ * get 방식을 통해 controller에서 읽어온 주문 단계 별 건수 api에서 읽어옴
+ * stsCnt[0]: 주문확인 stsCnt[1]: 피킹 지시 stsCnt[2]: 피킹 stsCnt[3]: 출고검수/패킹 stsCnt[4]: 출고 stsCnt[5]: 인계
+ * 각각의 값을 계산한 후 StatusProgressBar Component에 데이터 전송
+ *
+ * @author 김예원
+ * @param {number} statusOrd 주문 건수
+ * @param {number} statusPick 피킹 건수
+ * @param {number} statusPack 패킹 건수
+ * @param {number} statusRls 출고 건수
+ * @param {number} statusTrf 인계 건수
+ * @param {number} leftoverCnt 잔여 건수
+ * @param {number} percentOrd 주문 계획 대비 실적 달성률
+ * @param {number} percentPick 피킹 계획 대비 실적 달성률
+ * @param {number} percentPack 패킹 계획 대비 실적 달성률
+ * @param {number} percentRls 출고 계획 대비 실적 달성률
+ * @param {number} percentTrf 인계 계획 대비 실적 달성률
+ * @return {number} 
+ */
 async function getStsCnt() {
   const stsCnt = await clientApi.getStatusCnt();
-  statusOrd.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4] + stsCnt[5] + stsCnt[6];
-  statusPick.value = stsCnt[2] + stsCnt[3] + stsCnt[4] + stsCnt[5] + stsCnt[6];
-  statusPack.value = stsCnt[4] + stsCnt[5] + stsCnt[6];
-  statusRls.value = stsCnt[5] + stsCnt[6];
-  statusTrf.value = stsCnt[6];
+  statusOrd.value = stsCnt[0] + stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4] + stsCnt[5];
+  statusPick.value = stsCnt[1] + stsCnt[2] + stsCnt[3] + stsCnt[4] + stsCnt[5];
+  statusPack.value = stsCnt[3] + stsCnt[4] + stsCnt[5];
+  statusRls.value = stsCnt[4] + stsCnt[5];
+  statusTrf.value = stsCnt[5];
   //주문 단계마다 완료 퍼센트
   leftoverCnt.value = orderPlan.value - statusOrd.value;
   percentOrd.value = parseInt((statusOrd.value / orderPlan.value) * 100);
