@@ -241,16 +241,16 @@
           align="center"
           :width="60"
           cssClassAll="border-right-sm border-center"
-          :allowMerging="true"
         />
+          <!-- :allowMerging="true" -->
         <wj-flex-grid-column-group
           binding="RLS_SHP_CPN"
           header="택배사"
           align="center"
           :width="70"
           cssClassAll="border-right-sm border-center"
-          :allowMerging="true"
         />
+          <!-- :allowMerging="true" -->
         <wj-flex-grid-column-group
           binding="RLS_IVC_CODE"
           header="송장번호"
@@ -310,7 +310,7 @@ const filterList = reactive({
   vendorName: null,
 
   pageNo: 1,
-  pageSize: 10
+  pageSize: 18
 });
 const summaryList = reactive({
   status: {
@@ -337,8 +337,6 @@ const getSummary = async () => {
     summaryList.delivery.unreleasedNum = result.URLS_NUM;
     summaryList.delivery.expressShippingNum = result.EX_NUM;
     summaryList.delivery.normalShippingNum = result.NM_NUM;
-
-    
   });
 };
 getSummary();
@@ -346,7 +344,7 @@ getSummary();
 // 출고검수/패킹담당자 필터링용 드롭박스에 바인딩할 객체 조회.
 async function getAssigneeList() {
   const result = await afterPickingApi.getAssigneeList(filterList).then((result) => {
-    if (result.list != null) {
+    if (result != null && result.list != null) {
       let dbAssigneeList = [];
       dbAssigneeList.push({
         name: '전체',
@@ -364,19 +362,24 @@ async function getAssigneeList() {
     }
   });
 }
+getAssigneeList(filterList);
 
 // 리스트 전체 조회.
 const getAfterPickingList = async (query, pageNo, pageSize) => {
-  filterList.pageNo = pageNo;
-  filterList.pageSize = pageSize;
+  // filterList.pageNo = pageNo;
   console.log('@@ const getAfterPickingList - pageNo : ', pageNo);
-  const result = await afterPickingApi.getAfterPickingList(filterList);
+  let filter = JSON.parse(JSON.stringify(filterList));
+  filter.pageNo = pageNo;
+  console.log('!!! filter : ', filter);
+  const result = await afterPickingApi.getAfterPickingList(filter);
+  // const result = await afterPickingApi.getAfterPickingList(filterList);
   // const result = await afterPickingApi.getAfterPickingList(filterList, pageNo, pageSize=18);
   if (result != null && result.list != null) {
     afterPickingList.value = result.list;
     console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
+    // 필터값이 바뀔 때만 담당자 목록 새로 조회해야 하는거 아닌가?
     // 리스트를 조회할 때 마다, 조회되는 리스트에 맞는 출고검수/패킹 담당자 목록을 조회해서 동적으로 드롭박스에 할당.
-    getAssigneeList(filterList);
+    // getAssigneeList(filterList);
   } else {
     // 조회된 목록이 없는 경우:
     // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
@@ -434,8 +437,8 @@ const checkboxGroup3 = ref([
 ]);
 watch(filterList,
 (newFilterList, oldFilterList) => {
-  // getAfterPickingList();
   afterPickingKey.value++;
+  getAssigneeList(filterList);
   }
   , {deep: true}
 );
@@ -462,8 +465,6 @@ watch(
     } else {
       filterList.released = new3[0];
     }
-    console.log('watch([checkedGroup1, checkedGroup2, checkedGroup3] : ', filterList);
-    // afterPickingKey.value++;
   },
   { deep: true }
 );
@@ -471,19 +472,13 @@ watch(
 watch(
   () => selectedAssignee.value,
   (newSelectedAssignee, oldSelectedAssignee) => {
-    console.log('newSelectedAssignee : ', newSelectedAssignee);
+    console.log('watch selectedAssignee.value : ' + selectedAssignee.value);
     filterList.assignee = newSelectedAssignee;
-    console.log('watch(() => selectedAssignee.value : ' + filterList);
-    // getAfterPickingList();
-    console.log('$$ selectedAssignee.value : ', selectedAssignee.value);
-    // afterPickingKey.value++;
   }
 );
 
 // 필터링 키워드를 입력해서 조회한 경우.
 function search() {
-  console.log('## selectedSearchCategory.value : ', selectedSearchCategory.value);
-  console.log('## inputKeyword.value : ', inputKeyword.value);
   if (selectedSearchCategory.value === '주문번호') {
     filterList.orderNo = inputKeyword.value;
     filterList.clientName = null;
@@ -505,8 +500,6 @@ function search() {
     filterList.shippingDestination = null;
     filterList.vendorName = inputKeyword.value;
   }
-  console.log('## function search() : ', filterList);
-  // afterPickingKey.value++;
 }
 </script>
 

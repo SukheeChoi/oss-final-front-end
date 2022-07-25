@@ -442,8 +442,8 @@
       // 반드시 통신 메소드(정확히는 read()메소드) 다음 순서로 실행해야 함!!
       // receiptKey.value++;
     }
-    getVendorList();
-    vendorKey.value++;
+    // getVendorList();
+    // vendorKey.value++;
 
     // return result2;
     const receiptResult = read(query, pageNo, pageSize);
@@ -531,38 +531,6 @@
     console.log('@@ deliveryResult : ', deliveryResult);
     return deliveryResult;
   }
-
-  // 전달된 항목 정보 update.
-  // deliveredList.value.push(
-  //   {
-  //       "orderItemNo": 2,
-  //       "orderCheckDate": null,
-  //       "receiveCheck": true,
-  //       "receiveUnrelease": 0,
-  //       "deliveryUnrelease": 0,
-  //       "deliverCheck": true,
-  //       "employeeId": null,
-  //       "releaseScheduleDate": null,
-  //       "receiveDate": null,
-  //       "releaseQuantity": 2,
-  //       "deliveryQuantity": 2
-  //   }
-  // );
-  // deliveredList.value.push(
-  //   {
-  //       "orderItemNo": 3,
-  //       "orderCheckDate": null,
-  //       "receiveCheck": true,
-  //       "receiveUnrelease": 0,
-  //       "deliveryUnrelease": 0,
-  //       "deliverCheck": true,
-  //       "employeeId": null,
-  //       "releaseScheduleDate": null,
-  //       "receiveDate": null,
-  //       "releaseQuantity": 10,
-  //       "deliveryQuantity": 10
-  //   }
-  // );
 
   /**
    * 전달&&할일 탭
