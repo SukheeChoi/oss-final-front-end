@@ -64,6 +64,7 @@
           binding="itemName"
           header="품목명"
           :width="150"
+          align="left"
           :wordWrap="true"
           :multiLine="true"
           cssClassAll="border-left"
@@ -81,14 +82,14 @@
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="피킹">
         <wj-flex-grid-column-group binding="pickingEmployee" header="담당자" :width="60" align="center" />
-        <wj-flex-grid-column-group binding="pickingQuantity" header="피킹수량" :width="50" align="right" />
+        <wj-flex-grid-column-group binding="pickingQuantity" header="피킹수량" :width="50" align="center"/>
         <wj-flex-grid-column-group binding="pickingDate" header="피킹일시" :width="90" align="center" />
         <wj-flex-grid-column-group binding="pickingUnrelease" header="미출고" :width="50" align="center" />
       </wj-flex-grid-column-group>
       <wj-flex-grid-column-group header="협력사">
         <wj-flex-grid-column-group binding="orderShippingWay" header="배송방식" :width="60" align="center" />
         <wj-flex-grid-column-group binding="orderCheckDate" header="주문확인<br>일시" :width="80" align="center" />
-        <wj-flex-grid-column-group binding="releaseQuantity" header="출고수량" :width="50" align="right" />
+        <wj-flex-grid-column-group binding="releaseQuantity" header="출고수량" :width="50" align="center"/>
         <wj-flex-grid-column-group binding="releaseScheduleDate" header="출고예정<br>일자" :width="60" align="center" />
         <wj-flex-grid-column-group binding="recieveDate" header="수령일시" :width="80" align="center" />
       </wj-flex-grid-column-group>
@@ -205,7 +206,6 @@ getData.value = async function (query, pageNo, pageSize) {
 
 //그리드 초기 설정
 const onInitialized = (grid) => {
-
   //병합 기준 컬럼과, 병합 컬럼 설정
   const config = {
     groupingColumns: ['orderNo'],
@@ -218,6 +218,14 @@ const onInitialized = (grid) => {
   grid.formatItem.addHandler((flex, e) => {
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
+    }
+    if (e.panel == grid.cells) {
+      var col = grid.columns[e.col];
+      var row = grid.rows[e.row];
+      if (e.cell.innerHTML === "-") {
+        console.log(e);
+        console.log(e.cell);
+      }
     }
   });
 };
