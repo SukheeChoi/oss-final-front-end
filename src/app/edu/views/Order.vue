@@ -114,14 +114,16 @@ import orderApi from '@/api/orderApi';
 import OwStatusBar from '@/app/edu/components/OwStatusBar';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 
+//주문현황이 저장되는 ref 객체
 const orderStatus = ref([
   { name: '전체 : ', value: '', end: '건' },
   { name: '오스템 : ', value: '', end: '건' },
   { name: '협력사합배송 : ', value: '', end: '건' },
   { name: '협력사직배송 : ', value: '', end: '건' },
-  { name: '미출고 : ', value: '', end: '건', color: "red" },
+  { name: '미출고 : ', value: '', end: '건', color: 'red' },
 ]);
 
+//회사 체크박스 ref 객체
 const companyCheckbox = ref([
   { name: '오스템제품', value: 'osstemItem' },
   { name: '오스템상품', value: 'osstemProduct' },
@@ -129,27 +131,34 @@ const companyCheckbox = ref([
   { name: '협력사상품(직배송)', value: 'vendorproductDir' },
 ]);
 
+//배송구분 체크박스 ref 객체
 const shippingCheckbox = ref([
   { name: '긴급', value: 'emergency' },
   { name: '일반', value: 'normal' },
 ]);
 
+//미출고 체크박스 ref 객체
 const unreleaseCheckbox = ref([
   { name: '출고', value: 'released' },
   { name: '미출고', value: 'unreleased' },
 ]);
 
+//체크박스에서 선택된 데이터가 담기는 ref객체
 const selectCompany = ref(['osstemItem', 'osstemProduct', 'vendorproductPlus', 'vendorproductDir']);
 const selectShipping = ref(['emergency', 'normal']);
 const selectUnrelease = ref(['released', 'unreleased']);
 
-const getData = ref([]);
-const keyData = ref(0);
+const getData = ref([]); //그리드 데이터가 저장되는 ref 객체
+const keyData = ref(0); //그리드 리렌더링을 위한 ref 객체
 
-const searchSelected = ref(null);
-const searchContent = ref(null);
+const searchSelected = ref(null); //검색조건이 저장되는 ref 객체
+const searchContent = ref(null); //검색내용이 저장되는 ref 객체
 
-//현황 가져오는 함수
+/**
+ * 현황 컴포넌트에 데이터 바인딩
+ *
+ * @author 이동현
+ */
 async function getStatus() {
   //현황 api 호출
   const result = await orderApi.getStatus().then((data) => {
@@ -158,19 +167,21 @@ async function getStatus() {
     orderStatus.value[2].value = data.vendorShippingPlus;
     orderStatus.value[3].value = data.vendorShippingDir;
     orderStatus.value[4].value = data.unreleased;
-    console.log(data);
   });
 }
 getStatus();
 
-//그리드에 바인딩 하는 함수
+/**
+ * 주문확인 목록을 가져오는 기능
+ *
+ * @author 이동현
+ * @param {Object} query
+ * @param {number} pageNo 페이지 번호
+ * @param {number} pageSize 한 페이지당 몇 행
+ * @return {Object} 그리드에 바인딩할 주문확인 목록울 반환함
+ */
 getData.value = async function (query, pageNo, pageSize) {
-  console.log(pageNo, pageSize, selectCompany.value, selectShipping.value, selectUnrelease.value);
-  //pageNo = "페이지번호"
-  //pageSize = "한페이지 몇 행"
-  //totalCount = "전체 행 수"
-
-  const myPageSize = 16;
+  const myPageSize = 16; //한 페이지에 나올 행 수 설정
 
   //그리드 데이터 api 호출
   const list = await orderApi.getFilterList(
@@ -186,13 +197,15 @@ getData.value = async function (query, pageNo, pageSize) {
   const result = {
     ...list,
     pageNo,
-    pageSize: myPageSize
+    pageSize: myPageSize,
   };
 
   return result;
 };
 
+//그리드 초기 설정
 const onInitialized = (grid) => {
+
   //병합 기준 컬럼과, 병합 컬럼 설정
   const config = {
     groupingColumns: ['orderNo'],
@@ -201,6 +214,7 @@ const onInitialized = (grid) => {
 
   grid.mergeManager = new SimpleMergeManager(config);
 
+  //헤더에 html태그 사용하게 하는 설정
   grid.formatItem.addHandler((flex, e) => {
     if (e.panel == flex.columnHeaders) {
       e.cell.innerHTML = e.cell.textContent;
@@ -213,15 +227,18 @@ watch(
   () => [selectCompany, selectShipping, selectUnrelease],
   (newGroup, oldGroup) => {
     keyData.value++;
-    console.log(getData);
   },
   { deep: true }
 );
 
+/**
+ * 검색버튼을 클릭시 그리드를 리렌더링
+ *
+ * @author 이동현
+ */
 function getSearchList() {
   keyData.value++;
 }
-
 </script>
 <style scoped lang="scss">
 :deep {
