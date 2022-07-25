@@ -600,14 +600,12 @@ function getclientOrderDetail(orderNo) {
 
   .arrow_down {
     display: block;
-    transition: 0.5s ease; /* 속도 조절 */
   }
 
   .explain {
     position: absolute;
     display: none;
     z-index: 100;
-    transition: 0.5s ease;
     background-color: white;
     padding: 1em;
     border: 1px solid black;
