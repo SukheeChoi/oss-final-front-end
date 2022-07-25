@@ -96,7 +96,6 @@
   </div>
 
   <div>
-  <!-- <div class="ow-flex-wrap ow-grid-wrap"> -->
     <ow-grid
       headersVisibility="Column"
       allowSorting="None"
@@ -109,7 +108,6 @@
       style="display: flex"
       :key="afterPickingKey"
     >
-      <!-- :allowMerging="All" -->
       <!-- 출고검수/패킹 탭 -->
       <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm border-center">
         <wj-flex-grid-column-group
@@ -242,7 +240,6 @@
           :width="60"
           cssClassAll="border-right-sm border-center"
         />
-          <!-- :allowMerging="true" -->
         <wj-flex-grid-column-group
           binding="RLS_SHP_CPN"
           header="택배사"
@@ -250,7 +247,6 @@
           :width="70"
           cssClassAll="border-right-sm border-center"
         />
-          <!-- :allowMerging="true" -->
         <wj-flex-grid-column-group
           binding="RLS_IVC_CODE"
           header="송장번호"
@@ -286,7 +282,6 @@
 import afterPickingApi from '@/api/afterPickingApi.js';
 // 셀 병합 기준 조절 위함.
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
-// import { SimMergeManager } from '@/utils/wijmo.grid';
 import { ref, reactive, watch } from 'vue';
 
 const dropboxAssigneeLabel = '출고검수/패킹담당자';
@@ -384,7 +379,7 @@ const getAfterPickingList = async (query, pageNo, pageSize) => {
     // 조회된 목록이 없는 경우:
     // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
     afterPickingList.value = [];
-    // dropboxAssigneeList.value = []; // 담당자 드롭박스 안 비우는게 낫나?
+    dropboxAssigneeList.value = []; // 담당자 드롭박스 안 비우는게 낫나?
   }
   const result2 = {
     data: afterPickingList.value,
@@ -396,11 +391,6 @@ const getAfterPickingList = async (query, pageNo, pageSize) => {
   return result2;
 };
 
-const state = reactive({
-  flex: undefined,
-  //
-});
-
 const onInitialized = (flex) => {
   const config = {
     groupingColumns: [0],
@@ -408,8 +398,6 @@ const onInitialized = (flex) => {
   };
 
   flex.mergeManager = new SimpleMergeManager(config);
-  // flex.mergeManager = new SimMergeManager(config);
-
 };
 
 const selectSearchLabel = '검색';
