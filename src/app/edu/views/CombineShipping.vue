@@ -13,8 +13,7 @@
             :items="vendorList"
             :step="5"
             v-model="selectedVendor"
-            @update="selectedVendor = value('vendor-filter-radio')"
-            :key="vendorKey"
+            @update="selectedVendor = value('vendor-filter-radio').toString()"
           />
         </div>
       </div>
@@ -27,7 +26,6 @@
             :step="4"
             v-model="selectedAssignee"
             @update="selectedAssignee = value('assignee-filter-radio')"
-            :key="assigneeKey"
           />
         </div>
       </div>
@@ -64,7 +62,7 @@
   <!-- '수령'탭이 선택된 경우. -->
   <ow-n-grid
     v-if="showReceipt"
-    :initialized="initialize"
+    :initialized="onInitialized"
     :n="flexGridNum"
     :read="getReceiptList"
     :key="receiptKey"
@@ -99,7 +97,7 @@
   <!-- '전달'탭이 선택된 경우. -->
   <ow-n-grid
     v-if="!showReceipt"
-    :initialized="initialize"
+    :initialized="onInitialized"
     :n="flexGridNum"
     :read="getDeliveryList"
     :key="deliveryKey"
@@ -169,7 +167,7 @@
   // 서버 사이드 페이지네이션 위한 객체.
   const pager = reactive({
     // 현재 페이지의 인덱스
-    pageIndex: 1
+    pageIndex: 0
     // 현재 페이지의 번호
     , pageNo: 1
     // 전체 행 수
@@ -202,10 +200,11 @@
               , value: '전체'
             }];
             for(let i=0; i<result.list.length; i++) {
+              let vendorNo = result.list[i]['vendorNo'];
               dbVendor.push(
                 {
                   name: result.list[i]['vendorName']
-                  , value: result.list[i]['vendorNo']
+                  , value: String(vendorNo)
                   , disabled: false
                 }
               );
@@ -387,6 +386,16 @@
       });
   }
 
+/**
+ * 그리드 초기설정
+ * @author 최숙희
+ * @param {FlexGrid} flex FlexGrid 프록시 객체.
+ */
+const onInitialized = (flex) => {
+  // 그리드 선택모드 해제
+  flex.selectionMode = 0;
+};
+
   // 모달 이용하기 위한 함수
   async function openModal() {
     const config = {
@@ -457,6 +466,7 @@
       selectedVendor.value = newSelectedVendor;
       getReceiptList();
       receiptKey.value++;
+      console.log('watch(() => selectedVendor.value : ', selectedVendor.value);
     }
   );
   // 담당자 선택을 감시.
