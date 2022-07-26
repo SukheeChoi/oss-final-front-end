@@ -18,10 +18,6 @@ async function getStatus() {
   return response.data.status;
 }
 
-// 검품검수 및 라벨링 모니터링 페이지에서
-// 담당 작업 및 작업 목록을 트리그리드에 바인딩 하기 위해
-// 데이터를 서버로부터 가져오기 위한 axios 통신 수행 
-
 /**
  * 담당 작업 및 작업 트리그리드 목록을 반환함
  * 
@@ -38,10 +34,6 @@ async function getTreeList() {
   }
   return response.data.data;
 }
-
-// 검품검수 및 라벨링 모니터링 페이지에서
-// 추가 버튼을 눌렀을 때 뜨는 OwModal Component의 테이블에
-// 바인딩 할 데이터를 서버로부터 가져오기 위한 axios 통신 수행 
 
 /**
  * 잔업 가져오기

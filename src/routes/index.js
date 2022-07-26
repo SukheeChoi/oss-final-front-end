@@ -52,28 +52,6 @@ const routes = [
     path: '/:pathMatch(.*)*',
     component: () => import('@/views/AppNotFound'),
   }
-  , {
-    path: '/ngrid'
-    , name: 'OwNGrid'
-    , component: () => import('@/views/routerTest/ngridTest')
-  }
-  , {
-    path: '/test01'
-    , name: 'test01'
-    , component: () => import('@/views/wijmoTest/test01')
-  }
-  , {
-    path: '/actionplantest'
-    , component: () => import('@/views/wijmoTest/ActionPlanTest')
-  }
-  , {
-    path: '/grid'
-    , component: () => import('@/views/wijmoTest/OwGridTest')
-  }
-  , {
-    path: '/collection'
-    , component: () => import('@/views/wijmoTest/CollectionView')
-  }
 ];
 function loadRoutes() {
   console.log('initialize loadRoutes');
