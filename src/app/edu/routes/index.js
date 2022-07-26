@@ -39,59 +39,14 @@ export default [
         component: () => import('@@/edu/views/Releases'),
       },
       {
-        path: 'Releases2',
-        name: 'DISTSub4-2',
-        component: () => import('@@/edu/views/Releases copy'),
-      },
-      {
         path: 'Picking',
         name: 'DISTSub5',
         component: () => import('@@/edu/views/Picking'),
       },
       {
-        path: 'Picking2',
-        name: 'DISTSub5-2',
-        component: () => import('@@/edu/views/Picking copy'),
-      },
-      {
         path: 'InspectionLabeling',
         name: 'DISTSub6',
         component: () => import('@@/edu/views/InspectionLabeling'),
-      },
-      {
-        path: 'test',
-        name: 'test',
-        component: () => import('@@/edu/views/Test'),
-      },
-      {
-        path: 'test1',
-        name: 'test1',
-        component: () => import('@@/edu/views/Test1'),
-      },
-      {
-        path: 'test2',
-        name: 'test2',
-        component: () => import('@@/edu/views/Test2'),
-      },
-      {
-        path: 'test3',
-        name: 'test3',
-        component: () => import('@@/edu/views/Test3'),
-      },
-      {
-        path: 'Copy',
-        name: 'DISTSub7',
-        component: () => import('@@/edu/views/Copy'),
-      },
-      {
-        path: 'Copy2',
-        name: 'DISTSub8',
-        component: () => import('@@/edu/views/Copy2'),
-      },
-      {
-        path: 'Copy3',
-        name: 'DISTSub9',
-        component: () => import('@@/edu/views/Copy3'),
       },
     ],
   },
