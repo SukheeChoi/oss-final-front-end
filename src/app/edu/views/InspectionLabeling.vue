@@ -311,19 +311,19 @@ const openAddModal = async function () {
   //추가 모달의 확인을 클릭할 때 실행
   if (childAddRefData.ok === true) {
     const requestData = {
-      receiveItem: picked.value.receiveItem,
-      receiveQuantity: picked.value.receiveQuantity,
-      placingOrderNo: picked.value.placingOrderNo,
-      labelingWorkTimeNo: labelingWorkTimeNo.value,
-      startTime: lastStartTime.value,
-      endTime: '18:00',
+      receiveItem: picked.value.receiveItem,          //수령품목개수
+      receiveQuantity: picked.value.receiveQuantity,  //수령수량
+      placingOrderNo: picked.value.placingOrderNo,    //발주번호
+      labelingWorkTimeNo: labelingWorkTimeNo.value,   //작업번호
+      startTime: lastStartTime.value,                 //시작시간
+      endTime: '18:00',                               //끝시간
     };
 
     /**
      * 해당 담당자에게 잔업을 추가하는 기능
      *
      * @author 이동현
-     * @param {Object} requestData 작업에 대한 정보(발주번호, 작업번호, 시작시간, 끝시간)
+     * @param {Object} requestData 작업에 대한 정보(수령품목개수, 수령수량, 발주번호, 작업번호, 시작시간, 끝시간)
      */
     const result = await inspectionLabelingApi.updateOvertime(requestData).then((result) => {
       if (result === 'success') {
