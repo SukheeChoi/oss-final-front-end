@@ -276,8 +276,6 @@ const filterList = ref({
   unrelease: '',
   orderNo: '',
   clientName: '',
-  // pageNo: 1,
-  // perPage: 160
 });
 
 //보여지는 행 수

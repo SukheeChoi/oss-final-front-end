@@ -11,8 +11,7 @@ async function getFilterList(filterList) {
     params.append('orderUnrelease',filterList.unrelease);
     params.append('orderNo',filterList.orderNo);
     params.append('clientName',filterList.clientName);
-    // params.append('pageNo',filterList.pageNo);
-    // params.append('perPage',filterList.perPage);
+
     const response = await axios.post(`/client/getFilterList`, filterList);
     receiptList = response.data.list;
   } catch (error) {
