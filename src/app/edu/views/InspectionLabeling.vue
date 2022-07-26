@@ -311,19 +311,19 @@ const openAddModal = async function () {
   //추가 모달의 확인을 클릭할 때 실행
   if (childAddRefData.ok === true) {
     const requestData = {
-      receiveItem: picked.value.receiveItem,
-      receiveQuantity: picked.value.receiveQuantity,
-      placingOrderNo: picked.value.placingOrderNo,
-      labelingWorkTimeNo: labelingWorkTimeNo.value,
-      startTime: lastStartTime.value,
-      endTime: '18:00',
+      receiveItem: picked.value.receiveItem,          //수령품목개수
+      receiveQuantity: picked.value.receiveQuantity,  //수령수량
+      placingOrderNo: picked.value.placingOrderNo,    //발주번호
+      labelingWorkTimeNo: labelingWorkTimeNo.value,   //작업번호
+      startTime: lastStartTime.value,                 //시작시간
+      endTime: '18:00',                               //끝시간
     };
 
     /**
      * 해당 담당자에게 잔업을 추가하는 기능
      *
      * @author 이동현
-     * @param {Object} requestData 작업에 대한 정보(발주번호, 작업번호, 시작시간, 끝시간)
+     * @param {Object} requestData 작업에 대한 정보(수령품목개수, 수령수량, 발주번호, 작업번호, 시작시간, 끝시간)
      */
     const result = await inspectionLabelingApi.updateOvertime(requestData).then((result) => {
       if (result === 'success') {
@@ -516,6 +516,7 @@ function searchData() {
 const treeInitialized = (grid) => {
   grid.autoSizeRow(0, true);
 
+  //병합 기준 컬럼과, 병합 컬럼 설정
   const config = {
     groupingColumns: [],
     mergedColumns: [
@@ -696,31 +697,6 @@ const onInitialized = (grid) => {
 
 <style scoped lang="scss">
 ::v-deep {
-  .ow-panel1 {
-    width: 100%;
-    min-height: 0;
-    height: 644.5px;
-  }
-  .ow-panel1 .ow-panel-header {
-    display: flex;
-    height: 26px;
-    flex-shrink: 0;
-    align-items: center;
-    padding: 0 12px;
-    background-color: #284077;
-    border-radius: 4px 4px 0 0;
-    color: #fff;
-    font-size: 13px;
-  }
-  .ow-panel1 .ow-panel-body1 {
-    // flex-direction: column;
-    // flex: 1;
-    border: 2px solid #6980af;
-    border-top: 0;
-    background-color: #fff;
-    padding: var(--ow-gutter);
-    height: inherit;
-  }
 
   .wj-cell.wj-header {
     display: flex;
@@ -802,6 +778,29 @@ const onInitialized = (grid) => {
     color: red;
     text-align: center;
     white-space: nowrap;
+  }
+  .ow-panel1 {
+    width: 100%;
+    min-height: 0;
+    height: 644.5px;
+  }
+  .ow-panel1 .ow-panel-header {
+    display: flex;
+    height: 26px;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 0 12px;
+    background-color: #284077;
+    border-radius: 4px 4px 0 0;
+    color: #fff;
+    font-size: 13px;
+  }
+  .ow-panel1 .ow-panel-body1 {
+    border: 2px solid #6980af;
+    border-top: 0;
+    background-color: #fff;
+    padding: var(--ow-gutter);
+    height: inherit;
   }
 
   // 모달
