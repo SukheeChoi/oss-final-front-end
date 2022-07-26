@@ -48,7 +48,6 @@ export default [
         name: 'DISTSub6',
         component: () => import('@@/edu/views/InspectionLabeling'),
       },
-
     ],
   },
 ];
