@@ -56,21 +56,16 @@ import { ref } from 'vue';
 import OwFlexGrid from '@/components/grid/new/OwFlexGrid';
 import OwFlexGridEditor from '@/components/grid/new/OwFlexGridEditor';
 import {
-  //
   isFunction,
-  //
   EventArgs,
 } from '@grapecity/wijmo';
 import {
-  //
   FlexGrid,
 } from '@grapecity/wijmo.grid';
 import {
-  //
   NGridRestCollectionView,
 } from '@/model';
 import {
-  //
   computed,
   reactive,
   watch,
@@ -140,7 +135,6 @@ export default {
       perPage: computed(() => state.pageSize * props.n),
       pageIndex: 0
     });
-    // console.log('@@ ngrid - pageNo', pageNo);
 
     /**
      * 페이지 정보 설정
@@ -149,24 +143,15 @@ export default {
      * @param {EventArgs} e
      */
     const setPage = (c) => {
-      console.log('@@ c', c);
       if (c.first) {
         const { pageNo, pageSize, totalItemCount, pageSizeList, pageIndex } = c;
-        console.log('@@ setPage - NGridRestCollectionView - pageIndex : ', pageIndex)
         state.pageIndex = pageIndex;
-        // const { pageNo, pageSize, totalCount, pageSizeList } = c;
-        // const { pageNo, pageSize, totalItemCount, pageSizeList, itemCount } = c;
         state.pageNo = pageNo;
-        // state.pageSize = 20;
-        // state.pageSize = itemCount / props.n;
-        // state.pageSize = props.pageSize;
         state.pageSize = pageSize;
-        // state.totalCount = totalCount;
         state.totalCount = totalItemCount;
         state.pageSizeList = pageSizeList;
       }
     };
-    console.log('@@ state.pageSize : ', state.pageSize);
 
     /**
      * 이벤트 설정
@@ -177,7 +162,6 @@ export default {
     const setDefaultEvents = (s, c) => {
       // 데이터 로드시 페이지 정보 설정
       c.loaded.addHandler(setPage);
-      console.log('@@ after setPage - props.pageSize : ', props.pageSize);
     };
 
     /**
@@ -187,7 +171,6 @@ export default {
      * @param {FlexGrid} s
      */
     const initialize = (i, s) => {
-      console.log('@@ FlexGrid 초기화 : ', i);
       // 그리드
       const grid = s;
 
@@ -208,7 +191,6 @@ export default {
 
         pageIndex: state.pageIndex
       });
-      console.log('@@ const collection = new NGridRestCollectionView : ', collection);
 
       // 아이템 설정//
       grid.itemsSource = collection;

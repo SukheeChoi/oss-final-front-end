@@ -141,7 +141,6 @@ export default {
     onUnmounted(() => {
       observer.disconnect();
     });
-    console.log("radioradioradioradioradioradioradioradioradioradio", state);
     return {
       root,
       filter,

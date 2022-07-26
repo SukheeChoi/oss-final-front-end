@@ -3,71 +3,8 @@ import { createElement, setChecked, Event, ObservableArray } from '@grapecity/wi
 import { MergeManager, CellRange, CellType, CellEditEndingEventArgs, CellFactory, Row } from '@grapecity/wijmo.grid';
 import { Selector } from '@grapecity/wijmo.grid.selector';
 
-// Cells, ColumnnHeaders 병합이 가능하도록 MergeManager를 상속받은 class를 정의.
-class ColumnHeaderMergeManager extends MergeManager {
-  constructor() {
-    console.log("## ColumnHeaderMergeManager");
-    super();
-  }
-
-  getMergedRange(p, r, c) {
-    const range = new CellRange(r, c);
-    switch (p.cellType) {
-      case CellType.ColumnHeader:
-        // this.rowMergedRange(p, range);
-        // this.colMergedRange(p, range);
-
-        var rng = new CellRange(r, c);
-        for (var i = rng.col; i < p.columns.length - 1; i++) {
-          if (
-            p.getCellData(rng.row, i, true) !=
-            p.getCellData(rng.row, i + 1, true)
-          )
-            break;
-          rng.col2 = i + 1;
-        }
-        for (var i = rng.col; i > 0; i--) {
-          if (
-            p.getCellData(rng.row, i, true) !=
-            p.getCellData(rng.row, i - 1, true)
-          )
-            break;
-          rng.col = i - 1;
-        }
-        for (var i = rng.row; i < p.rows.length - 1; i++) {
-          if (
-            p.getCellData(i, rng.col, true) !=
-            p.getCellData(i + 1, rng.col, true)
-          )
-            break;
-          rng.row2 = i + 1;
-        }
-        for (var i = rng.row; i > 0; i--) {
-          if (
-            p.getCellData(i, rng.col, true) !=
-            p.getCellData(i - 1, rng.col, true)
-          )
-            break;
-          rng.row = i - 1;
-        }
-        return rng;
-
-      case CellType.Cell:
-        if (this.isMerged(p, c)) {
-          this.rowMergedRange(p, range);
-        }
-        break;
-    }
-    return range;
-  }
-}
-
-
 class SimpleMergeManager extends MergeManager {
   constructor(config) {
-    console.log("config", config)
-    console.log("config.groupingColumns", config.groupingColumns);
-    console.log("config.mergedColumns", config.mergedColumns);
     super();
     this.groupingColumns = config.groupingColumns || [];
     this.mergedColumns = config.mergedColumns || [];
@@ -494,9 +431,6 @@ export { OwSelector };
 
 class TreeMergeManager extends MergeManager {
   constructor(config) {
-    console.log("config", config)
-    console.log("config.groupingColumns", config.groupingColumns);
-    console.log("config.mergedColumns", config.mergedColumns);
     super();
     this.groupingColumns = config.groupingColumns || [];
     this.mergedColumns = config.mergedColumns || [];
@@ -582,9 +516,6 @@ export { TreeMergeManager };
 
 class SimMergeManager extends MergeManager {
   constructor(config) {
-    console.log("config", config)
-    console.log("config.groupingColumns", config.groupingColumns);
-    console.log("config.mergedColumns", config.mergedColumns);
     super();
     this.groupingColumns = config.groupingColumns || [];
     this.mergedColumns = config.mergedColumns || [];
@@ -636,8 +567,6 @@ class SimMergeManager extends MergeManager {
   }
 
   colMergedRange(p, r) {
-    // console.log(p);
-    // console.log(r);
     for (let i = r.col; i > 0; i -= 1) {
       if (this.equals(p, r.row, i, 'col_prev')) {
         r.col = i - 1;
