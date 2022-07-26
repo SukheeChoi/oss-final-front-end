@@ -96,12 +96,10 @@
   </div>
 
   <div>
-  <!-- <div class="ow-flex-wrap ow-grid-wrap"> -->
     <ow-grid
       headersVisibility="Column"
       allowSorting="None"
-      selectionMode="RowRange"
-      :visibleRowsCount="18"
+      :visibleRowsCount="20"
       :autoGenerateColumns="false"
       class="ow-grid type-header-group"
       :read="getAfterPickingList"
@@ -109,7 +107,6 @@
       style="display: flex"
       :key="afterPickingKey"
     >
-      <!-- :allowMerging="All" -->
       <!-- 출고검수/패킹 탭 -->
       <wj-flex-grid-column-group header="출고검수/패킹" align="center" cssClassAll="border-right-sm border-center">
         <wj-flex-grid-column-group
@@ -124,14 +121,14 @@
           binding="ITM_NAME"
           header="품목명"
           align="left"
-          width="*"
+          width="3*"
           cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
           binding="ITM_CODE"
           header="품목코드"
           align="left"
-          :width="110"
+          width="*"
           cssClassAll="border-right-sm border-center"
         />
         <wj-flex-grid-column-group
@@ -241,7 +238,6 @@
           align="center"
           :width="60"
           cssClassAll="border-right-sm border-center"
-          :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="RLS_SHP_CPN"
@@ -249,7 +245,6 @@
           align="center"
           :width="70"
           cssClassAll="border-right-sm border-center"
-          :allowMerging="true"
         />
         <wj-flex-grid-column-group
           binding="RLS_IVC_CODE"
@@ -266,6 +261,7 @@
         align="center"
         :width="100"
         cssClassAll="border-center"
+        multiLine="true"
         :allowMerging="true"
       >
       <wj-flex-grid-column-group
@@ -274,6 +270,7 @@
         align="center"
         :width="100"
         cssClassAll="border-center"
+        multiLine="true"
         :allowMerging="true"
       >
       </wj-flex-grid-column-group>
@@ -284,8 +281,8 @@
 
 <script setup>
 import afterPickingApi from '@/api/afterPickingApi.js';
-// 셀 병합 기준 조절 위함.
-import { SimMergeManager } from '@/utils/wijmo.grid';
+// 그리드 병합 위함.
+import { SimpleMergeManager } from '@/utils/wijmo.grid';
 import { ref, reactive, watch } from 'vue';
 
 const dropboxAssigneeLabel = '출고검수/패킹담당자';
@@ -297,17 +294,18 @@ const selectedAssignee = ref('');
 const selectedSearchCategory = ref('주문번호');
 // 검색 키워드
 const inputKeyword = ref(null);
-
+// 검색용 필터 객체
 const filterList = reactive({
-  shippingCategory: '',
-  shippingWay: '',
-  released: '',
-  assignee: '',
-  orderNo: -1,
-  clientName: '',
-  shippingDestination: '',
-  vendorName: '',
+  shippingCategory: null,
+  shippingWay: null,
+  released: null,
+  assignee: null,
+  orderNo: null,
+  clientName: null,
+  shippingDestination: null,
+  vendorName: null
 });
+// 상단 현황 정보 표시 위한 양방향 바인딩 객체
 const summaryList = reactive({
   status: {
     progressOrderNum: null,
@@ -320,100 +318,11 @@ const summaryList = reactive({
     normalShippingNum: null,
   },
 });
-// 통신을 통한 데이터 바인딩.
+// 출고검수/패킹 진행 목록.
 const afterPickingList = ref([]);
 const afterPickingKey = ref(1);
 
-// 현황/배송구분 정보 불러오기.(새로고침 시에만 통신.)
-const getSummary = async () => {
-  const result = await afterPickingApi.getSummary().then((result) => {
-    summaryList.status.progressOrderNum = result.summaryMap.progressOrderNum;
-    summaryList.status.pickingDirectionNum = result.summaryMap.pickingDirectionNum;
-    summaryList.status.releaseInspectionNum = result.summaryMap.releaseInspectionNum;
-    summaryList.delivery.unreleasedNum = result.summaryMap.unreleasedNum;
-    summaryList.delivery.expressShippingNum = result.summaryMap.expressShippingNum;
-    summaryList.delivery.normalShippingNum = result.summaryMap.normalShippingNum;
-
-    
-  });
-};
-getSummary();
-
-// 출고검수/패킹담당자 필터링용 드롭박스에 바인딩할 객체 조회.
-async function getAssigneeList() {
-  const result = await afterPickingApi.getAssigneeList(filterList).then((result) => {
-    if (result.list != null) {
-      let dbAssigneeList = [];
-      dbAssigneeList.push({
-        name: '전체',
-        value: '',
-      });
-      for (let i = 0; i < result.list.length; i++) {
-        dbAssigneeList.push({
-          name: result.list[i],
-          value: result.list[i],
-        });
-      }
-      dropboxAssigneeList.value = dbAssigneeList;
-    } else {
-      dropboxAssigneeList.value = [];
-    }
-  });
-}
-
-// 리스트 전체 조회.
-const getAfterPickingList = async (query, pageNo, pageSize) => {
-  console.log('@@ const getAfterPickingList - pageNo : ', pageNo);
-  const result = await afterPickingApi.getAfterPickingList(filterList, pageNo, pageSize=18);
-  // .then((result) => {
-  //   if(result != null && result.list != null) {
-  //     afterPickingList.value = result.list;
-  //     console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
-  //     // 리스트를 조회할 때 마다, 조회되는 리스트에 맞는 출고검수/패킹 담당자 목록을 조회해서 동적으로 드롭박스에 할당.
-  //     getAssigneeList(filterList);
-  //   } else {
-  //     // 조회된 목록이 없는 경우:
-  //     // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
-  //     afterPickingList.value = [];
-  //     dropboxAssigneeList.value = [];
-  //   }
-  // });
-  if (result != null && result.list != null) {
-    afterPickingList.value = result.list;
-    console.log('## afterPickingList.value.length : ' + afterPickingList.value.length);
-    // 리스트를 조회할 때 마다, 조회되는 리스트에 맞는 출고검수/패킹 담당자 목록을 조회해서 동적으로 드롭박스에 할당.
-    getAssigneeList(filterList);
-  } else {
-    // 조회된 목록이 없는 경우:
-    // 그리드의 셀을 비우고 && 출고검수/패킹 담당자 드롭박스 비우기.
-    afterPickingList.value = [];
-    // dropboxAssigneeList.value = []; // 담당자 드롭박스 안 비우는게 낫나?
-  }
-  const result2 = {
-    data: afterPickingList.value,
-    pageNo: result.pager.pageNo,
-    pageSize: result.pager.rowsPerPage,
-    totalCount: result.pager.totalRows,
-  };
-  console.log('$$ result2 : ', result2);
-  return result2;
-};
-
-const state = reactive({
-  flex: undefined,
-  //
-});
-
-const onInitialized = (flex) => {
-  const config = {
-    groupingColumns: [0],
-    mergedColumns: [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
-  };
-
-  flex.mergeManager = new SimMergeManager(config);
-
-};
-
+// OwSelect 컴포넌트 사용
 const selectSearchLabel = '검색';
 const selectSearchList = [
   { name: '주문번호', value: '주문번호' },
@@ -421,7 +330,7 @@ const selectSearchList = [
   { name: '배송지', value: '배송지' },
   { name: '업체명', value: '업체명' },
 ];
-
+// OwFilterCheckbox 컴포넌트 사용
 const checkedGroup1 = ref(['긴급', '일반']);
 const checkedGroup2 = ref(['오스템', '합배송']);
 const checkedGroup3 = ref(['출고', '미출고']);
@@ -438,75 +347,160 @@ const checkboxGroup3 = ref([
   { name: '미출고', value: '미출고' },
 ]);
 
-// 체크된 값을 기준으로 필터링한 데이터를 받아오는 API요청.
+/**
+ * 현황/배송구분 정보 불러오기.페이지 새로 로드시에만 통신.
+ * @author 최숙희
+ */
+async function getSummary () {
+  const result = await afterPickingApi.getSummary().then((result) => {
+    summaryList.status.progressOrderNum = result.ORD_NUM;
+    summaryList.status.pickingDirectionNum = result.PIC_DIR_NUM;
+    summaryList.status.releaseInspectionNum = result.RLS_INSP_NUM;
+    summaryList.delivery.unreleasedNum = result.URLS_NUM;
+    summaryList.delivery.expressShippingNum = result.EX_NUM;
+    summaryList.delivery.normalShippingNum = result.NM_NUM;
+  });
+}
+getSummary();
+
+/**
+ * 출고검수/패킹담당자 필터링용 드롭박스에 바인딩할 목록 조회.
+ * @author 최숙희
+ */
+async function getAssigneeList() {
+  const result = await afterPickingApi.getAssigneeList(filterList).then((result) => {
+    if (result != null && result.list != null) {
+      let dbAssigneeList = [];
+      dbAssigneeList.push({
+        name: '전체',
+        value: null,
+      });
+      for (let i = 0; i < result.list.length; i++) {
+        dbAssigneeList.push({
+          name: result.list[i],
+          value: result.list[i],
+        });
+      }
+      dropboxAssigneeList.value = dbAssigneeList;
+    } else {
+      dropboxAssigneeList.value = [];
+    }
+  });
+}
+getAssigneeList(filterList);
+
+/**
+ * 목록 전체 조회.
+ * @author 최숙희
+ * @param {Object} query 
+ * @param {Number} pageNo FlexGrid 번호
+ * @param {Number} pageSize FlexGrid 행 개수
+ */
+async function getAfterPickingList(query, pageNo=1, pageSize) {
+  // 페이지 정보만 변할 때는 담당자 필터링이 필요치 않으므로 페이지 정보는 통신할 때 전달.
+  let filter = JSON.parse(JSON.stringify(filterList));
+  filter.pageNo = pageNo;
+  filter.pageSize = 20;
+  // 서버통신 위한 api모듈 호출.
+  const result = await afterPickingApi.getAfterPickingList(filter);
+  if (result != null && result.list != null) {
+    afterPickingList.value = result.list;
+  } else {// 조회된 목록이 없는 경우:
+    // 그리드의 셀을 비우고, 출고검수/패킹 담당자 드롭박스 비우기.
+    afterPickingList.value = [];
+    dropboxAssigneeList.value = [];
+  }
+  const result2 = {
+    data: afterPickingList.value,
+    pageNo: result.pager.pageNo,
+    pageSize: result.pager.rowsPerPage,
+    totalCount: result.pager.totalRows,
+  };
+  return result2;
+}
+
+/**
+ * 그리드 초기설정
+ * @author 최숙희
+ * @param {FlexGrid} flex FlexGrid 프록시 객체.
+ */
+const onInitialized = (flex) => {
+  // 그리드 선택모드 해제
+  flex.selectionMode = 0;
+  // 셀병합 위한 설정
+  const config = {
+    // 병합의 기준이 되는 컬럼 지정
+    groupingColumns: [0],
+    // 병합될 컬럼 지정
+    mergedColumns: [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+  };
+  flex.mergeManager = new SimpleMergeManager(config);
+};
+
+// 필터 정보 담은 객체를 감시해서 서버통신 수행.
+watch(filterList,
+(newFilterList, oldFilterList) => {
+  afterPickingKey.value++;
+  getAssigneeList(filterList);
+  }
+  , {deep: true}
+);
+// 체크박스에 선택된 값을 필터 객체에 모으기.
 watch(
   [checkedGroup1, checkedGroup2, checkedGroup3],
   ([new1, new2, new3], [old1, old2, old3]) => {
     // '배송구분' 체크박스의 체크된 값을 필터링용 반응형 객체에 대입.
     if (new1.length == 2) {
-      filterList.shippingCategory = '전체';
+      filterList.shippingCategory = null;
     } else {
       filterList.shippingCategory = new1[0];
     }
     // '배송방식' 체크박스의 체크된 값을 필터링용 반응형 객체에 대입.
     if (new2.length == 2) {
-      filterList.shippingWay = '전체';
+      filterList.shippingWay = null;
     } else {
       filterList.shippingWay = new2[0];
     }
     // '미출고' 체크박스의 체크된 값을 필터링용 반응형 객체에 대입.
     if (new3.length == 2) {
-      filterList.released = '전체';
+      filterList.released = null;
     } else {
       filterList.released = new3[0];
     }
-    console.log('watch([checkedGroup1, checkedGroup2, checkedGroup3] : ', filterList);
-    // getAfterPickingList();
-    afterPickingKey.value++;
   },
   { deep: true }
 );
-// 출고검수/패킹담담자가 선택된 경우, 드롭박스의 값을 필터링용 반응형 객체에 대입.
+// 출고검수/패킹담당자가 선택된 경우, 드롭박스의 값을 필터링용 반응형 객체에 대입.
 watch(
   () => selectedAssignee.value,
   (newSelectedAssignee, oldSelectedAssignee) => {
-    console.log('newSelectedAssignee : ', newSelectedAssignee);
     filterList.assignee = newSelectedAssignee;
-    console.log('watch(() => selectedAssignee.value : ' + filterList);
-    // getAfterPickingList();
-    console.log('$$ selectedAssignee.value : ', selectedAssignee.value);
-    afterPickingKey.value++;
   }
 );
 
 // 필터링 키워드를 입력해서 조회한 경우.
 function search() {
-  console.log('## selectedSearchCategory.value : ', selectedSearchCategory.value);
-  console.log('## inputKeyword.value : ', inputKeyword.value);
   if (selectedSearchCategory.value === '주문번호') {
     filterList.orderNo = inputKeyword.value;
-    filterList.clientName = '';
-    filterList.shippingDestination = '';
-    filterList.vendorName = '';
+    filterList.clientName = null;
+    filterList.shippingDestination = null;
+    filterList.vendorName = null;
   } else if (selectedSearchCategory.value === '거래처') {
-    filterList.orderNo = -1;
+    filterList.orderNo = null;
     filterList.clientName = inputKeyword.value;
-    filterList.shippingDestination = '';
-    filterList.vendorName = '';
+    filterList.shippingDestination = null;
+    filterList.vendorName = null;
   } else if (selectedSearchCategory.value === '배송지') {
-    filterList.orderNo = -1;
-    filterList.clientName = '';
+    filterList.orderNo = null;
+    filterList.clientName = null;
     filterList.shippingDestination = inputKeyword.value;
-    filterList.vendorName = '';
+    filterList.vendorName = null;
   } else if (selectedSearchCategory.value === '업체명') {
-    filterList.orderNo = -1;
-    filterList.clientName = '';
-    filterList.shippingDestination = '';
+    filterList.orderNo = null;
+    filterList.clientName = null;
+    filterList.shippingDestination = null;
     filterList.vendorName = inputKeyword.value;
   }
-  console.log('## function search() : ', filterList);
-  // getAfterPickingList();
-  afterPickingKey.value++;
 }
 </script>
 

@@ -11,19 +11,8 @@ async function getFilterList(filterList) {
     params.append('orderUnrelease',filterList.unrelease);
     params.append('orderNo',filterList.orderNo);
     params.append('clientName',filterList.clientName);
-    // params.append('pageSize',filterList.pageSize);
-    // params.append('startRowIndex',filterList.startRowIndex);
-
-    console.log("api - filterList.shippingCategory : " + filterList.shippingCategory);
-    console.log("api - filterList.status : " + filterList.status);
-    console.log("api - filterList.unrelease : " + filterList.unrelease);
-    console.log("api - filterList.orderNo : " + filterList.orderNo);
-    console.log("api - filterList.clientName : " + filterList.clientName);
-    // console.log("api - filterList.pageSize : " + filterList.pageSize);
-    // console.log("api - filterList.startRowIndex : " + filterList.startRowIndex);
     const response = await axios.post(`/client/getFilterList`, filterList);
     receiptList = response.data;
-    // console.log("api - receiptList : " + receiptList[0]['orderItem']['unreleaseQuantity']);
   } catch (error) {
     console.log(error);
   }
@@ -36,19 +25,18 @@ async function getStatusCnt() {
   try {
     const response = await axios.get(`/client/sts`);
     status = response.data.statusCnt;
-    console.log('status : ' + status);
   } catch (error) {
     console.log(error);
   }
   return status;
 }
 
+//미출고 건수 요청
 async function getUnreleaseCnt() {
   let unreleaseCnt = [];
   try{
     const response = await axios.get(`/client/unreleaseCnt`);
     unreleaseCnt = response.data;
-    console.log('unreleaseCnt : ' + unreleaseCnt);
   } catch (error) {
     console.log(error);
   }
