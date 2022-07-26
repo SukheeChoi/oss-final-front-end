@@ -276,6 +276,8 @@ const filterList = ref({
   unrelease: '',
   orderNo: '',
   clientName: '',
+  // pageNo: 1,
+  // perPage: 160
 });
 
 //보여지는 행 수
@@ -405,24 +407,13 @@ function search() {
 async function getFilterList(afterFilterList) {
   const result = await clientApi.getFilterList(afterFilterList).then((data) => {
     receiptList.value = [];
-    //미출고 출력
-    for (let i = 0; i < data.list2.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       receiptList.value.push({
-        client: data['list2'][i]['client']['clientName'],
-        level: data['list2'][i]['status'],
-        unrelease: data['list2'][i]['orderItem']['unreleaseQuantity'],
-        orderNo: data['list2'][i]['orderNo'],
-        clientNo: data['list2'][i]['client']['clientNo'],
-      });
-    }
-    //출고 출력
-    for (let i = 0; i < data.list1.length; i++) {
-      receiptList.value.push({
-        client: data['list1'][i]['client']['clientName'],
-        level: data['list1'][i]['status'],
-        unrelease: data['list1'][i]['orderItem']['unreleaseQuantity'],
-        orderNo: data['list1'][i]['orderNo'],
-        clientNo: data['list1'][i]['client']['clientNo'],
+        client: data[i]['client']['clientName'],
+        level: data[i]['status'],
+        unrelease: data[i]['orderItem']['unreleaseQuantity'],
+        orderNo: data[i]['orderNo'],
+        clientNo: data[i]['client']['clientNo'],
       });
     }
   });
