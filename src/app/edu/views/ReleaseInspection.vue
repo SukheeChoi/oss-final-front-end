@@ -315,13 +315,19 @@
 
   <ow-modal type="XS" title="출고요청서 인쇄"  ref="releasePrintRef" :cancelButton="true" style="font-size: 130%;" >
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100px; max-height: calc(100vh - 36px - 62px) !important;">
-      <span>{{dateRef}}</span>
+      <span>요청일시: {{dateRef}}
+            <br/>
+            출고 요청서가 인쇄됩니다. 
+      </span>
     </div>
   </ow-modal>
 
   <ow-modal type="XS" title="거래명세서 인쇄"  ref="receiptePrintRef" :cancelButton="true" style="font-size: 130%;" >
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100px; max-height: calc(100vh - 36px - 62px) !important;">
-      <span>박스{{index+1}}의 물품의 수량을 확인해 주세요!</span>
+      <span>요청일시: {{dateRef}}
+            <br/>
+            거래 명세서가 인쇄됩니다. 
+      </span>
     </div>
   </ow-modal>
 
@@ -334,10 +340,9 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs, watch, toRaw, onMounted } from 'vue';
+import { ref, reactive, watch, toRaw} from 'vue';
 import { SimpleMergeManager } from '@/utils/wijmo.grid';
 import releaseInspectionApi from '@/api/releaseInspectionApi';
-import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 
 export default {
   setup() {
@@ -500,10 +505,14 @@ export default {
     const page = reactive({"pageNo":1, "pageSize" : 5});
     
     //read에 전달되는 function
-    releaseInspectionData.value = async function (query, pageNo, pageSize) {
-
-      console.log(pageNo);
-      
+    /**
+     * 목록 전체 조회.
+     * @author 신현주
+     * @param {Object} query 
+     * @param {Number} pageNo FlexGrid 번호
+     * @param {Number} pageSize FlexGrid 행 개수
+     */
+    releaseInspectionData.value = async function (query, pageNo, pageSize) { 
       //releaseInspectionApi 통신할 때 필요한 매개변수
       const apiData = {"emptyGroup": toRaw(emptyGroup.value), "pageNo":pageNo, "pageSize":pageSize};
 
@@ -541,8 +550,6 @@ export default {
       
       //필터링 될 때마다 그리드 업데이트+
       keyData.value++;
-
-      console.log("releaseInspectionData.value >> ",releaseInspectionData.value);
     },
     {deep: true});
 
@@ -581,7 +588,6 @@ export default {
 
       //result -> 스캔한 코드에 대한 전체 데이터
       const result = await getBoxInfobyReleaseCode(code, kind);
-      console.log("result >> ", result);
       dummyBox.value = result;
 
       tally.totalPickingQty = 0;
@@ -613,14 +619,16 @@ export default {
           boxArrays.value.push('박스'+i)
         }
       }
-
       return result;
     }
 
-    //n번째 박스 패킹처리
-    async function oneBoxPacking(index) {
-      console.log("=====oneBoxPacking 클릭=====")
-
+    /**
+     * n번째 박스 패킹처리
+     * 
+     * @author 신현주
+     * @returns 유효성 검사 통과 했을 경우 업데이트된 행의 개수
+     */
+    async function oneBoxPacking() {
       //api로 전달할 변수(//박스별 검수수량을 저장할 객체 -> 박스 집합)
       const apiArray = [];
 
@@ -629,23 +637,18 @@ export default {
 
       //전달해줄 데이터
       for(let i=0; i<boxItemData.value.length; i++) {
-        console.log(i+'번째', boxItemData.value[i]);
         apiArray.push({"releaseCode": boxItemData.value[i].releaseCode,
                       "orderItemNo" : boxItemData.value[i].orderItemNo,
                       "boxNumber": boxItemData.value[i].boxNum,
                       "boxItemQuantity": boxItemData.value[i].boxItemQuantity});
         sumBoxItemQty = sumBoxItemQty + parseInt(boxItemData.value[i].boxItemQuantity);
-        console.log("sumBoxItemQty >> ", sumBoxItemQty);
       }
 
-      console.log("apiArray >> ", apiArray);
-      console.log("boxItemData >> ", boxItemData.value);
-
       //api통신
-      if(sumBoxItemQty === 0){
+      if(sumBoxItemQty === 0){  //물품 수량의 총합이 0일 경우
         openModal();
         return null;
-      }else{
+      }else{                    //물품 수량의 총합이 0이 아닐 경우
         const result = await releaseInspectionApi.updateBoxTable(apiArray);
         keyData.value++;
         return result;
@@ -657,7 +660,6 @@ export default {
      * 유효성 검사를 통해 총 검수수량과 총 물품수량이 같은지 비교해준다.
      * 비동기 통신을 통해 orderStatus를 5로 증가시켜준다. 
      * 
-     * 
      * @author 신현주
      */
     async function packingDone() {
@@ -665,7 +667,6 @@ export default {
 
       //총검수수량
       sumItemQty = await getTotalRlQty(tally.orderNo);
-      console.log("sumItemQty  >> ", sumItemQty);
       //총물품수량
       const totalItemQty = await getTotalItemQty(tally.releaseCode);
       if(totalItemQty == sumItemQty){
@@ -685,14 +686,17 @@ export default {
         getBoxInfobyOrderNo(tally.orderNo, index.value+1); 
       }else{
         getBoxInfobyOrderNo(tally.orderNo, index.value+1);
-        console.log("tally.orderNo >> ", tally.orderNo);
-        console.log("index.value+1 >> ", index.value+1);
       }
     },{deep: true});
 
+    /**
+     * grid에 이벤트 발생했을 때, aggregateRange 호출
+     * 
+     * @author 신현주
+     * @param gird
+     */
     const SelectionChanged = async (grid, e) => {
       let ranges = grid.selectedRanges;
-      let sel = grid.selection;
 
       tally.totalPickingQty = 0;
       tally.totalInspectionQty = 0;
@@ -700,6 +704,14 @@ export default {
       aggregateRange(tally, grid, ranges);
     };
 
+    /**
+     * ow-grid에서 마우스로 선택된 셀의 영역 데이터를 for문을 이용해 추출
+     * 
+     * @author 신현주
+     * @param tally
+     * @param grid
+     * @param ranges
+     */
     function aggregateRange(tally, grid, ranges) {
       for (let r = grid.selectedRanges[0]._row; r <= grid.selectedRanges[0]._row2; r++) {
         for (let c = 0; c <= 16; c++) {
@@ -736,15 +748,25 @@ export default {
       }
     }
 
+    /**
+     * 주문번호와 패킹된 박스의 번호를 통해 해당 박스에 들어있는 물품 정보 조회를 요청하는 함수
+     * 
+     * @author 신현주
+     * @param orderNo
+     * @param index
+     */
     async function getBoxInfobyOrderNo(orderNo, index){
       const result = await releaseInspectionApi.getBoxInfobyOrderNo(orderNo, index);
-      console.log("getBoxInfobyOrderNo의 result >> ", result);
       boxItemData.value = result;
       return result;
     }
 
     /**
+     * 거래처, 총검수수량, 패킹된 박스 개수를 얻기 위한 요청 함수
      * 
+     * @author 신현주
+     * @param code 출고번호/바코드
+     * @param kind 'releaseCode'/'barCode'
      */
     async function getBoxInfobyReleaseCode(code, kind){
       const result = await releaseInspectionApi.scan(code, kind);
@@ -783,14 +805,12 @@ export default {
 
     //출고요청서 인쇄 btn
     function releasePrintBtn(e,ctx) {
-      console.log("ctx >> ", ctx);
       openreleaseModal();
     }
 
     //거래명세서 인쇄 btn
     function receiptPrintBtn(e, ctx) {
-      console.log("ctx >> ", ctx);
-      openreleaseModal();
+      openreceipteModal();
     }
 
     /**
