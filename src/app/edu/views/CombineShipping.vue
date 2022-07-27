@@ -122,7 +122,7 @@
     </wj-flex-grid-column>
     <wj-flex-grid-column v-if="toDo==1" header="전달여부" binding="orderItem.orderItemNo" align="center" :width="70" wordWrap="true">
       <wj-flex-grid-cell-template cellType="Cell" v-slot="cell">
-        <button class="ow-btn type-icon check-state" @click="handleDeliveryCheckBtn($event, cell.item.orderItem.orderItemNo)"></button>
+        <button class="ow-btn type-icon check-state" @click="handleDeliveryCheckBtn($event, cell.item.orderItem.orderItemNo, cell.item.orderItem.orderNo)"></button>
       </wj-flex-grid-cell-template>
     </wj-flex-grid-column>
   </ow-n-grid>
@@ -648,13 +648,20 @@ const onInitialized = (flex) => {
     event.target.classList.toggle('active');
   }
   // 전달여부 체크 버튼 클릭시.
-  function handleDeliveryCheckBtn(event, orderItemNo) {
+  function handleDeliveryCheckBtn(event, orderItemNo, orderNo) {
     if(event.target.classList.contains('active')) {
       // 전달객체에서 해당하는 객체 삭제.
-      deliveredList.value.pop(orderItemNo);
+
+      deliveredList.value.pop({
+        'orderItemNo': orderItemNo
+        , 'orderNo': orderNo
+      });
     } else {
       // 전달객체에 객체 추가.
-      deliveredList.value.push(orderItemNo);
+      deliveredList.value.push({
+        'orderItemNo': orderItemNo
+        , 'orderNo': orderNo
+      });
     }
     // 활성화 클래스 toggle.
     event.target.classList.toggle('active');
