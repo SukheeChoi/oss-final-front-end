@@ -467,8 +467,6 @@ const onInitialized = (flex) => {
         if(receiptList.value[i]['orderItem']['orderItemNo']
           == receiptedList.value[j]['orderItemNo']
         ) {
-          console.log('receiptedList.value[j]["receiveUnreleaseQuantity"] : ', receiptedList.value[j]['receiveUnreleaseQuantity']);
-          console.log('receiptedList.value[j]["receiveUnreleaseQuantity"] : ', typeof(receiptedList.value[j]['receiveUnreleaseQuantity']));
           let modalObject = null;
           if(receiptedList.value[j]['receiveUnreleaseQuantity'] == '') {
             receiptList.value[i]['receiveUnreleaseQuantity'] = '0';
@@ -481,7 +479,6 @@ const onInitialized = (flex) => {
         }
       }
     }
-    console.log('checkBeforeUpdateReceipt - receiptedList.value : ', receiptedList.value);
     openReceiptCheckModal();
   }
 
