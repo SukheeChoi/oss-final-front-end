@@ -286,6 +286,13 @@ const state = reactive({
 //ngrid 페이지 설정
 const retrieve = (param) => {
   let filteredItems = _.cloneDeep(receiptList.value); //cloneDeep : 객체 복사
+  const totalCount = filteredItems.length;
+  if (param.sort) {
+    filteredItems = _.sortBy(filteredItems, param.sort);
+    if (['desc', 'DESC'].includes(param.direction)) {
+      filteredItems = filteredItems.reverse();
+    }
+  }
   if (param.pageNo) {
     filteredItems = filteredItems.splice((param.pageNo - 1) * param.pageSize ?? 16, param.pageSize ?? 16);
   }
@@ -295,6 +302,7 @@ const retrieve = (param) => {
     status: 200,
     code: 'OK',
     message: 'Success',
+    totalCount,
   });
 };
 

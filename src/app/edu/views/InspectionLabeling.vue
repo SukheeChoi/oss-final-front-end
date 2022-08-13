@@ -332,6 +332,7 @@ const openAddModal = async function () {
         alert('오류가 발생했습니다.');
       }
       treeKeyData.value++;
+      keyData.value++;
     });
   }
 };

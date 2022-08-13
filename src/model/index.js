@@ -545,8 +545,6 @@ export class NGridRestCollectionView extends GridRestCollectionView {
   }
 
   async getItems() {
-    console.log('@@ NGridRestCollectionView - async getItems() - 실행 : ');
-    console.log('@@ NGridRestCollectionView - async getItems() - this : ', this);
     if (!isFunction(this._getItems)) {
       console.error('조회 API가 없거나 함수 형태가 아닙니다.');
       return;
@@ -554,12 +552,12 @@ export class NGridRestCollectionView extends GridRestCollectionView {
     const fn = this._getItems.bind(this);
     const pageNo = this.pageIndex * this.n + this.i;
     const result = await fn(this.query, +pageNo, this.pageSize, this.pageIndex);
-    // const result = await fn(this.query, +pageNo, this.pageSize);
     const { totalCount: totalItemCount, data: items } = result;
     this._totalItemCount = totalItemCount;
     return items;
   }
-
+  
+  // const result = await fn(this.query, +pageNo, this.pageSize);
   lookup(query) {
     this._query = query;
     this._pgIdx = 0;

@@ -99,7 +99,7 @@
     <ow-grid
       headersVisibility="Column"
       allowSorting="None"
-      :visibleRowsCount="20"
+      :visibleRowsCount="18"
       :autoGenerateColumns="false"
       class="ow-grid type-header-group"
       :read="getAfterPickingList"
@@ -400,7 +400,7 @@ async function getAfterPickingList(query, pageNo=1, pageSize) {
   // 페이지 정보만 변할 때는 담당자 필터링이 필요치 않으므로 페이지 정보는 통신할 때 전달.
   let filter = JSON.parse(JSON.stringify(filterList));
   filter.pageNo = pageNo;
-  filter.pageSize = 20;
+  filter.pageSize = 18;
   // 서버통신 위한 api모듈 호출.
   const result = await afterPickingApi.getAfterPickingList(filter);
   if (result != null && result.list != null) {

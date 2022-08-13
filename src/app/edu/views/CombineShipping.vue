@@ -341,6 +341,8 @@
       , pager.rowsPerPage
     );
 
+    console.log('result : ', result);
+
     if(result != null && result.receiptList != null) {
       receiptList.value = result.receiptList;
       pager.pageNo = result.pager.pageNo;
@@ -600,8 +602,10 @@ const onInitialized = (flex) => {
     // 미출고 수량은 출고 수량(주문수량과 같거나 작음)보다 커질 수 없음.
     if(parseInt(inputUnreleasedQuantity) > parseInt(receiptList.value[(rownum-1) - (pager.rowsPerPage * pager.pageIndex)]['informationPartner']['releaseQuantity'])) {
       // 입력된 미출고 수량이 출고 수량보다 큰 경우, 해당 미출고값을 0으로 초기화 하고, alert 띄움.
-      receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = 0;
-      event.target.value = 0;
+      receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = '';
+      event.target.value = '';
+      // receiptList.value[rownum-1]['receiveUnreleaseQuantity'] = 0;
+      // event.target.value = 0;
       // 모달 열어서 '미출고 수량은 출고 수량 보다 클 수 없습니다!'라는 알림을 띄움.
       openModal();
     }
